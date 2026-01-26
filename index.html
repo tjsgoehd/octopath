@@ -3,53 +3,296 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Octopath Traveler Archivist</title>
-    <!-- 라이브러리 로드 -->
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <title>은빛독수리 캐릭보유 아카이브</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700;900&display=swap');
+        
+        :root { 
+            --bg-dark: #0d0d0c; 
+            --card-bg: #1a1a18; 
+            --accent: #d97706; 
+            --cell-bg: transparent; 
+            --status-color: #ffcc00; /* 성장상태 전용 색상 변경 */
+            --highlight: #99ffff;
+            --check-accent: #99ffff; 
+            --box-accent: #FF9933;   
+        }
+        
         body { 
-            background-color: #0f0f0e; 
-            font-family: 'Noto Serif KR', serif; 
-            color: #d1d1bc;
+            font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, 'Apple SD Gothic Neo', 'Malgun Gothic'; 
+            background-color: var(--bg-dark); 
+            color: #e2e2d5; 
+            margin: 0; 
+            overflow-x: hidden; 
         }
-        .custom-scroll::-webkit-scrollbar { width: 4px; height: 4px; }
-        .custom-scroll::-webkit-scrollbar-track { background: #1a1a18; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: #3d3d35; border-radius: 10px; }
-        .custom-scroll::-webkit-scrollbar-thumb:hover { background: #b0b095; }
-        input:focus, textarea:focus { outline: none; }
-        .glass-panel {
-            background: rgba(20, 20, 18, 0.8);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(59, 59, 51, 0.5);
+        
+        .table-container { 
+            background: #141412; 
+            border-radius: 12px; 
+            border: 1px solid rgba(255,255,255,0.05); 
+            position: relative;
+            scrollbar-width: thin;
+            scrollbar-color: #333 #000;
+            overflow-x: auto;
         }
-        .error-shake { animation: shake 0.5s ease-in-out; }
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
+
+        .table-container::-webkit-scrollbar { width: 8px; height: 8px; }
+        .table-container::-webkit-scrollbar-track { background: #000; border-radius: 10px; }
+        .table-container::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; border: 2px solid #000; }
+        .table-container::-webkit-scrollbar-thumb:hover { background: #d97706; }
+
+        table { 
+            table-layout: auto; 
+            width: max-content; 
+            min-width: 100%; 
+            border-spacing: 0; 
+            border-collapse: separate;
         }
+
+        th { 
+            background: #2d2d26 !important; 
+            color: #a1a18b !important; 
+            font-size: 11px; 
+            padding: 12px 20px; 
+            border-right: 1px solid rgba(255,255,255,0.05); 
+            position: sticky; 
+            top: 0; 
+            z-index: 20; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            white-space: nowrap;
+            text-align: center;
+        }
+
+        td { 
+            font-size: 12px; 
+            border-bottom: 1px solid rgba(255,255,255,0.03); 
+            border-right: 1px solid rgba(255,255,255,0.02); 
+            padding: 0 !important; 
+            height: 54px; 
+            position: relative; 
+            background-color: var(--cell-bg);
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .drag-handle-cell {
+            width: 44px !important;
+            min-width: 44px !important;
+            max-width: 44px !important;
+            cursor: grab;
+            padding: 0 !important;
+            border-right: 1px solid rgba(255,255,255,0.1) !important;
+            position: relative; 
+        }
+        
+        .drag-handle-inner {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            opacity: 0.3;
+            z-index: 10;
+        }
+        
+        .drag-handle-cell:hover .drag-handle-inner {
+            background-color: rgba(255,255,255,0.07);
+            opacity: 1;
+        }
+        
+        .drag-handle-cell:active { cursor: grabbing; }
+
+        .cell-input-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            padding: 0 15px;
+            box-sizing: border-box;
+        }
+
+        .cell-input { 
+            width: 100%;
+            background: transparent; 
+            border: none; 
+            color: inherit; 
+            text-align: center; 
+            outline: none; 
+            padding: 0 !important;
+            box-sizing: border-box; 
+        }
+        
+        .cell-textarea {
+            width: 100%;
+            min-height: 54px;
+            background: transparent;
+            border: none;
+            color: inherit;
+            text-align: left; 
+            outline: none;
+            padding: 18px 15px !important; 
+            box-sizing: border-box;
+            resize: none;
+            overflow: hidden;
+            display: block;
+            line-height: 1.4;
+            vertical-align: middle;
+            white-space: pre-wrap;
+        }
+        
+        .display-multiline {
+            display: block;
+            padding: 12px 15px !important;
+            white-space: pre-wrap; 
+            line-height: 1.5;
+            box-sizing: border-box;
+            text-align: center; 
+            word-break: keep-all;
+        }
+
+        .reinforce-text { color: var(--highlight) !important; font-weight: bold; }
+        .growth-text { color: var(--status-color) !important; font-weight: 900; }
+
+        /* 성장상태 드롭다운 스타일 수정 */
+        .status-select {
+            background: transparent; border: none; 
+            width: 100%; height: 54px;
+            text-align: center; 
+            text-align-last: center; /* 드롭다운 닫혔을 때 가운데 정렬 */
+            font-weight: 900; 
+            cursor: pointer; 
+            appearance: none; 
+            outline: none;
+            padding: 0 15px; 
+            color: var(--status-color); /* #ffcc00 적용 */
+        }
+        
+        .status-select option {
+            background: var(--card-bg);
+            color: var(--status-color);
+            text-align: center;
+        }
+        
+        .image-cell-wrapper {
+            display: flex; align-items: center; justify-content: center; 
+            width: 100%; height: 54px;
+            cursor: pointer; padding: 0 15px; box-sizing: border-box; outline: none;
+        }
+        
+        .preview-img { max-height: 40px; max-width: 100%; object-fit: contain; pointer-events: none; }
+
+        .badge-box {
+            display: inline-flex; align-items: center; justify-content: center;
+            padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: 900;
+            border: 1px solid rgba(255,255,255,0.05); min-width: 44px; background: rgba(255,255,255,0.03); color: rgba(255,255,255,0.2);     
+        }
+        .badge-box.active { background: var(--highlight) !important; color: #000 !important; border-color: var(--highlight); }
+
+        .simple-checkbox, .round-radio { width: 16px; height: 16px; cursor: pointer; }
+        .simple-checkbox { accent-color: var(--box-accent); }
+        .round-radio { accent-color: var(--check-accent); }
+        
+        .loading-overlay { background: rgba(0,0,0,0.9); display: flex; position: fixed; inset: 0; z-index: 9999; align-items: center; justify-content: center; }
     </style>
 </head>
-<body>
-    <div id="root"></div>
+<body class="min-h-screen pb-12">
 
-    <script type="text/babel">
-        const { useState, useEffect, useCallback } = React;
-        
-        // 아이콘 컴포넌트 (SVG)
-        const IconSearch = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>;
-        const IconKey = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3m-3-3l-2.5-2.5"></path></svg>;
-        const IconCloud = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.5 19A5.5 5.5 0 0 0 18 8.02a9 9 0 0 0-17.5 3.5c0 1.3.3 2.6.8 3.5"></path><path d="M21 19h-3.5"></path></svg>;
-        const IconStar = ({ filled }) => <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill={filled ? "#b0b095" : "none"} stroke="#b0b095" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>;
+    <div id="loading" class="loading-overlay">
+        <div class="flex flex-col items-center gap-4">
+            <div class="w-12 h-12 border-4 border-amber-500/20 border-t-amber-500 rounded-full animate-spin"></div>
+            <p class="text-[11px] font-black text-amber-500 uppercase tracking-widest">System Booting...</p>
+        </div>
+    </div>
 
-        // Firebase 모듈 가져오기 (GitHub Pages 호환성 강화)
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-        import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider, onAuthStateChanged, signOut, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-        import { getFirestore, collection, query, onSnapshot, doc, updateDoc, addDoc, serverTimestamp, deleteDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+    <header class="sticky top-0 z-50 bg-[#141412]/95 border-b border-amber-900/30 px-6 py-4 flex justify-between items-center backdrop-blur-sm">
+        <div class="flex items-center gap-3">
+            <div class="p-2 bg-amber-900/20 rounded-lg border border-amber-600/30"><i class="fa-solid fa-feather-pointed text-amber-500 text-xl"></i></div>
+            <div>
+                <h1 class="text-lg font-black tracking-tight text-amber-50 italic uppercase">은빛독수리 아카이브</h1>
+                <p class="text-[9px] text-amber-600 font-bold uppercase tracking-[0.3em]">SILVER EAGLE ARCHIVE</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-4">
+            <button id="addCharBtn" class="hidden flex items-center gap-2 px-4 py-2 bg-amber-600 text-black rounded-lg text-xs font-black hover:bg-amber-500 transition-all shadow-lg shadow-amber-900/20">
+                <i class="fa-solid fa-plus"></i> 캐릭터 추가
+            </button>
+            <div id="userInfo" class="hidden text-[10px] text-zinc-500 font-mono border-l border-white/10 pl-4 h-6 flex items-center"></div>
+            <button id="adminBtn" class="px-4 py-2 rounded-lg text-xs font-bold border border-amber-500/50 text-amber-500 hover:bg-amber-500 hover:text-black transition-all">ADMIN LOGIN</button>
+            <button id="logoutBtn" class="hidden px-4 py-2 rounded-lg text-xs font-bold border border-red-500/50 text-red-500 hover:bg-red-500 hover:text-white transition-all">로그아웃</button>
+        </div>
+    </header>
+
+    <main class="w-full px-4 py-6">
+        <div class="table-container shadow-2xl">
+            <table id="mainTable">
+                <thead>
+                    <tr id="headerRow">
+                        <th id="dragHeader" class="hidden" style="width: 44px; min-width: 44px; border-right: 1px solid rgba(255,255,255,0.1);">↕</th>
+                        <th>직업</th>
+                        <th>캐릭터</th>
+                        <th>이름</th>
+                        <th>성장상태</th>
+                        <th>등화</th>
+                        <th>등화(배틀/서포트)</th>
+                        <th>등화(스탯)</th>
+                        <th>레벨</th>
+                        <th>천부</th>
+                        <th>필살기</th>
+                        <th>각성</th>
+                        <th>오의</th>
+                        <th>등불</th>
+                        <th>악세명</th>
+                        <th>악세(스탯)</th>
+                        <th style="min-width: 420px;">악세(효과)</th>
+                        <th style="min-width: 470px;">서포트 어빌</th> 
+                        <th style="min-width: 470px;">필살기 정보</th> 
+                        <th id="adminHeader" class="hidden bg-red-900/20 text-red-500" style="width: 60px;">기능</th>
+                    </tr>
+                </thead>
+                <tbody id="travelerTableBody" class="divide-y divide-white/5"></tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- Modals -->
+    <div id="loginModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-black/85 backdrop-blur-md p-6">
+        <div class="bg-[#1a1a18] border border-amber-900/40 p-8 rounded-[2.5rem] w-full max-w-md shadow-[0_0_50px_rgba(0,0,0,0.8)]">
+            <div class="text-center mb-10">
+                <div class="w-16 h-16 bg-amber-900/20 border border-amber-600/30 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                    <i class="fa-solid fa-shield-halved text-amber-500 text-2xl"></i>
+                </div>
+                <h2 class="text-xl font-black text-amber-500 uppercase tracking-tighter italic">Admin Verify</h2>
+            </div>
+            <div class="space-y-6">
+                <input type="password" id="loginPassword" placeholder="••••••" class="w-full bg-black/40 border border-white/5 rounded-2xl py-4 px-6 outline-none focus:border-amber-500/40 text-white text-center font-bold tracking-[0.5em] transition-all">
+                <button id="doLogin" class="w-full py-4 bg-amber-600 text-black font-black text-xs uppercase rounded-2xl hover:bg-amber-500 transition-all tracking-widest">인증 완료</button>
+            </div>
+            <button onclick="document.getElementById('loginModal').classList.add('hidden')" class="mt-6 w-full text-[10px] text-zinc-600 font-bold uppercase hover:text-zinc-400">취소하기</button>
+        </div>
+    </div>
+
+    <div id="uiModal" class="fixed inset-0 z-[200] hidden flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <div class="bg-[#1a1a18] border border-white/5 p-8 rounded-3xl w-full max-w-xs text-center">
+            <p id="uiModalMsg" class="text-sm font-bold mb-6"></p>
+            <div class="flex gap-2">
+                <button id="uiModalConfirm" class="flex-1 py-3 bg-red-600 text-white rounded-xl text-xs font-black">확인</button>
+                <button id="uiModalCancel" class="flex-1 py-3 bg-zinc-800 text-zinc-400 rounded-xl text-xs font-black">취소</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, signInAnonymously, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, writeBatch, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAjbApqAPhrZXcnR2P_xd-nvrZOvZp67CI",
@@ -63,261 +306,270 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const provider = new GoogleAuthProvider();
-        const appId = "octopath-85851";
+        const appId = 'silver-eagle-archive';
         const ADMIN_EMAIL = "tjsgoehd@gmail.com";
 
-        const App = () => {
-            const [user, setUser] = useState(null);
-            const [characters, setCharacters] = useState([]);
-            const [loading, setLoading] = useState(true);
-            const [searchTerm, setSearchTerm] = useState('');
-            const [error, setError] = useState(null);
+        const travelerTableBody = document.getElementById('travelerTableBody');
+        const adminBtn = document.getElementById('adminBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const adminHeader = document.getElementById('adminHeader');
+        const dragHeader = document.getElementById('dragHeader');
+        const addCharBtn = document.getElementById('addCharBtn');
+        const loadingOverlay = document.getElementById('loading');
+        const userInfo = document.getElementById('userInfo');
+        const loginModal = document.getElementById('loginModal');
+        const loginPassword = document.getElementById('loginPassword');
+        const doLoginBtn = document.getElementById('doLogin');
+        const uiModal = document.getElementById('uiModal');
+        const uiModalMsg = document.getElementById('uiModalMsg');
 
-            // 인증 상태 감시 및 리다이렉트 결과 처리
-            useEffect(() => {
-                const initAuth = async () => {
-                    try {
-                        // 리다이렉트 로그인 결과 확인 (팝업 차단 환경 대응)
-                        const result = await getRedirectResult(auth);
-                        if (result?.user) {
-                            console.log("Logged in via redirect");
-                        }
-                    } catch (err) {
-                        if (err.code === 'auth/unauthorized-domain') {
-                            setError(`도메인 승인 오류: ${window.location.hostname}를 Firebase에 등록해 주세요.`);
-                        }
-                    }
+        let currentUser = null;
+        let sortable = null;
 
-                    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-                        if (currentUser) {
-                            setUser(currentUser);
-                            setError(null);
-                        } else {
-                            // 기본 익명 로그인 (데이터 조회를 위해)
-                            signInAnonymously(auth).catch(e => {
-                                if (e.code === 'auth/unauthorized-domain') {
-                                    setError("도메인 미승인 상태입니다. 조회 모드만 가능합니다.");
-                                }
-                            });
-                            setUser(null);
-                        }
-                        setLoading(false);
-                    });
-                    return unsubscribe;
-                };
-
-                const authUnsubscribe = initAuth();
-                return () => {
-                    if (typeof authUnsubscribe === 'function') authUnsubscribe();
-                };
-            }, []);
-
-            // 데이터 실시간 로드
-            useEffect(() => {
-                const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'characters'));
-                const unsubscribe = onSnapshot(q, (snapshot) => {
-                    const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    data.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
-                    setCharacters(data);
-                }, (err) => {
-                    console.error("Firestore Error:", err);
-                });
-                return () => unsubscribe();
-            }, []);
-
-            const handleLogin = async () => {
-                try {
-                    setLoading(true);
-                    await signInWithPopup(auth, provider);
-                } catch (err) {
-                    if (err.code === 'auth/unauthorized-domain' || err.code === 'auth/popup-closed-by-user') {
-                        // 팝업 실패 시 리다이렉트 방식으로 2차 시도
-                        try {
-                            await signInWithRedirect(auth, provider);
-                        } catch (reErr) {
-                            setError(`로그인 실패: ${reErr.message}`);
-                        }
-                    } else {
-                        setError(`로그인 오류: ${err.message}`);
-                    }
-                } finally {
-                    setLoading(false);
-                }
-            };
-
-            const updateData = async (id, field, value) => {
-                if (!user || user.email !== ADMIN_EMAIL) return;
-                try {
-                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'characters', id);
-                    await updateDoc(docRef, { [field]: value, updatedAt: serverTimestamp() });
-                } catch (err) {
-                    console.error("Update Error:", err);
-                }
-            };
-
-            const isAdmin = user && user.email === ADMIN_EMAIL;
-
-            if (loading) return (
-                <div className="min-h-screen flex flex-col items-center justify-center bg-[#0f0f0e]">
-                    <div className="w-12 h-12 border-4 border-[#3d3d35] border-t-[#b0b095] rounded-full animate-spin mb-4"></div>
-                    <p className="text-[#b0b095] font-mono text-[10px] tracking-[0.3em] uppercase">Synchronizing Archives...</p>
-                </div>
-            );
-
-            return (
-                <div className="min-h-screen p-4 md:p-10 max-w-[1600px] mx-auto">
-                    {error && (
-                        <div className="fixed top-5 left-1/2 -translate-x-1/2 z-50 bg-red-950/90 border border-red-500 text-red-200 px-6 py-4 rounded-xl shadow-2xl flex flex-col items-center gap-2 error-shake backdrop-blur-md">
-                            <span className="text-xs font-bold uppercase tracking-widest">Protocol Warning</span>
-                            <span className="text-[11px] opacity-80 text-center">{error}</span>
-                            <button onClick={() => setError(null)} className="mt-2 text-[10px] underline hover:text-white transition-colors uppercase">Dismiss</button>
-                        </div>
-                    )}
-
-                    <header className="flex flex-col md:flex-row justify-between items-center md:items-end mb-12 border-b border-[#2a2a25] pb-8 gap-6">
-                        <div className="flex items-center gap-5">
-                            <div className="p-4 bg-[#b0b095] rounded shadow-[4px_4px_0px_#1c1c1a]"><IconCloud /></div>
-                            <div>
-                                <h1 className="text-4xl font-black text-[#b0b095] italic uppercase tracking-tighter leading-none">Octopath Archivist</h1>
-                                <div className="flex items-center gap-3 mt-2">
-                                    <span className="text-[9px] text-[#5c5c4d] font-mono tracking-[0.3em] uppercase">Archive Host: {window.location.hostname}</span>
-                                    <div className={`h-1.5 w-1.5 rounded-full ${isAdmin ? 'bg-green-500 shadow-[0_0_8px_#22c55e]' : 'bg-amber-500'}`}></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="flex flex-wrap justify-center gap-4 items-center">
-                            <div className="relative group">
-                                <span className="absolute left-4 top-3 text-[#4d4d45] group-focus-within:text-[#b0b095] transition-colors"><IconSearch /></span>
-                                <input 
-                                    className="bg-[#161614] border border-[#2a2a25] rounded-full pl-12 pr-6 py-2.5 text-xs text-white w-64 md:w-80 focus:border-[#b0b095] transition-all"
-                                    placeholder="Search by traveler name..."
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                />
-                            </div>
-                            {!isAdmin ? (
-                                <button onClick={handleLogin} className="bg-[#b0b095] hover:bg-white text-black px-8 py-2.5 rounded-full text-[11px] font-black flex items-center gap-2 transition-all uppercase shadow-lg active:scale-95">
-                                    <IconKey /> Admin Access
-                                </button>
-                            ) : (
-                                <div className="flex items-center gap-4">
-                                    <span className="text-[10px] font-bold text-[#b0b095] bg-[#1c1c1a] px-3 py-1.5 rounded-full border border-[#2a2a25]">ADMIN MODE</span>
-                                    <button onClick={() => signOut(auth)} className="text-[#5c5c4d] hover:text-red-500 text-[10px] font-bold uppercase transition-colors">Logout</button>
-                                </div>
-                            )}
-                        </div>
-                    </header>
-
-                    <div className="glass-panel rounded-2xl overflow-hidden shadow-2xl mb-20">
-                        <div className="overflow-x-auto custom-scroll">
-                            <table className="w-full text-center min-w-[1200px] border-collapse">
-                                <thead>
-                                    <tr className="bg-[#1c1c1a] text-[#5c5c4d] text-[10px] font-black uppercase tracking-[0.2em] border-b border-[#2a2a25]">
-                                        <th className="p-5 w-32">Job</th>
-                                        <th className="p-5">Traveler Name</th>
-                                        <th className="p-5 w-24">Element</th>
-                                        <th className="p-5 w-32">Rarity</th>
-                                        <th className="p-5 w-32">Enhance</th>
-                                        <th className="p-5 w-20">A-Rank</th>
-                                        <th className="p-5 w-20">U-Rank</th>
-                                        <th className="p-5 min-w-[300px] text-left">Strategic Records</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-[#1c1c1a]">
-                                    {characters.filter(c => (c.name || '').toLowerCase().includes(searchTerm.toLowerCase())).map(char => (
-                                        <tr key={char.id} className="hover:bg-white/[0.03] transition-colors group">
-                                            <td className="p-4 text-2xl filter grayscale group-hover:grayscale-0 opacity-40 group-hover:opacity-100 transition-all">
-                                                {char.job === 'Warrior' ? '⚔️' : 
-                                                 char.job === 'Merchant' ? '💰' : 
-                                                 char.job === 'Thief' ? '🗡️' : 
-                                                 char.job === 'Apothecary' ? '🧪' : 
-                                                 char.job === 'Hunter' ? '🏹' : 
-                                                 char.job === 'Cleric' ? '📜' : 
-                                                 char.job === 'Scholar' ? '📖' : '💃'}
-                                            </td>
-                                            <td className="p-4">
-                                                <input 
-                                                    disabled={!isAdmin}
-                                                    className={`bg-transparent w-full text-center font-bold text-[#b0b095] text-xl italic outline-none ${isAdmin ? 'focus:bg-white/5 cursor-text' : 'cursor-default'}`}
-                                                    value={char.name || ''}
-                                                    onChange={(e) => updateData(char.id, 'name', e.target.value)}
-                                                />
-                                            </td>
-                                            <td className="p-4 text-2xl opacity-60">
-                                                {char.element === 'Fire' ? '🔥' : 
-                                                 char.element === 'Ice' ? '❄️' : 
-                                                 char.element === 'Thunder' ? '⚡' : 
-                                                 char.element === 'Wind' ? '🌪️' : 
-                                                 char.element === 'Light' ? '☀️' : '🌙'}
-                                            </td>
-                                            <td className="p-4">
-                                                <div className="flex justify-center gap-0.5">
-                                                    {[...Array(5)].map((_, i) => <IconStar key={i} filled={i < (char.rarity || 5)} />)}
-                                                </div>
-                                            </td>
-                                            <td className="p-4">
-                                                <div className="text-cyan-600 font-mono font-bold text-[10px] tracking-widest uppercase">Boost +{char.boost || 10}</div>
-                                                <div className="text-[#4d4d45] text-[10px] font-mono mt-0.5 tracking-tighter">Level {char.level || 100}</div>
-                                            </td>
-                                            <td className="p-4">
-                                                <button 
-                                                    disabled={!isAdmin}
-                                                    onClick={() => updateData(char.id, 'awakening', !char.awakening)}
-                                                    className={`w-4 h-4 rounded-sm border ${char.awakening ? 'bg-cyan-600 border-cyan-400 shadow-[0_0_10px_rgba(8,145,178,0.5)]' : 'border-[#2a2a25]'} mx-auto transition-all`}
-                                                />
-                                            </td>
-                                            <td className="p-4">
-                                                <button 
-                                                    disabled={!isAdmin}
-                                                    onClick={() => updateData(char.id, 'ultimate', !char.ultimate)}
-                                                    className={`w-4 h-4 rounded-sm border ${char.ultimate ? 'bg-cyan-600 border-cyan-400 shadow-[0_0_10px_rgba(8,145,178,0.5)]' : 'border-[#2a2a25]'} mx-auto transition-all`}
-                                                />
-                                            </td>
-                                            <td className="p-4 px-8 text-left">
-                                                <textarea 
-                                                    disabled={!isAdmin}
-                                                    rows="1"
-                                                    className={`bg-transparent w-full outline-none text-[#5c5c4d] text-xs italic resize-none overflow-hidden placeholder:text-[#2a2a25] ${isAdmin ? 'focus:text-[#8a8a75]' : ''}`}
-                                                    placeholder="Enter strategic archives..."
-                                                    value={char.notes || ''}
-                                                    onChange={(e) => updateData(char.id, 'notes', e.target.value)}
-                                                />
-                                            </td>
-                                        </tr>
-                                    ))}
-                                    {characters.length === 0 && (
-                                        <tr>
-                                            <td colSpan="8" className="py-40">
-                                                <div className="flex flex-col items-center opacity-20">
-                                                    <IconCloud />
-                                                    <p className="text-[10px] tracking-[1em] uppercase mt-4 font-serif">No Data Synchronized</p>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <footer className="mt-20 flex flex-col md:flex-row justify-between items-center text-[9px] text-[#3d3d35] font-mono tracking-[0.3em] uppercase gap-8 pb-20 border-t border-[#1c1c1a] pt-10">
-                        <div className="flex gap-10">
-                            <p>© Square Enix / Octopath Traveler CoTC Manager</p>
-                            <p className="text-[#5c5c4d]">Admin: <span className="text-[#8a8a75]">{ADMIN_EMAIL}</span></p>
-                        </div>
-                        <div className="flex gap-6 items-center italic">
-                             <span className="flex items-center gap-2 text-green-900"><div className="w-1.5 h-1.5 rounded-full bg-green-900 shadow-[0_0_8px_#064e3b]"></div> Status: Online</span>
-                             <span className="text-[#2a2a25]">Protocol: gh-pages-secured</span>
-                        </div>
-                    </footer>
-                </div>
-            );
+        const showConfirm = (msg) => {
+            return new Promise((resolve) => {
+                uiModalMsg.innerText = msg;
+                uiModal.classList.remove('hidden');
+                document.getElementById('uiModalConfirm').onclick = () => { uiModal.classList.add('hidden'); resolve(true); };
+                document.getElementById('uiModalCancel').onclick = () => { uiModal.classList.add('hidden'); resolve(false); };
+            });
         };
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
+        const initAuth = async () => {
+            try {
+                await setPersistence(auth, browserLocalPersistence);
+                onAuthStateChanged(auth, async (user) => {
+                    currentUser = user;
+                    const isAdmin = user && !user.isAnonymous;
+                    adminBtn.classList.toggle('hidden', isAdmin);
+                    logoutBtn.classList.toggle('hidden', !isAdmin);
+                    adminHeader.classList.toggle('hidden', !isAdmin);
+                    dragHeader.classList.toggle('hidden', !isAdmin);
+                    addCharBtn.classList.toggle('hidden', !isAdmin);
+                    if (isAdmin) {
+                        userInfo.classList.remove('hidden');
+                        userInfo.innerHTML = `<span class="bg-amber-500/10 text-amber-500 px-2 py-0.5 rounded text-[9px] font-black mr-2">ADMIN</span> ${user.email}`;
+                    } else {
+                        userInfo.classList.add('hidden');
+                        if (!user) await signInAnonymously(auth);
+                    }
+                    loadTable();
+                    loadingOverlay.style.display = 'none';
+                });
+            } catch (e) { 
+                loadingOverlay.style.display = 'none';
+            }
+        };
+        initAuth();
+
+        function loadTable() {
+            const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'travelers');
+            onSnapshot(colRef, (snapshot) => {
+                travelerTableBody.innerHTML = '';
+                const items = [];
+                snapshot.forEach(d => items.push({ id: d.id, ...d.data() }));
+                items.sort((a, b) => (a.order ?? 9999) - (b.order ?? 9999) || (b.timestamp || 0) - (a.timestamp || 0));
+                items.forEach(item => renderRow(item));
+                if (currentUser && !currentUser.isAnonymous) enableSorting();
+            });
+        }
+
+        function enableSorting() {
+            if (sortable) sortable.destroy();
+            sortable = Sortable.create(travelerTableBody, {
+                animation: 250,
+                handle: '.drag-handle-cell',
+                onEnd: async function() {
+                    const rows = Array.from(travelerTableBody.querySelectorAll('tr'));
+                    const batch = writeBatch(db);
+                    rows.forEach((row, index) => {
+                        const id = row.getAttribute('data-id');
+                        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'travelers', id);
+                        batch.update(docRef, { order: index });
+                    });
+                    await batch.commit();
+                }
+            });
+        }
+
+        async function handlePaste(event, wrapper, callback) {
+            const items = (event.clipboardData || event.originalEvent.clipboardData).items;
+            for (const item of items) {
+                if (item.type.indexOf("image") !== -1) {
+                    const blob = item.getAsFile();
+                    const reader = new FileReader();
+                    reader.onload = async (e) => {
+                        const img = new Image();
+                        img.src = e.target.result;
+                        img.onload = () => {
+                            const canvas = document.createElement('canvas');
+                            const maxWidth = 150;
+                            const scale = maxWidth / img.width;
+                            canvas.width = maxWidth;
+                            canvas.height = img.height * scale;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                            callback(canvas.toDataURL('image/webp', 0.85));
+                        };
+                    };
+                    reader.readAsDataURL(blob);
+                    break;
+                }
+            }
+        }
+
+        function renderRow(data) {
+            const isAdmin = currentUser && !currentUser.isAnonymous;
+            const tr = document.createElement('tr');
+            tr.setAttribute('data-id', data.id);
+            tr.className = "group";
+
+            if (isAdmin) {
+                const dragTd = document.createElement('td');
+                dragTd.className = "drag-handle-cell";
+                dragTd.innerHTML = '<div class="drag-handle-inner"><i class="fa-solid fa-grip-vertical text-[12px]"></i></div>';
+                tr.appendChild(dragTd);
+            }
+
+            const fields = ['job', 'type', 'name', 'status', 'light', 'support', 'reinforce', 'level', 'gift', 'skill', 'awake', 'ultimate', 'crystal', 'accessory', 'basestat', 'extra1', 'extra2', 'extra3'];
+            
+            fields.forEach(field => {
+                const td = document.createElement('td');
+                if (isAdmin) {
+                    if (['job', 'type', 'gift'].includes(field)) {
+                        const wrapper = document.createElement('div');
+                        wrapper.className = "image-cell-wrapper";
+                        wrapper.innerHTML = data[field] ? `<img src="${data[field]}" class="preview-img">` : '';
+                        wrapper.onpaste = (e) => handlePaste(e, wrapper, (resized) => updateCell(data.id, field, resized));
+                        td.appendChild(wrapper);
+                    } else if (field === 'status') {
+                        const select = document.createElement('select');
+                        const statusOptions = [{ label: '★★★★★★', value: '6성' }, { label: '★★★★★', value: '5성' }, { label: '★★★★', value: '4성' }, { label: '★★★', value: '3성' }];
+                        select.className = `status-select`; /* 전용 클래스로 변경 */
+                        statusOptions.forEach(opt => {
+                            const o = document.createElement('option');
+                            o.value = opt.value; o.text = opt.label;
+                            if (data[field] === opt.value) o.selected = true;
+                            select.appendChild(o);
+                        });
+                        select.onchange = () => updateCell(data.id, field, select.value);
+                        td.appendChild(select);
+                    } else if (field === 'support') {
+                        const checkContainer = document.createElement('div');
+                        checkContainer.className = "flex gap-4 justify-center items-center h-[54px] px-[15px]";
+                        const currentValues = Array.isArray(data[field]) ? data[field] : [];
+                        [1, 2].forEach(i => {
+                            const rb = document.createElement('input');
+                            rb.type = "checkbox"; rb.className = "round-radio";
+                            rb.checked = currentValues.includes(i);
+                            rb.onchange = () => {
+                                let newArr = rb.checked ? [...currentValues, i] : currentValues.filter(v => v !== i);
+                                updateCell(data.id, field, newArr);
+                            };
+                            checkContainer.appendChild(rb);
+                        });
+                        td.appendChild(checkContainer);
+                    } else if (['extra1', 'extra2', 'extra3'].includes(field)) {
+                        const textarea = document.createElement('textarea');
+                        textarea.className = "cell-textarea";
+                        textarea.value = data[field] || '';
+                        const autoResize = (el) => { el.style.height = '54px'; el.style.height = el.scrollHeight + 'px'; };
+                        textarea.oninput = () => autoResize(textarea);
+                        textarea.onblur = () => { if (textarea.value !== (data[field] || '')) updateCell(data.id, field, textarea.value); };
+                        td.appendChild(textarea);
+                        setTimeout(() => autoResize(textarea), 0);
+                    } else if (['awake', 'ultimate'].includes(field)) {
+                        const cb = document.createElement('input');
+                        cb.type = "checkbox"; cb.className = "simple-checkbox";
+                        cb.checked = !!data[field];
+                        cb.onchange = () => updateCell(data.id, field, cb.checked);
+                        const wrapper = document.createElement('div');
+                        wrapper.className = "flex items-center justify-center h-[54px]";
+                        wrapper.appendChild(cb);
+                        td.appendChild(wrapper);
+                    } else {
+                        const wrapper = document.createElement('div');
+                        wrapper.className = "cell-input-wrapper";
+                        const input = document.createElement('input');
+                        input.className = "cell-input";
+                        if (['reinforce', 'light'].includes(field)) input.classList.add('reinforce-text');
+                        input.value = data[field] || '';
+                        
+                        const adjustWidth = () => {
+                            const span = document.createElement('span');
+                            span.style.visibility = 'hidden'; span.style.position = 'absolute'; span.style.whiteSpace = 'pre';
+                            span.style.font = window.getComputedStyle(input).font;
+                            span.innerText = input.value || '';
+                            document.body.appendChild(span);
+                            const textWidth = span.getBoundingClientRect().width;
+                            document.body.removeChild(span);
+                            td.style.width = (textWidth + 40) + 'px';
+                            td.style.minWidth = (textWidth + 40) + 'px';
+                        };
+                        
+                        input.oninput = adjustWidth;
+                        input.onblur = () => { if (input.value !== (data[field] || '')) updateCell(data.id, field, input.value); };
+                        wrapper.appendChild(input);
+                        td.appendChild(wrapper);
+                        setTimeout(adjustWidth, 0);
+                    }
+                } else {
+                    if (['job', 'type', 'gift'].includes(field)) {
+                        td.innerHTML = data[field] ? `<div class="px-[15px]"><img src="${data[field]}" class="preview-img"></div>` : '-';
+                    } else if (field === 'status') {
+                        const statusLabels = { '6성': '★★★★★★', '5성': '★★★★★', '4성': '★★★★', '3성': '★★★' };
+                        td.innerHTML = `<span class="growth-text px-[15px]">${statusLabels[data[field]] || '-'}</span>`;
+                    } else if (field === 'support') {
+                        const currentValues = Array.isArray(data[field]) ? data[field] : [];
+                        td.innerHTML = `<div class="flex gap-1.5 justify-center py-4 px-[15px]"><span class="badge-box ${currentValues.includes(1) ? 'active' : ''}">배틀</span><span class="badge-box ${currentValues.includes(2) ? 'active' : ''}">서포트</span></div>`;
+                    } else if (['awake', 'ultimate'].includes(field)) {
+                        td.innerHTML = data[field] ? '<div class="px-[15px]"><i class="fa-solid fa-check text-[#ff9933]"></i></div>' : '-';
+                    } else {
+                        const span = document.createElement('span');
+                        span.className = "display-multiline";
+                        if (['extra1', 'extra2', 'extra3'].includes(field)) span.style.textAlign = 'left';
+                        if (['reinforce', 'light'].includes(field)) span.classList.add('reinforce-text');
+                        span.innerText = data[field] || '-';
+                        td.appendChild(span);
+                    }
+                }
+                tr.appendChild(td);
+            });
+
+            if (isAdmin) {
+                const delTd = document.createElement('td');
+                delTd.style.width = "60px";
+                const delBtn = document.createElement('button');
+                delBtn.className = "text-zinc-600 hover:text-red-500 p-2 w-full h-full flex items-center justify-center";
+                delBtn.innerHTML = '<i class="fa-solid fa-trash-can"></i>';
+                delBtn.onclick = async () => { if (await showConfirm('삭제할까요?')) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'travelers', data.id)); };
+                delTd.appendChild(delBtn);
+                tr.appendChild(delTd);
+            }
+            travelerTableBody.appendChild(tr);
+        }
+
+        async function updateCell(id, field, value) {
+            if (!auth.currentUser || auth.currentUser.isAnonymous) return;
+            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'travelers', id), { [field]: value });
+        }
+
+        addCharBtn.onclick = async () => {
+            const snapshot = await getDocs(collection(db, 'artifacts', appId, 'public', 'data', 'travelers'));
+            let maxOrder = -1;
+            snapshot.forEach(doc => { if (doc.data().order > maxOrder) maxOrder = doc.data().order; });
+            await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'travelers'), {
+                job: '', name: '새 캐릭터', status: '5성', support: [], awake: false, ultimate: false, order: maxOrder + 1, timestamp: Date.now()
+            });
+        };
+
+        adminBtn.onclick = () => { loginModal.classList.remove('hidden'); loginPassword.value = ''; loginPassword.focus(); };
+        const handleLogin = async () => {
+            try { await signInWithEmailAndPassword(auth, ADMIN_EMAIL, loginPassword.value); loginModal.classList.add('hidden'); } catch (e) { loginPassword.value = ''; loginPassword.focus(); }
+        };
+        doLoginBtn.onclick = handleLogin;
+        loginPassword.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleLogin(); });
+        logoutBtn.onclick = async () => { if (await showConfirm('로그아웃?')) { await signOut(auth); location.reload(); } };
     </script>
 </body>
 </html>
