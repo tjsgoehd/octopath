@@ -1,362 +1,323 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Plus, Trash2, Search, Star, Image as ImageIcon, Cloud, Loader2, LogIn, LogOut, ShieldAlert, Copy, CheckCircle2, AlertCircle, ExternalLink, RefreshCw, Key } from 'lucide-react';
-import { initializeApp } from 'firebase/app';
-import { 
-  getAuth, 
-  signInWithPopup, 
-  signInWithRedirect,
-  getRedirectResult,
-  GoogleAuthProvider, 
-  onAuthStateChanged, 
-  signOut, 
-  setPersistence, 
-  browserLocalPersistence,
-  signInAnonymously,
-  signInWithCustomToken
-} from 'firebase/auth';
-import { getFirestore, collection, doc, setDoc, onSnapshot, deleteDoc, updateDoc, serverTimestamp, query } from 'firebase/firestore';
-
-// 사용자 Firebase 설정
-const firebaseConfig = {
-  apiKey: "AIzaSyAjbApqAPhrZXcnR2P_xd-nvrZOvZp67CI",
-  authDomain: "octopath-85851.firebaseapp.com",
-  projectId: "octopath-85851",
-  storageBucket: "octopath-85851.firebasestorage.app",
-  messagingSenderId: "744016190979",
-  appId: "1:744016190979:web:fbc5badeda2e24f5f47836",
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-const provider = new GoogleAuthProvider();
-const appId = typeof __app_id !== 'undefined' ? __app_id : 'octopath-85851';
-
-const ADMIN_EMAIL = "tjsgoehd@gmail.com";
-
-const App = () => {
-  const [characters, setCharacters] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [authError, setAuthError] = useState(null);
-  const [detectedDomain, setDetectedDomain] = useState('');
-  const [copied, setCopied] = useState(false);
-
-  useEffect(() => {
-    // 현재 접속 중인 전체 호스트네임 감지
-    setDetectedDomain(window.location.hostname);
-
-    const initAuth = async () => {
-      try {
-        await setPersistence(auth, browserLocalPersistence);
-        
-        // 1. 커스텀 토큰이 환경 변수로 제공된 경우 최우선 인증 (도메인 제약 우회 가능)
-        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-          try {
-            await signInWithCustomToken(auth, __initial_auth_token);
-          } catch (e) {
-            console.error("Custom token auth failed", e);
-          }
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Octopath Traveler Archivist</title>
+    <!-- 라이브러리 로드 -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            background-color: #0f0f0e; 
+            font-family: 'Noto Serif KR', serif; 
+            color: #d1d1bc;
         }
-
-        // 2. 리다이렉트 로그인 결과 확인
-        try {
-          const result = await getRedirectResult(auth);
-          if (result?.user) {
-            console.log("Redirect login successful");
-          }
-        } catch (e) {
-          if (e.code === 'auth/unauthorized-domain') {
-            setAuthError("도메인 승인 오류: Firebase 설정에서 도메인 등록이 필요합니다.");
-          }
+        .custom-scroll::-webkit-scrollbar { width: 4px; height: 4px; }
+        .custom-scroll::-webkit-scrollbar-track { background: #1a1a18; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #3d3d35; border-radius: 10px; }
+        .custom-scroll::-webkit-scrollbar-thumb:hover { background: #b0b095; }
+        input:focus, textarea:focus { outline: none; }
+        .glass-panel {
+            background: rgba(20, 20, 18, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(59, 59, 51, 0.5);
         }
-
-        // 3. 인증 상태 리스너
-        const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-          if (currentUser) {
-            // 이메일 권한 확인 (익명 로그인 제외)
-            if (!currentUser.isAnonymous && currentUser.email && currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
-              setAuthError(`권한이 없는 계정입니다: ${currentUser.email}`);
-              await signOut(auth);
-              setUser(null);
-            } else {
-              setUser(currentUser);
-              setAuthError(null);
-            }
-          } else {
-            setUser(null);
-            // 자동 익명 로그인 시도 (조회용)
-            try {
-              await signInAnonymously(auth);
-            } catch (err) {
-              if (err.code === 'auth/unauthorized-domain') {
-                setAuthError("현재 도메인이 Firebase에 등록되지 않았습니다.");
-              }
-            }
-          }
-          setLoading(false);
-        });
-        
-        return unsubscribe;
-      } catch (err) {
-        setLoading(false);
-      }
-    };
-
-    const cleanup = initAuth();
-    return () => { if (typeof cleanup === 'function') cleanup(); };
-  }, []);
-
-  // 데이터 실시간 동기화
-  useEffect(() => {
-    if (!user) return;
-    
-    const collectionPath = collection(db, 'artifacts', appId, 'public', 'data', 'characters');
-    const q = query(collectionPath);
-
-    const unsubscribe = onSnapshot(q, 
-      (snapshot) => {
-        const charData = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
-        // 생성일 순 정렬
-        charData.sort((a, b) => (a.createdAt?.toMillis() || 0) - (b.createdAt?.toMillis() || 0));
-        setCharacters(charData);
-      },
-      (err) => {
-        console.error("Firestore error:", err);
-      }
-    );
-    return () => unsubscribe();
-  }, [user]);
-
-  const handleAdminLogin = async () => {
-    try {
-      setLoading(true);
-      setAuthError(null);
-      // 팝업 시도
-      await signInWithPopup(auth, provider);
-    } catch (err) {
-      console.error("Login Error:", err);
-      if (err.code === 'auth/unauthorized-domain') {
-        // 팝업 실패 시 리다이렉트 시도 (더 넓은 도메인 허용 범위 가질 수 있음)
-        try {
-          await signInWithRedirect(auth, provider);
-        } catch (reErr) {
-          setAuthError(`도메인 승인 오류: Firebase 콘솔에서 '${detectedDomain}'를 추가해야 합니다.`);
+        .error-shake { animation: shake 0.5s ease-in-out; }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
         }
-      } else {
-        setAuthError(`로그인 중 오류 발생: ${err.message}`);
-      }
-      setLoading(false);
-    }
-  };
+    </style>
+</head>
+<body>
+    <div id="root"></div>
 
-  const copyToClipboard = (text) => {
-    const el = document.createElement('textarea');
-    el.value = text;
-    document.body.appendChild(el);
-    el.select();
-    document.execCommand('copy');
-    document.body.removeChild(el);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  const updateCell = async (id, field, value) => {
-    if (!user || user.isAnonymous) return;
-    try {
-      await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'characters', id), { 
-        [field]: value,
-        updatedAt: serverTimestamp()
-      });
-    } catch (e) {
-      console.error("Update failed", e);
-    }
-  };
-
-  if (loading) return (
-    <div className="min-h-screen bg-[#0f0f0e] flex flex-col items-center justify-center text-[#8a8a75]">
-      <Loader2 className="animate-spin mb-4 text-[#b0b095]" />
-      <p className="text-[10px] tracking-[0.4em] font-serif uppercase animate-pulse">Synchronizing Grimoire...</p>
-    </div>
-  );
-
-  return (
-    <div className="min-h-screen bg-[#0f0f0e] text-[#d1d1bc] p-6 font-sans text-[13px]">
-      <div className="max-w-[1600px] mx-auto">
+    <script type="text/babel">
+        const { useState, useEffect, useCallback } = React;
         
-        {/* 도메인 오류 알림 섹션 */}
-        {authError && (
-          <div className="mb-8 bg-red-950/20 border border-red-500/30 p-6 rounded-lg backdrop-blur-md shadow-2xl ring-1 ring-red-500/20">
-            <div className="flex flex-col md:flex-row items-center gap-6">
-              <div className="bg-red-500/20 p-4 rounded-full border border-red-500/40 shrink-0">
-                <ShieldAlert size={32} className="text-red-400" />
-              </div>
-              <div className="flex-1">
-                <h3 className="text-red-100 font-serif text-xl font-bold mb-2 italic">Access Protocol Denied</h3>
-                <p className="text-red-200/60 text-sm mb-4 leading-relaxed">
-                  Firebase가 현재 도메인을 신뢰하지 않습니다. 콘솔의 <strong>[Authentication &gt; Settings &gt; Authorized domains]</strong>에 아래의 루트 도메인들을 모두 추가해 주세요.
-                </p>
-                
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
-                  {[detectedDomain, 'r.val.run', 'usercontent.goog'].map(domain => (
-                    <div key={domain} className="bg-black/40 border border-white/5 p-3 rounded flex justify-between items-center group">
-                      <code className="text-[11px] text-white/80 font-mono">{domain}</code>
-                      <button onClick={() => copyToClipboard(domain)} className="text-[#5c5c4d] hover:text-white transition-colors">
-                        <Copy size={14} />
-                      </button>
-                    </div>
-                  ))}
+        // 아이콘 컴포넌트 (SVG)
+        const IconSearch = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>;
+        const IconKey = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3m-3-3l-2.5-2.5"></path></svg>;
+        const IconCloud = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.5 19A5.5 5.5 0 0 0 18 8.02a9 9 0 0 0-17.5 3.5c0 1.3.3 2.6.8 3.5"></path><path d="M21 19h-3.5"></path></svg>;
+        const IconStar = ({ filled }) => <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill={filled ? "#b0b095" : "none"} stroke="#b0b095" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>;
+
+        // Firebase 모듈 가져오기 (GitHub Pages 호환성 강화)
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+        import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider, onAuthStateChanged, signOut, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+        import { getFirestore, collection, query, onSnapshot, doc, updateDoc, addDoc, serverTimestamp, deleteDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAjbApqAPhrZXcnR2P_xd-nvrZOvZp67CI",
+            authDomain: "octopath-85851.firebaseapp.com",
+            projectId: "octopath-85851",
+            storageBucket: "octopath-85851.firebasestorage.app",
+            messagingSenderId: "744016190979",
+            appId: "1:744016190979:web:fbc5badeda2e24f5f47836"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const provider = new GoogleAuthProvider();
+        const appId = "octopath-85851";
+        const ADMIN_EMAIL = "tjsgoehd@gmail.com";
+
+        const App = () => {
+            const [user, setUser] = useState(null);
+            const [characters, setCharacters] = useState([]);
+            const [loading, setLoading] = useState(true);
+            const [searchTerm, setSearchTerm] = useState('');
+            const [error, setError] = useState(null);
+
+            // 인증 상태 감시 및 리다이렉트 결과 처리
+            useEffect(() => {
+                const initAuth = async () => {
+                    try {
+                        // 리다이렉트 로그인 결과 확인 (팝업 차단 환경 대응)
+                        const result = await getRedirectResult(auth);
+                        if (result?.user) {
+                            console.log("Logged in via redirect");
+                        }
+                    } catch (err) {
+                        if (err.code === 'auth/unauthorized-domain') {
+                            setError(`도메인 승인 오류: ${window.location.hostname}를 Firebase에 등록해 주세요.`);
+                        }
+                    }
+
+                    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+                        if (currentUser) {
+                            setUser(currentUser);
+                            setError(null);
+                        } else {
+                            // 기본 익명 로그인 (데이터 조회를 위해)
+                            signInAnonymously(auth).catch(e => {
+                                if (e.code === 'auth/unauthorized-domain') {
+                                    setError("도메인 미승인 상태입니다. 조회 모드만 가능합니다.");
+                                }
+                            });
+                            setUser(null);
+                        }
+                        setLoading(false);
+                    });
+                    return unsubscribe;
+                };
+
+                const authUnsubscribe = initAuth();
+                return () => {
+                    if (typeof authUnsubscribe === 'function') authUnsubscribe();
+                };
+            }, []);
+
+            // 데이터 실시간 로드
+            useEffect(() => {
+                const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'characters'));
+                const unsubscribe = onSnapshot(q, (snapshot) => {
+                    const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    data.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+                    setCharacters(data);
+                }, (err) => {
+                    console.error("Firestore Error:", err);
+                });
+                return () => unsubscribe();
+            }, []);
+
+            const handleLogin = async () => {
+                try {
+                    setLoading(true);
+                    await signInWithPopup(auth, provider);
+                } catch (err) {
+                    if (err.code === 'auth/unauthorized-domain' || err.code === 'auth/popup-closed-by-user') {
+                        // 팝업 실패 시 리다이렉트 방식으로 2차 시도
+                        try {
+                            await signInWithRedirect(auth, provider);
+                        } catch (reErr) {
+                            setError(`로그인 실패: ${reErr.message}`);
+                        }
+                    } else {
+                        setError(`로그인 오류: ${err.message}`);
+                    }
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            const updateData = async (id, field, value) => {
+                if (!user || user.email !== ADMIN_EMAIL) return;
+                try {
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'characters', id);
+                    await updateDoc(docRef, { [field]: value, updatedAt: serverTimestamp() });
+                } catch (err) {
+                    console.error("Update Error:", err);
+                }
+            };
+
+            const isAdmin = user && user.email === ADMIN_EMAIL;
+
+            if (loading) return (
+                <div className="min-h-screen flex flex-col items-center justify-center bg-[#0f0f0e]">
+                    <div className="w-12 h-12 border-4 border-[#3d3d35] border-t-[#b0b095] rounded-full animate-spin mb-4"></div>
+                    <p className="text-[#b0b095] font-mono text-[10px] tracking-[0.3em] uppercase">Synchronizing Archives...</p>
                 </div>
-                <p className="text-[11px] text-red-400/50 italic">* 전체 주소 입력이 안 될 경우 'usercontent.goog'만 입력해 보세요.</p>
-              </div>
-              <div className="flex flex-col gap-3 w-full md:w-auto">
-                <a href="https://console.firebase.google.com/" target="_blank" className="bg-red-600 hover:bg-red-500 text-white px-8 py-3 rounded font-bold text-center flex items-center justify-center gap-2 transition-transform active:scale-95 shadow-lg shadow-red-900/20">
-                  Firebase 콘솔 <ExternalLink size={16} />
-                </a>
-                <button onClick={() => window.location.reload()} className="bg-white/5 hover:bg-white/10 text-white px-8 py-3 rounded font-bold border border-white/10 flex items-center justify-center gap-2 transition-all">
-                  <RefreshCw size={16} /> 새로고침
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+            );
 
-        <header className="flex flex-col md:flex-row justify-between items-end mb-10 border-b border-[#2a2a25] pb-8">
-          <div className="flex items-center gap-5">
-            <div className="w-12 h-12 bg-gradient-to-br from-[#b0b095] to-[#8a8a75] rounded flex items-center justify-center shadow-[6px_6px_0px_#1c1c1a]">
-              <Cloud className="text-[#0f0f0e]" size={24} />
-            </div>
-            <div>
-              <h1 className="text-4xl font-serif font-black text-[#b0b095] tracking-tighter uppercase italic">Octopath Archivist</h1>
-              <div className="flex items-center gap-3 mt-1">
-                <span className="text-[9px] text-[#5c5c4d] font-mono tracking-[0.3em] uppercase">Cloud Synchronized Database</span>
-                <div className="h-px w-12 bg-[#2a2a25]"></div>
-                <span className="text-[9px] text-cyan-700 font-bold uppercase tracking-widest">{user?.isAnonymous ? 'Guest Mode' : 'Admin Access'}</span>
-              </div>
-            </div>
-          </div>
-          
-          <div className="flex gap-5 items-center mt-6 md:mt-0">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#4d4d45]" size={14} />
-              <input 
-                type="text" placeholder="Search traveler records..."
-                className="bg-[#161614] border border-[#2a2a25] rounded-full pl-10 pr-6 py-2.5 focus:outline-none focus:border-[#b0b095] focus:ring-1 focus:ring-[#b0b095] text-xs transition-all w-72"
-                value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-            
-            {user?.isAnonymous ? (
-              <button 
-                onClick={handleAdminLogin} 
-                className="bg-[#b0b095] hover:bg-white text-black px-6 py-2.5 rounded-full text-[11px] font-black transition-all flex items-center gap-2 uppercase tracking-tighter shadow-xl shadow-black/40 active:scale-95"
-              >
-                <Key size={14} /> Admin Login
-              </button>
-            ) : (
-              <div className="flex items-center gap-4 bg-[#161614] border border-[#2a2a25] pl-4 pr-2 py-1.5 rounded-full">
-                <span className="text-[10px] font-bold text-[#b0b095] uppercase tracking-widest">{ADMIN_EMAIL.split('@')[0]}</span>
-                <button onClick={() => signOut(auth)} className="text-[#5c5c4d] hover:text-red-400 p-2 transition-colors">
-                  <LogOut size={16} />
-                </button>
-              </div>
-            )}
-          </div>
-        </header>
+            return (
+                <div className="min-h-screen p-4 md:p-10 max-w-[1600px] mx-auto">
+                    {error && (
+                        <div className="fixed top-5 left-1/2 -translate-x-1/2 z-50 bg-red-950/90 border border-red-500 text-red-200 px-6 py-4 rounded-xl shadow-2xl flex flex-col items-center gap-2 error-shake backdrop-blur-md">
+                            <span className="text-xs font-bold uppercase tracking-widest">Protocol Warning</span>
+                            <span className="text-[11px] opacity-80 text-center">{error}</span>
+                            <button onClick={() => setError(null)} className="mt-2 text-[10px] underline hover:text-white transition-colors uppercase">Dismiss</button>
+                        </div>
+                    )}
 
-        {/* 메인 데이터 그리드 */}
-        <div className="overflow-x-auto rounded-xl border border-[#2a2a25] bg-[#141412] shadow-2xl relative overflow-hidden group">
-          <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none"></div>
-          <table className="w-full text-center border-collapse min-w-[1200px] relative z-10">
-            <thead>
-              <tr className="bg-[#1c1c1a] text-[#5c5c4d] text-[10px] uppercase tracking-[0.2em] font-black border-b border-[#2a2a25]">
-                <th className="p-5 w-20">Job</th>
-                <th className="p-5">Name</th>
-                <th className="p-5 w-20">Element</th>
-                <th className="p-5 w-32">Rarity</th>
-                <th className="p-5 w-32">Status</th>
-                <th className="p-5 w-16">A1</th>
-                <th className="p-5 w-16">U10</th>
-                <th className="p-5 min-w-[200px]">Equipments</th>
-                <th className="p-5 min-w-[300px] text-left">Strategic Notes</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#1c1c1a]">
-              {characters.filter(c => (c.name || '').toLowerCase().includes(searchTerm.toLowerCase())).map((char) => (
-                <tr key={char.id} className="hover:bg-white/[0.03] transition-colors group/row">
-                  <td className="p-4 text-2xl filter grayscale group-hover/row:grayscale-0 transition-all opacity-40 group-hover/row:opacity-100">
-                    {/* 직업 아이콘 로직 생략(기존 동일) */}
-                    ⚔️
-                  </td>
-                  <td className="p-4">
-                    <input 
-                      disabled={user?.isAnonymous} 
-                      className="bg-transparent w-full text-center font-serif font-bold text-[#b0b095] text-lg outline-none placeholder:text-[#2a2a25]" 
-                      value={char.name || ''} 
-                      onChange={(e) => updateCell(char.id, 'name', e.target.value)} 
-                    />
-                  </td>
-                  <td className="p-4 text-2xl opacity-60">🔥</td>
-                  <td className="p-4">
-                    <div className="flex justify-center gap-1">
-                      {[...Array(5)].map((_, i) => <Star key={i} size={10} fill={i < 5 ? "#b0b095" : "transparent"} className="text-[#b0b095]" />)}
+                    <header className="flex flex-col md:flex-row justify-between items-center md:items-end mb-12 border-b border-[#2a2a25] pb-8 gap-6">
+                        <div className="flex items-center gap-5">
+                            <div className="p-4 bg-[#b0b095] rounded shadow-[4px_4px_0px_#1c1c1a]"><IconCloud /></div>
+                            <div>
+                                <h1 className="text-4xl font-black text-[#b0b095] italic uppercase tracking-tighter leading-none">Octopath Archivist</h1>
+                                <div className="flex items-center gap-3 mt-2">
+                                    <span className="text-[9px] text-[#5c5c4d] font-mono tracking-[0.3em] uppercase">Archive Host: {window.location.hostname}</span>
+                                    <div className={`h-1.5 w-1.5 rounded-full ${isAdmin ? 'bg-green-500 shadow-[0_0_8px_#22c55e]' : 'bg-amber-500'}`}></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex flex-wrap justify-center gap-4 items-center">
+                            <div className="relative group">
+                                <span className="absolute left-4 top-3 text-[#4d4d45] group-focus-within:text-[#b0b095] transition-colors"><IconSearch /></span>
+                                <input 
+                                    className="bg-[#161614] border border-[#2a2a25] rounded-full pl-12 pr-6 py-2.5 text-xs text-white w-64 md:w-80 focus:border-[#b0b095] transition-all"
+                                    placeholder="Search by traveler name..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                />
+                            </div>
+                            {!isAdmin ? (
+                                <button onClick={handleLogin} className="bg-[#b0b095] hover:bg-white text-black px-8 py-2.5 rounded-full text-[11px] font-black flex items-center gap-2 transition-all uppercase shadow-lg active:scale-95">
+                                    <IconKey /> Admin Access
+                                </button>
+                            ) : (
+                                <div className="flex items-center gap-4">
+                                    <span className="text-[10px] font-bold text-[#b0b095] bg-[#1c1c1a] px-3 py-1.5 rounded-full border border-[#2a2a25]">ADMIN MODE</span>
+                                    <button onClick={() => signOut(auth)} className="text-[#5c5c4d] hover:text-red-500 text-[10px] font-bold uppercase transition-colors">Logout</button>
+                                </div>
+                            )}
+                        </div>
+                    </header>
+
+                    <div className="glass-panel rounded-2xl overflow-hidden shadow-2xl mb-20">
+                        <div className="overflow-x-auto custom-scroll">
+                            <table className="w-full text-center min-w-[1200px] border-collapse">
+                                <thead>
+                                    <tr className="bg-[#1c1c1a] text-[#5c5c4d] text-[10px] font-black uppercase tracking-[0.2em] border-b border-[#2a2a25]">
+                                        <th className="p-5 w-32">Job</th>
+                                        <th className="p-5">Traveler Name</th>
+                                        <th className="p-5 w-24">Element</th>
+                                        <th className="p-5 w-32">Rarity</th>
+                                        <th className="p-5 w-32">Enhance</th>
+                                        <th className="p-5 w-20">A-Rank</th>
+                                        <th className="p-5 w-20">U-Rank</th>
+                                        <th className="p-5 min-w-[300px] text-left">Strategic Records</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-[#1c1c1a]">
+                                    {characters.filter(c => (c.name || '').toLowerCase().includes(searchTerm.toLowerCase())).map(char => (
+                                        <tr key={char.id} className="hover:bg-white/[0.03] transition-colors group">
+                                            <td className="p-4 text-2xl filter grayscale group-hover:grayscale-0 opacity-40 group-hover:opacity-100 transition-all">
+                                                {char.job === 'Warrior' ? '⚔️' : 
+                                                 char.job === 'Merchant' ? '💰' : 
+                                                 char.job === 'Thief' ? '🗡️' : 
+                                                 char.job === 'Apothecary' ? '🧪' : 
+                                                 char.job === 'Hunter' ? '🏹' : 
+                                                 char.job === 'Cleric' ? '📜' : 
+                                                 char.job === 'Scholar' ? '📖' : '💃'}
+                                            </td>
+                                            <td className="p-4">
+                                                <input 
+                                                    disabled={!isAdmin}
+                                                    className={`bg-transparent w-full text-center font-bold text-[#b0b095] text-xl italic outline-none ${isAdmin ? 'focus:bg-white/5 cursor-text' : 'cursor-default'}`}
+                                                    value={char.name || ''}
+                                                    onChange={(e) => updateData(char.id, 'name', e.target.value)}
+                                                />
+                                            </td>
+                                            <td className="p-4 text-2xl opacity-60">
+                                                {char.element === 'Fire' ? '🔥' : 
+                                                 char.element === 'Ice' ? '❄️' : 
+                                                 char.element === 'Thunder' ? '⚡' : 
+                                                 char.element === 'Wind' ? '🌪️' : 
+                                                 char.element === 'Light' ? '☀️' : '🌙'}
+                                            </td>
+                                            <td className="p-4">
+                                                <div className="flex justify-center gap-0.5">
+                                                    {[...Array(5)].map((_, i) => <IconStar key={i} filled={i < (char.rarity || 5)} />)}
+                                                </div>
+                                            </td>
+                                            <td className="p-4">
+                                                <div className="text-cyan-600 font-mono font-bold text-[10px] tracking-widest uppercase">Boost +{char.boost || 10}</div>
+                                                <div className="text-[#4d4d45] text-[10px] font-mono mt-0.5 tracking-tighter">Level {char.level || 100}</div>
+                                            </td>
+                                            <td className="p-4">
+                                                <button 
+                                                    disabled={!isAdmin}
+                                                    onClick={() => updateData(char.id, 'awakening', !char.awakening)}
+                                                    className={`w-4 h-4 rounded-sm border ${char.awakening ? 'bg-cyan-600 border-cyan-400 shadow-[0_0_10px_rgba(8,145,178,0.5)]' : 'border-[#2a2a25]'} mx-auto transition-all`}
+                                                />
+                                            </td>
+                                            <td className="p-4">
+                                                <button 
+                                                    disabled={!isAdmin}
+                                                    onClick={() => updateData(char.id, 'ultimate', !char.ultimate)}
+                                                    className={`w-4 h-4 rounded-sm border ${char.ultimate ? 'bg-cyan-600 border-cyan-400 shadow-[0_0_10px_rgba(8,145,178,0.5)]' : 'border-[#2a2a25]'} mx-auto transition-all`}
+                                                />
+                                            </td>
+                                            <td className="p-4 px-8 text-left">
+                                                <textarea 
+                                                    disabled={!isAdmin}
+                                                    rows="1"
+                                                    className={`bg-transparent w-full outline-none text-[#5c5c4d] text-xs italic resize-none overflow-hidden placeholder:text-[#2a2a25] ${isAdmin ? 'focus:text-[#8a8a75]' : ''}`}
+                                                    placeholder="Enter strategic archives..."
+                                                    value={char.notes || ''}
+                                                    onChange={(e) => updateData(char.id, 'notes', e.target.value)}
+                                                />
+                                            </td>
+                                        </tr>
+                                    ))}
+                                    {characters.length === 0 && (
+                                        <tr>
+                                            <td colSpan="8" className="py-40">
+                                                <div className="flex flex-col items-center opacity-20">
+                                                    <IconCloud />
+                                                    <p className="text-[10px] tracking-[1em] uppercase mt-4 font-serif">No Data Synchronized</p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                  </td>
-                  <td className="p-4">
-                    <div className="text-cyan-600 font-mono font-bold text-[10px] tracking-widest uppercase">Max Boost</div>
-                    <div className="text-[#4d4d45] text-[10px] font-mono">Level 100</div>
-                  </td>
-                  <td className="p-4">
-                    <div className="w-4 h-4 rounded-full border border-cyan-900 bg-cyan-950/30 mx-auto"></div>
-                  </td>
-                  <td className="p-4">
-                    <div className="w-4 h-4 rounded-full border border-[#2a2a25] mx-auto"></div>
-                  </td>
-                  <td className="p-4 px-6">
-                    <input 
-                      disabled={user?.isAnonymous} 
-                      className="bg-[#1c1c1a]/50 border border-transparent focus:border-[#2a2a25] rounded px-3 py-1.5 w-full outline-none text-[11px] text-[#8a8a75] italic transition-all" 
-                      placeholder="Accessory..."
-                    />
-                  </td>
-                  <td className="p-4 px-6 text-left">
-                    <textarea 
-                      disabled={user?.isAnonymous}
-                      rows="1"
-                      className="bg-transparent w-full outline-none text-[#5c5c4d] text-[11px] resize-none overflow-hidden placeholder:text-[#2a2a25]"
-                      placeholder="Input strategic archives..."
-                    />
-                  </td>
-                </tr>
-              ))}
-              {characters.length === 0 && (
-                <tr>
-                  <td colSpan="9" className="py-40">
-                    <div className="flex flex-col items-center opacity-20">
-                      <Cloud size={48} className="mb-4" />
-                      <p className="text-[10px] tracking-[1em] uppercase font-serif">Empty Archives</p>
-                    </div>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
 
-        <footer className="mt-16 pt-10 border-t border-[#1c1c1a] flex flex-col md:flex-row justify-between items-center text-[9px] text-[#3d3d35] font-mono tracking-[0.2em] uppercase gap-8 pb-16">
-          <div className="flex gap-10">
-            <p>© Square Enix / Octopath Traveler CoTC Manager</p>
-            <p className="text-[#5c5c4d]">Admin: <span className="text-[#8a8a75]">{ADMIN_EMAIL}</span></p>
-          </div>
-          <div className="flex gap-6 items-center italic">
-             <span className="flex items-center gap-2 text-green-900"><div className="w-1.5 h-1.5 rounded-full bg-green-900 shadow-[0_0_8px_#064e3b]"></div> Database Online</span>
-             <span className="text-[#2a2a25]">Host: {detectedDomain}</span>
-          </div>
-        </footer>
-      </div>
-    </div>
-  );
-};
+                    <footer className="mt-20 flex flex-col md:flex-row justify-between items-center text-[9px] text-[#3d3d35] font-mono tracking-[0.3em] uppercase gap-8 pb-20 border-t border-[#1c1c1a] pt-10">
+                        <div className="flex gap-10">
+                            <p>© Square Enix / Octopath Traveler CoTC Manager</p>
+                            <p className="text-[#5c5c4d]">Admin: <span className="text-[#8a8a75]">{ADMIN_EMAIL}</span></p>
+                        </div>
+                        <div className="flex gap-6 items-center italic">
+                             <span className="flex items-center gap-2 text-green-900"><div className="w-1.5 h-1.5 rounded-full bg-green-900 shadow-[0_0_8px_#064e3b]"></div> Status: Online</span>
+                             <span className="text-[#2a2a25]">Protocol: gh-pages-secured</span>
+                        </div>
+                    </footer>
+                </div>
+            );
+        };
 
-export default App;
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
