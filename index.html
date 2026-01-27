@@ -53,6 +53,13 @@
             overflow-x: auto;
         }
 
+        /* Custom Scrollbar */
+        .table-container::-webkit-scrollbar { height: 10px; width: 8px; }
+        .table-container::-webkit-scrollbar-track { background: #000000; border-radius: 10px; }
+        .table-container::-webkit-scrollbar-thumb { background: #333330; border-radius: 10px; border: 2px solid #000000; }
+        .table-container::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+        .table-container { scrollbar-width: thin; scrollbar-color: #333330 #000000; }
+
         table { width: max-content; min-width: 100%; border-spacing: 0; border-collapse: separate; }
 
         th { 
@@ -74,51 +81,11 @@
             text-align: center; vertical-align: middle;
         }
 
-        .admin-cell-wrapper {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0 15px;
-            min-height: 54px;
-            box-sizing: border-box;
-            min-width: 60px; /* 빈 셀이라도 클릭 가능하도록 최소 너비 보장 */
-        }
+        .admin-cell-wrapper { display: inline-flex; align-items: center; justify-content: center; padding: 0 15px; min-height: 54px; box-sizing: border-box; min-width: 60px; }
+        .cell-input { background: transparent; border: none; color: inherit; text-align: center; outline: none; padding: 0; width: 100%; display: block; }
 
-        .cell-input {
-            background: transparent;
-            border: none;
-            color: inherit;
-            text-align: center;
-            outline: none;
-            padding: 0;
-            width: 100%;
-            display: block;
-        }
-
-        .admin-textarea-wrapper {
-            display: flex;
-            align-items: center;
-            padding: 12px 15px;
-            min-height: 54px;
-            box-sizing: border-box;
-            width: 100%;
-        }
-
-        .cell-textarea {
-            width: 100%;
-            background: transparent;
-            border: none;
-            color: inherit;
-            text-align: left;
-            outline: none;
-            padding: 0 !important;
-            resize: none;
-            overflow: hidden;
-            display: block;
-            line-height: 1.5;
-            white-space: pre-wrap;
-            height: auto;
-        }
+        .admin-textarea-wrapper { display: flex; align-items: center; padding: 12px 15px; min-height: 54px; box-sizing: border-box; width: 100%; }
+        .cell-textarea { width: 100%; background: transparent; border: none; color: inherit; text-align: left; outline: none; padding: 0 !important; resize: none; overflow: hidden; display: block; line-height: 1.5; white-space: pre-wrap; height: auto; }
 
         .fixed-col-wide { min-width: 420px; width: 420px; }
         .fixed-col-extra { min-width: 470px; width: 470px; }
@@ -155,10 +122,15 @@
         }
         .filter-select:hover { border-color: rgba(217, 119, 6, 0.4); color: #fff; }
         .filter-select option { background: #1a1a18; color: #ccc; }
+
+        .delete-btn-wrapper { display: flex; align-items: center; justify-content: center; height: 54px; width: 60px; }
+        .delete-btn { color: #444; transition: all 0.2s; padding: 10px; cursor: pointer; }
+        .delete-btn:hover { color: #ef4444; transform: scale(1.1); }
     </style>
 </head>
 <body class="min-h-screen pb-12">
 
+    <!-- Loading Overlay -->
     <div id="loading" class="loading-overlay">
         <div class="flex flex-col items-center gap-4">
             <div class="w-12 h-12 border-4 border-amber-500/20 border-t-amber-500 rounded-full animate-spin"></div>
@@ -187,8 +159,8 @@
         
         <div class="flex items-center justify-between border-t border-white/5 px-4 bg-[#141412]/80">
             <div class="flex">
-                <button id="tab-5star" class="tab-btn active" onclick="switchTab('5star')">5성 (...)</button>
-                <button id="tab-lowstar" class="tab-btn" onclick="switchTab('lowstar')">4성/3성 (...)</button>
+                <button id="tab-5star" class="tab-btn active" onclick="window.switchTab('5star')">5성 (...)</button>
+                <button id="tab-lowstar" class="tab-btn" onclick="window.switchTab('lowstar')">4성/3성 (...)</button>
             </div>
             <div id="userTools" class="search-container py-2">
                 <select id="searchFieldFilter" class="filter-select">
@@ -221,12 +193,28 @@
         </div>
     </main>
 
+    <!-- Admin Login Modal -->
     <div id="loginModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-black/85 backdrop-blur-md p-6">
         <div class="bg-[#1a1a18] border border-amber-900/40 p-8 rounded-[2.5rem] w-full max-w-md text-center">
             <h2 class="text-xl font-black text-amber-500 mb-10 italic uppercase">Admin Verify</h2>
             <input type="password" id="loginPassword" placeholder="••••••" class="w-full bg-black/40 border border-white/5 rounded-2xl py-4 text-center tracking-[0.5em] outline-none focus:border-amber-500/40 text-white mb-6">
             <button id="doLogin" class="w-full py-4 bg-amber-600 text-black font-black uppercase rounded-2xl">인증 완료</button>
             <button onclick="document.getElementById('loginModal').classList.add('hidden')" class="mt-6 text-[10px] text-zinc-600 font-bold uppercase">취소</button>
+        </div>
+    </div>
+
+    <!-- Custom Delete Confirmation Modal -->
+    <div id="deleteConfirmModal" class="fixed inset-0 z-[200] hidden flex items-center justify-center bg-black/90 backdrop-blur-sm p-6">
+        <div class="bg-[#1a1a18] border border-red-900/40 p-8 rounded-[2rem] w-full max-w-sm text-center">
+            <div class="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i class="fa-solid fa-triangle-exclamation text-red-500 text-2xl"></i>
+            </div>
+            <h2 class="text-lg font-black text-white mb-2 italic">정말 삭제하시겠습니까?</h2>
+            <p class="text-zinc-500 text-xs mb-10 leading-relaxed">이 작업은 되돌릴 수 없으며,<br>해당 캐릭터의 모든 정보가 영구 삭제됩니다.</p>
+            <div class="flex gap-3">
+                <button id="cancelDeleteBtn" class="flex-1 py-4 bg-zinc-800 text-zinc-400 font-bold rounded-xl text-xs hover:bg-zinc-700 transition-all">취소</button>
+                <button id="confirmDeleteBtn" class="flex-1 py-4 bg-red-600 text-white font-black rounded-xl text-xs hover:bg-red-500 transition-all shadow-lg shadow-red-900/20">삭제 실행</button>
+            </div>
         </div>
     </div>
 
@@ -264,12 +252,44 @@
         const loginPasswordInput = document.getElementById('loginPassword');
         const doLoginBtn = document.getElementById('doLogin');
 
+        // Custom Modal Elements
+        const deleteConfirmModal = document.getElementById('deleteConfirmModal');
+        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+        const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+
         let currentUser = null;
         let activeTab = '5star';
         let rawData = [];
         let unsubscribeCurrent = null;
+        let deleteIdPending = null;
 
         const COLLECTION_MAP = { '5star': 'travelers', 'lowstar': 'travelers_lowstar' };
+
+        /**
+         * FIXED: Custom Modal Logic instead of window.confirm()
+         */
+        window.deleteRow = (id) => {
+            deleteIdPending = id;
+            deleteConfirmModal.classList.remove('hidden');
+        };
+
+        confirmDeleteBtn.onclick = async () => {
+            if (deleteIdPending) {
+                try {
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', COLLECTION_MAP[activeTab], deleteIdPending);
+                    await deleteDoc(docRef);
+                    deleteIdPending = null;
+                    deleteConfirmModal.classList.add('hidden');
+                } catch (error) {
+                    console.error("삭제 에러:", error);
+                }
+            }
+        };
+
+        cancelDeleteBtn.onclick = () => {
+            deleteIdPending = null;
+            deleteConfirmModal.classList.add('hidden');
+        };
 
         window.switchTab = (tab) => {
             activeTab = tab;
@@ -305,7 +325,8 @@
                 onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', COLLECTION_MAP[t]), (snap) => {
                     let gifts = 0;
                     snap.forEach(d => { if (d.data().gift?.trim()) gifts++; });
-                    document.getElementById(`tab-${t}`).innerText = `${t === '5star' ? '5성' : '4성/3성'} (${gifts}명/${snap.size}명)`;
+                    const btn = document.getElementById(`tab-${t}`);
+                    if (btn) btn.innerText = `${t === '5star' ? '5성' : '4성/3성'} (${gifts}명/${snap.size}명)`;
                 });
             });
         }
@@ -320,7 +341,7 @@
         }
 
         function renderTable() {
-            const searchTerm = charSearch.value.toLowerCase().trim();
+            const searchTerm = (charSearch.value || "").toLowerCase().trim();
             const filterField = searchFieldFilter.value;
             travelerTableBody.innerHTML = '';
             rawData.filter(i => {
@@ -334,6 +355,7 @@
                 }
             }).forEach(i => renderRow(i));
         }
+        
         charSearch.oninput = renderTable;
         searchFieldFilter.onchange = renderTable;
 
@@ -432,9 +454,14 @@
 
             if (isAdmin) {
                 const delTd = document.createElement('td');
-                delTd.className = "text-center";
-                delTd.innerHTML = '<button class="text-zinc-600 hover:text-red-500 p-2"><i class="fa-solid fa-trash-can"></i></button>';
-                delTd.onclick = async () => { if(confirm('삭제하시겠습니까?')) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', COLLECTION_MAP[activeTab], data.id)); };
+                const delWrapper = document.createElement('div');
+                delWrapper.className = "delete-btn-wrapper";
+                const delBtn = document.createElement('div');
+                delBtn.className = "delete-btn";
+                delBtn.innerHTML = '<i class="fa-solid fa-trash-can"></i>';
+                delBtn.onclick = () => window.deleteRow(data.id);
+                delWrapper.appendChild(delBtn);
+                delTd.appendChild(delWrapper);
                 tr.appendChild(delTd);
             }
             travelerTableBody.appendChild(tr);
@@ -475,13 +502,7 @@
 
         adminBtn.onclick = () => { document.getElementById('loginModal').classList.remove('hidden'); loginPasswordInput.focus(); };
 
-        // 엔터키 로그인 이벤트 추가
-        loginPasswordInput.onkeydown = (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                doLoginBtn.click();
-            }
-        };
+        loginPasswordInput.onkeydown = (e) => { if (e.key === 'Enter') { e.preventDefault(); doLoginBtn.click(); } };
 
         doLoginBtn.onclick = async () => { 
             try { 
@@ -498,7 +519,7 @@
                 Array.from(travelerTableBody.querySelectorAll('tr')).forEach((row, idx) => {
                     batch.update(doc(db, 'artifacts', appId, 'public', 'data', COLLECTION_MAP[activeTab], row.getAttribute('data-id')), { order: idx });
                 });
-                batch.commit();
+                await batch.commit();
             }
         });
     </script>
