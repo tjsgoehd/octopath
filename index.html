@@ -46,71 +46,23 @@
             background: rgba(255, 204, 0, 0.05);
         }
 
-        /* 검색창 스타일 */
-        .search-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-            margin-right: 24px;
-        }
-        .search-input {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 20px;
-            padding: 6px 15px 6px 35px;
-            font-size: 11px;
-            color: #fff;
-            outline: none;
-            transition: all 0.3s ease;
-            width: 180px;
-        }
-        .search-input:focus {
-            border-color: var(--status-color);
-            background: rgba(255,255,255,0.07);
-            width: 240px;
-        }
-        .search-icon {
-            position: absolute;
-            left: 12px;
-            font-size: 12px;
-            color: #666;
-        }
-
         .table-container { 
             background: #141412; 
             border-radius: 12px; 
             border: 1px solid rgba(255,255,255,0.05); 
-            position: relative;
-            scrollbar-width: thin;
-            scrollbar-color: #333 #000;
             overflow-x: auto;
         }
 
-        .table-container::-webkit-scrollbar { width: 8px; height: 8px; }
-        .table-container::-webkit-scrollbar-track { background: #000; border-radius: 10px; }
-        .table-container::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; border: 2px solid #000; }
-        .table-container::-webkit-scrollbar-thumb:hover { background: #d97706; }
-
-        table { 
-            table-layout: auto; 
-            width: max-content; 
-            min-width: 100%; 
-            border-spacing: 0; 
-            border-collapse: separate;
-        }
+        table { width: max-content; min-width: 100%; border-spacing: 0; border-collapse: separate; }
 
         th { 
             background: #2d2d26 !important; 
             color: #a1a18b !important; 
             font-size: 11px; 
-            padding: 12px 20px; 
+            padding: 12px 15px; 
             border-right: 1px solid rgba(255,255,255,0.05); 
-            position: sticky; 
-            top: 0; 
-            z-index: 20; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-            white-space: nowrap;
-            text-align: center;
+            position: sticky; top: 0; z-index: 20; 
+            white-space: nowrap; text-align: center;
         }
 
         td { 
@@ -119,64 +71,90 @@
             border-right: 1px solid rgba(255,255,255,0.02); 
             padding: 0 !important; 
             height: 54px; 
-            position: relative; 
-            background-color: transparent;
+            text-align: center; vertical-align: middle;
+        }
+
+        .admin-cell-wrapper {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 15px;
+            min-height: 54px;
+            box-sizing: border-box;
+            min-width: 60px; /* 빈 셀이라도 클릭 가능하도록 최소 너비 보장 */
+        }
+
+        .cell-input {
+            background: transparent;
+            border: none;
+            color: inherit;
             text-align: center;
-            vertical-align: middle;
+            outline: none;
+            padding: 0;
+            width: 100%;
+            display: block;
         }
 
-        .drag-handle-cell {
-            width: 44px !important;
-            min-width: 44px !important;
-            cursor: grab;
-            border-right: 1px solid rgba(255,255,255,0.1) !important;
+        .admin-textarea-wrapper {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            min-height: 54px;
+            box-sizing: border-box;
+            width: 100%;
         }
-        
-        .drag-handle-inner {
-            display: flex; align-items: center; justify-content: center;
-            opacity: 0.3; transition: all 0.2s ease; height: 100%;
-        }
-        
-        .drag-handle-cell:hover .drag-handle-inner { background-color: rgba(255,255,255,0.07); opacity: 1; }
 
-        .cell-input-wrapper { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; padding: 0 15px; box-sizing: border-box; }
-        .cell-input { width: 100%; background: transparent; border: none; color: inherit; text-align: center; outline: none; }
-        
         .cell-textarea {
-            width: 100%; min-height: 54px; background: transparent; border: none; color: inherit; 
-            text-align: left; outline: none; padding: 18px 15px !important; box-sizing: border-box;
-            resize: none; overflow: hidden; display: block; line-height: 1.4; white-space: pre-wrap;
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: inherit;
+            text-align: left;
+            outline: none;
+            padding: 0 !important;
+            resize: none;
+            overflow: hidden;
+            display: block;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            height: auto;
         }
-        
-        .display-multiline { display: block; padding: 12px 15px !important; white-space: pre-wrap; line-height: 1.5; text-align: center; word-break: keep-all; }
 
-        .reinforce-text { color: var(--highlight) !important; font-weight: bold; }
-        .growth-text { color: var(--status-color) !important; font-weight: 900; }
+        .fixed-col-wide { min-width: 420px; width: 420px; }
+        .fixed-col-extra { min-width: 470px; width: 470px; }
 
-        .status-select {
-            background: transparent; border: none; width: 100%; height: 54px;
-            text-align: center; text-align-last: center; font-weight: 900; 
-            cursor: pointer; appearance: none; outline: none; padding: 0 15px; 
-            color: var(--status-color);
-        }
-        
-        .status-select option { background: var(--card-bg); color: var(--status-color); text-align: center; }
-        
-        .image-cell-wrapper { display: flex; align-items: center; justify-content: center; width: 100%; height: 54px; cursor: pointer; padding: 0 15px; }
-        .preview-img { max-height: 40px; max-width: 100%; object-fit: contain; pointer-events: none; }
+        .drag-handle-cell { width: 44px !important; min-width: 44px !important; cursor: grab; }
+        .drag-handle-inner { display: flex; align-items: center; justify-content: center; opacity: 0.3; transition: 0.2s; height: 100%; }
+        .drag-handle-cell:hover .drag-handle-inner { background: rgba(255,255,255,0.07); opacity: 1; }
+
+        .display-multiline { display: block; padding: 12px 15px !important; white-space: pre-wrap; line-height: 1.5; text-align: left; word-break: keep-all; }
+        .display-center { display: block; padding: 12px 15px !important; white-space: pre-wrap; line-height: 1.5; text-align: center; word-break: keep-all; }
+
+        .image-cell-wrapper { display: flex; align-items: center; justify-content: center; width: 100%; height: 54px; cursor: pointer; padding: 0 15px; min-width: 50px; }
+        .preview-img { max-height: 40px; max-width: 100%; object-fit: contain; }
 
         .badge-box {
             display: inline-flex; align-items: center; justify-content: center;
             padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: 900;
-            border: 1px solid rgba(255,255,255,0.05); min-width: 44px; background: rgba(255,255,255,0.03); color: rgba(255,255,255,0.2);     
+            background: rgba(255,255,255,0.03); color: rgba(255,255,255,0.2);     
         }
-        .badge-box.active { background: var(--highlight) !important; color: #000 !important; border-color: var(--highlight); }
+        .badge-box.active { background: var(--highlight) !important; color: #000 !important; }
 
         .simple-checkbox, .round-radio { width: 16px; height: 16px; cursor: pointer; }
         .simple-checkbox { accent-color: var(--box-accent); }
         .round-radio { accent-color: var(--check-accent); }
         
         .loading-overlay { background: rgba(0,0,0,0.9); display: flex; position: fixed; inset: 0; z-index: 9999; align-items: center; justify-content: center; }
+
+        .search-container { display: flex; align-items: center; gap: 8px; }
+        .filter-select {
+            background: #1a1a18; border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px; color: #a1a18b; font-size: 11px; font-weight: 700; 
+            padding: 6px 10px; outline: none; cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .filter-select:hover { border-color: rgba(217, 119, 6, 0.4); color: #fff; }
+        .filter-select option { background: #1a1a18; color: #ccc; }
     </style>
 </head>
 <body class="min-h-screen pb-12">
@@ -188,9 +166,8 @@
         </div>
     </div>
 
-    <!-- HEADER -->
     <header class="sticky top-0 z-50 backdrop-blur-sm">
-        <div class="px-6 py-4 flex justify-between items-center">
+        <div class="px-4 py-4 flex justify-between items-center">
             <div class="flex items-center gap-3">
                 <div class="p-2 bg-amber-900/20 rounded-lg border border-amber-600/30"><i class="fa-solid fa-feather-pointed text-amber-500 text-xl"></i></div>
                 <div>
@@ -199,25 +176,29 @@
                 </div>
             </div>
             <div class="flex items-center gap-4">
-                <button id="addCharBtn" class="hidden flex items-center gap-2 px-4 py-2 bg-amber-600 text-black rounded-lg text-xs font-black hover:bg-amber-500 transition-all shadow-lg shadow-amber-900/20">
+                <button id="addCharBtn" class="hidden flex items-center gap-2 px-4 py-2 bg-amber-600 text-black rounded-lg text-xs font-black hover:bg-amber-500 transition-all shadow-lg">
                     <i class="fa-solid fa-plus"></i> 캐릭터 추가
                 </button>
                 <div id="userInfo" class="hidden text-[10px] text-zinc-500 font-mono border-l border-white/10 pl-4 h-6 flex items-center"></div>
-                <button id="adminBtn" class="px-4 py-2 rounded-lg text-xs font-bold border border-amber-500/50 text-amber-500 hover:bg-amber-500 hover:text-black transition-all">ADMIN LOGIN</button>
-                <button id="logoutBtn" class="hidden px-4 py-2 rounded-lg text-xs font-bold border border-red-500/50 text-red-500 hover:bg-red-500 hover:text-white transition-all">로그아웃</button>
+                <button id="adminBtn" class="px-4 py-2 rounded-lg text-xs font-bold border border-amber-500/50 text-amber-500">ADMIN LOGIN</button>
+                <button id="logoutBtn" class="hidden px-4 py-2 rounded-lg text-xs font-bold border border-red-500/50 text-red-500">로그아웃</button>
             </div>
         </div>
         
-        <!-- TABS & SEARCH -->
-        <div class="flex items-center justify-between border-t border-white/5 px-6 bg-[#141412]/50">
+        <div class="flex items-center justify-between border-t border-white/5 px-4 bg-[#141412]/80">
             <div class="flex">
-                <button id="tab-5star" class="tab-btn active" onclick="switchTab('5star')">5성 (불러오는 중...)</button>
-                <button id="tab-lowstar" class="tab-btn" onclick="switchTab('lowstar')">4성/3성 (불러오는 중...)</button>
+                <button id="tab-5star" class="tab-btn active" onclick="switchTab('5star')">5성 (...)</button>
+                <button id="tab-lowstar" class="tab-btn" onclick="switchTab('lowstar')">4성/3성 (...)</button>
             </div>
-            <!-- 검색창: 초기 상태는 hidden, 일반 사용자 로그인 시에만 스크립트로 표시함 -->
-            <div id="searchWrapper" class="search-wrapper hidden">
-                <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                <input type="text" id="charSearch" placeholder="캐릭터 이름 또는 정보 검색..." class="search-input">
+            <div id="userTools" class="search-container py-2">
+                <select id="searchFieldFilter" class="filter-select">
+                    <option value="all">전체</option>
+                    <option value="basestat">악세(스탯)</option>
+                    <option value="extra1">악세(효과)</option>
+                    <option value="extra2">서포트</option>
+                    <option value="extra3">필살기</option>
+                </select>
+                <input type="text" id="charSearch" placeholder="검색어를 입력하세요.." class="bg-white/5 border border-white/10 rounded-full px-4 py-1.5 text-[11px] text-white outline-none focus:border-amber-500/50 w-[220px]">
             </div>
         </div>
     </header>
@@ -227,25 +208,11 @@
             <table id="mainTable">
                 <thead>
                     <tr id="headerRow">
-                        <th id="dragHeader" class="hidden" style="width: 44px; min-width: 44px;">↕</th>
-                        <th>직업</th>
-                        <th>캐릭터</th>
-                        <th>이름</th>
-                        <th>성장상태</th>
-                        <th>등화</th>
-                        <th>등화(배틀/서포트)</th>
-                        <th>등화(스탯)</th>
-                        <th>레벨</th>
-                        <th>천부</th>
-                        <th>필살기</th>
-                        <th>각성</th>
-                        <th>오의</th>
-                        <th>등불</th>
-                        <th>악세명</th>
-                        <th>악세(스탯)</th>
-                        <th style="min-width: 420px;">악세(효과)</th>
-                        <th style="min-width: 470px;">서포트 어빌</th> 
-                        <th style="min-width: 470px;">필살기 정보</th> 
+                        <th id="dragHeader" class="hidden" style="width: 44px;">↕</th>
+                        <th>직업</th><th>캐릭터</th><th>이름</th><th>성장상태</th><th>등화</th><th>등화(배틀/서포트)</th><th>등화(스탯)</th><th>레벨</th><th>천부</th><th>필살기</th><th>각성</th><th>오의</th><th>등불</th><th>악세명</th><th>악세(스탯)</th>
+                        <th class="fixed-col-wide">악세(효과)</th>
+                        <th class="fixed-col-extra">서포트 어빌</th> 
+                        <th class="fixed-col-extra">필살기 정보</th> 
                         <th id="adminHeader" class="hidden bg-red-900/20 text-red-500" style="width: 60px;">기능</th>
                     </tr>
                 </thead>
@@ -254,37 +221,19 @@
         </div>
     </main>
 
-    <!-- Modals -->
     <div id="loginModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-black/85 backdrop-blur-md p-6">
-        <div class="bg-[#1a1a18] border border-amber-900/40 p-8 rounded-[2.5rem] w-full max-w-md shadow-[0_0_50px_rgba(0,0,0,0.8)]">
-            <div class="text-center mb-10">
-                <div class="w-16 h-16 bg-amber-900/20 border border-amber-600/30 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                    <i class="fa-solid fa-shield-halved text-amber-500 text-2xl"></i>
-                </div>
-                <h2 class="text-xl font-black text-amber-500 uppercase tracking-tighter italic">Admin Verify</h2>
-            </div>
-            <div class="space-y-6">
-                <input type="password" id="loginPassword" placeholder="••••••" class="w-full bg-black/40 border border-white/5 rounded-2xl py-4 px-6 outline-none focus:border-amber-500/40 text-white text-center font-bold tracking-[0.5em] transition-all">
-                <button id="doLogin" class="w-full py-4 bg-amber-600 text-black font-black text-xs uppercase rounded-2xl hover:bg-amber-500 transition-all tracking-widest">인증 완료</button>
-            </div>
-            <button onclick="document.getElementById('loginModal').classList.add('hidden')" class="mt-6 w-full text-[10px] text-zinc-600 font-bold uppercase hover:text-zinc-400">취소하기</button>
-        </div>
-    </div>
-
-    <div id="uiModal" class="fixed inset-0 z-[200] hidden flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-        <div class="bg-[#1a1a18] border border-white/5 p-8 rounded-3xl w-full max-w-xs text-center">
-            <p id="uiModalMsg" class="text-sm font-bold mb-6"></p>
-            <div class="flex gap-2">
-                <button id="uiModalConfirm" class="flex-1 py-3 bg-red-600 text-white rounded-xl text-xs font-black">확인</button>
-                <button id="uiModalCancel" class="flex-1 py-3 bg-zinc-800 text-zinc-400 rounded-xl text-xs font-black">취소</button>
-            </div>
+        <div class="bg-[#1a1a18] border border-amber-900/40 p-8 rounded-[2.5rem] w-full max-w-md text-center">
+            <h2 class="text-xl font-black text-amber-500 mb-10 italic uppercase">Admin Verify</h2>
+            <input type="password" id="loginPassword" placeholder="••••••" class="w-full bg-black/40 border border-white/5 rounded-2xl py-4 text-center tracking-[0.5em] outline-none focus:border-amber-500/40 text-white mb-6">
+            <button id="doLogin" class="w-full py-4 bg-amber-600 text-black font-black uppercase rounded-2xl">인증 완료</button>
+            <button onclick="document.getElementById('loginModal').classList.add('hidden')" class="mt-6 text-[10px] text-zinc-600 font-bold uppercase">취소</button>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, writeBatch, getDocs, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, writeBatch, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAjbApqAPhrZXcnR2P_xd-nvrZOvZp67CI",
@@ -308,176 +257,96 @@
         const dragHeader = document.getElementById('dragHeader');
         const addCharBtn = document.getElementById('addCharBtn');
         const loadingOverlay = document.getElementById('loading');
-        const userInfo = document.getElementById('userInfo');
-        const loginModal = document.getElementById('loginModal');
-        const loginPassword = document.getElementById('loginPassword');
-        const doLoginBtn = document.getElementById('doLogin');
-        const uiModal = document.getElementById('uiModal');
-        const uiModalMsg = document.getElementById('uiModalMsg');
         const charSearch = document.getElementById('charSearch');
-        const searchWrapper = document.getElementById('searchWrapper');
+        const searchFieldFilter = document.getElementById('searchFieldFilter');
+        const userTools = document.getElementById('userTools');
+        const userInfo = document.getElementById('userInfo');
+        const loginPasswordInput = document.getElementById('loginPassword');
+        const doLoginBtn = document.getElementById('doLogin');
 
         let currentUser = null;
-        let sortable = null;
         let activeTab = '5star';
-        let unsubscribeCurrent = null;
-        let unsubscribeCounts = [];
         let rawData = [];
+        let unsubscribeCurrent = null;
 
-        const COLLECTION_MAP = {
-            '5star': 'travelers',
-            'lowstar': 'travelers_lowstar'
-        };
+        const COLLECTION_MAP = { '5star': 'travelers', 'lowstar': 'travelers_lowstar' };
 
         window.switchTab = (tab) => {
             activeTab = tab;
-            charSearch.value = '';
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(`tab-${tab}`).classList.add('active');
+            if (searchFieldFilter) searchFieldFilter.value = 'all';
+            if (charSearch) charSearch.value = '';
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.id === `tab-${tab}`));
             loadTable();
         };
 
-        const showConfirm = (msg) => {
-            return new Promise((resolve) => {
-                uiModalMsg.innerText = msg;
-                uiModal.classList.remove('hidden');
-                document.getElementById('uiModalConfirm').onclick = () => { uiModal.classList.add('hidden'); resolve(true); };
-                document.getElementById('uiModalCancel').onclick = () => { uiModal.classList.add('hidden'); resolve(false); };
-            });
-        };
-
-        const initAuth = async () => {
-            onAuthStateChanged(auth, async (user) => {
-                currentUser = user;
-                const isAdmin = user && !user.isAnonymous;
-                
-                // UI 제어
-                adminBtn.classList.toggle('hidden', isAdmin);
-                logoutBtn.classList.toggle('hidden', !isAdmin);
-                adminHeader.classList.toggle('hidden', !isAdmin);
-                dragHeader.classList.toggle('hidden', !isAdmin);
-                addCharBtn.classList.toggle('hidden', !isAdmin);
-                
-                // 검색창 제어: 관리자 모드에는 필요 없으므로 isAdmin이 아닐 때만 노출
-                searchWrapper.classList.toggle('hidden', isAdmin);
-                if (isAdmin) charSearch.value = ''; // 관리자로 전환 시 검색어 초기화
-                
-                if (isAdmin) {
-                    userInfo.classList.remove('hidden');
-                    userInfo.innerHTML = `<span class="bg-amber-500/10 text-amber-500 px-2 py-0.5 rounded text-[9px] font-black mr-2">ADMIN</span> ${user.email}`;
-                } else {
-                    userInfo.classList.add('hidden');
-                    if (!user) await signInAnonymously(auth);
-                }
-                
-                updateAllCounts();
-                loadTable();
-                loadingOverlay.style.display = 'none';
-            });
-        };
-        initAuth();
+        onAuthStateChanged(auth, async (user) => {
+            currentUser = user;
+            const isAdmin = user && !user.isAnonymous;
+            adminBtn.classList.toggle('hidden', isAdmin);
+            logoutBtn.classList.toggle('hidden', !isAdmin);
+            adminHeader.classList.toggle('hidden', !isAdmin);
+            dragHeader.classList.toggle('hidden', !isAdmin);
+            addCharBtn.classList.toggle('hidden', !isAdmin);
+            userTools.classList.toggle('hidden', isAdmin); 
+            if (isAdmin) {
+                userInfo.classList.remove('hidden');
+                userInfo.innerHTML = `<span class="bg-amber-500/10 text-amber-500 px-2 py-0.5 rounded text-[9px] font-black mr-2">ADMIN</span> ${user.email}`;
+            } else {
+                userInfo.classList.add('hidden');
+                if (!user) await signInAnonymously(auth);
+            }
+            loadTable();
+            updateAllCounts();
+            loadingOverlay.style.display = 'none';
+        });
 
         function updateAllCounts() {
-            unsubscribeCounts.forEach(unsub => unsub());
-            unsubscribeCounts = [];
-            const tabs = ['5star', 'lowstar'];
-            tabs.forEach(t => {
-                const colRef = collection(db, 'artifacts', appId, 'public', 'data', COLLECTION_MAP[t]);
-                const unsub = onSnapshot(colRef, (snap) => {
-                    const label = t === '5star' ? '5성' : '4성/3성';
-                    document.getElementById(`tab-${t}`).innerText = `${label} (${snap.size}명)`;
+            ['5star', 'lowstar'].forEach(t => {
+                onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', COLLECTION_MAP[t]), (snap) => {
+                    let gifts = 0;
+                    snap.forEach(d => { if (d.data().gift?.trim()) gifts++; });
+                    document.getElementById(`tab-${t}`).innerText = `${t === '5star' ? '5성' : '4성/3성'} (${gifts}명/${snap.size}명)`;
                 });
-                unsubscribeCounts.push(unsub);
             });
         }
 
         function loadTable() {
             if (unsubscribeCurrent) unsubscribeCurrent();
-            const colName = COLLECTION_MAP[activeTab];
-            const colRef = collection(db, 'artifacts', appId, 'public', 'data', colName);
-            
-            unsubscribeCurrent = onSnapshot(colRef, (snapshot) => {
-                rawData = [];
-                snapshot.forEach(d => rawData.push({ id: d.id, ...d.data() }));
-                rawData.sort((a, b) => (a.order ?? 9999) - (b.order ?? 9999) || (b.timestamp || 0) - (a.timestamp || 0));
-                
-                renderFilteredTable();
-                if (currentUser && !currentUser.isAnonymous) enableSorting();
+            unsubscribeCurrent = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', COLLECTION_MAP[activeTab]), (snap) => {
+                rawData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                rawData.sort((a, b) => (a.order ?? 9999) - (b.order ?? 9999));
+                renderTable();
             });
         }
 
-        function renderFilteredTable() {
+        function renderTable() {
             const searchTerm = charSearch.value.toLowerCase().trim();
+            const filterField = searchFieldFilter.value;
             travelerTableBody.innerHTML = '';
-            
-            const filtered = rawData.filter(item => {
-                // 관리자 모드(검색창 숨김)이거나 검색어가 없으면 모두 표시
-                if (searchWrapper.classList.contains('hidden') || !searchTerm) return true;
-                const searchString = `${item.name} ${item.accessory} ${item.extra1} ${item.extra2} ${item.extra3}`.toLowerCase();
-                return searchString.includes(searchTerm);
-            });
-
-            filtered.forEach(item => renderRow(item));
-        }
-
-        charSearch.addEventListener('input', renderFilteredTable);
-
-        function enableSorting() {
-            if (sortable) sortable.destroy();
-            sortable = Sortable.create(travelerTableBody, {
-                animation: 250,
-                handle: '.drag-handle-cell',
-                onEnd: async function() {
-                    const rows = Array.from(travelerTableBody.querySelectorAll('tr'));
-                    const batch = writeBatch(db);
-                    const colName = COLLECTION_MAP[activeTab];
-                    rows.forEach((row, index) => {
-                        const id = row.getAttribute('data-id');
-                        const docRef = doc(db, 'artifacts', appId, 'public', 'data', colName, id);
-                        batch.update(docRef, { order: index });
-                    });
-                    await batch.commit();
+            rawData.filter(i => {
+                if (!searchTerm) return true;
+                if (filterField === 'all') {
+                    const allData = Object.values(i).join(' ').toLowerCase();
+                    return allData.includes(searchTerm);
+                } else {
+                    const targetData = (i[filterField] || '').toString().toLowerCase();
+                    return targetData.includes(searchTerm);
                 }
-            });
+            }).forEach(i => renderRow(i));
         }
-
-        async function handlePaste(event, wrapper, callback) {
-            const items = (event.clipboardData || event.originalEvent.clipboardData).items;
-            for (const item of items) {
-                if (item.type.indexOf("image") !== -1) {
-                    const blob = item.getAsFile();
-                    const reader = new FileReader();
-                    reader.onload = async (e) => {
-                        const img = new Image();
-                        img.src = e.target.result;
-                        img.onload = () => {
-                            const canvas = document.createElement('canvas');
-                            const maxWidth = 150;
-                            const scale = maxWidth / img.width;
-                            canvas.width = maxWidth;
-                            canvas.height = img.height * scale;
-                            const ctx = canvas.getContext('2d');
-                            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                            callback(canvas.toDataURL('image/webp', 0.85));
-                        };
-                    };
-                    reader.readAsDataURL(blob);
-                    break;
-                }
-            }
-        }
+        charSearch.oninput = renderTable;
+        searchFieldFilter.onchange = renderTable;
 
         function renderRow(data) {
             const isAdmin = currentUser && !currentUser.isAnonymous;
             const tr = document.createElement('tr');
             tr.setAttribute('data-id', data.id);
-            tr.className = "group";
 
             if (isAdmin) {
-                const dragTd = document.createElement('td');
-                dragTd.className = "drag-handle-cell";
-                dragTd.innerHTML = '<div class="drag-handle-inner"><i class="fa-solid fa-grip-vertical text-[12px]"></i></div>';
-                tr.appendChild(dragTd);
+                const dTd = document.createElement('td');
+                dTd.className = "drag-handle-cell";
+                dTd.innerHTML = '<div class="drag-handle-inner"><i class="fa-solid fa-grip-vertical"></i></div>';
+                tr.appendChild(dTd);
             }
 
             const fields = ['job', 'type', 'name', 'status', 'light', 'support', 'reinforce', 'level', 'gift', 'skill', 'awake', 'ultimate', 'crystal', 'accessory', 'basestat', 'extra1', 'extra2', 'extra3'];
@@ -486,102 +355,76 @@
                 const td = document.createElement('td');
                 if (isAdmin) {
                     if (['job', 'type', 'gift'].includes(field)) {
-                        const wrapper = document.createElement('div');
-                        wrapper.className = "image-cell-wrapper";
-                        wrapper.innerHTML = data[field] ? `<img src="${data[field]}" class="preview-img">` : '';
-                        wrapper.onpaste = (e) => handlePaste(e, wrapper, (resized) => updateCell(data.id, field, resized));
-                        td.appendChild(wrapper);
-                    } else if (field === 'status') {
-                        const select = document.createElement('select');
-                        const statusOptions = activeTab === '5star' 
-                            ? [{ label: '★★★★★★', value: '6성' }, { label: '★★★★★', value: '5성' }]
-                            : [{ label: '★★★★', value: '4성' }, { label: '★★★', value: '3성' }];
-                        
-                        select.className = `status-select`;
-                        statusOptions.forEach(opt => {
-                            const o = document.createElement('option');
-                            o.value = opt.value; o.text = opt.label;
-                            if (data[field] === opt.value) o.selected = true;
-                            select.appendChild(o);
-                        });
-                        select.onchange = () => updateCell(data.id, field, select.value);
-                        td.appendChild(select);
-                    } else if (field === 'support') {
-                        const checkContainer = document.createElement('div');
-                        checkContainer.className = "flex gap-4 justify-center items-center h-[54px] px-[15px]";
-                        const currentValues = Array.isArray(data[field]) ? data[field] : [];
-                        [1, 2].forEach(i => {
-                            const rb = document.createElement('input');
-                            rb.type = "checkbox"; rb.className = "round-radio";
-                            rb.checked = currentValues.includes(i);
-                            rb.onchange = () => {
-                                let newArr = rb.checked ? [...currentValues, i] : currentValues.filter(v => v !== i);
-                                updateCell(data.id, field, newArr);
-                            };
-                            checkContainer.appendChild(rb);
-                        });
-                        td.appendChild(checkContainer);
+                        const w = document.createElement('div'); w.className = "image-cell-wrapper";
+                        if (data[field]) {
+                            const img = document.createElement('img'); img.src = data[field]; img.className = "preview-img";
+                            img.onclick = (e) => { e.stopPropagation(); updateCell(data.id, field, ''); };
+                            w.appendChild(img);
+                        } else {
+                            w.innerHTML = '<i class="fa-solid fa-image opacity-10 text-[10px]"></i>';
+                        }
+                        w.onpaste = (e) => handlePaste(e, (res) => updateCell(data.id, field, res));
+                        td.appendChild(w);
                     } else if (['extra1', 'extra2', 'extra3'].includes(field)) {
-                        const textarea = document.createElement('textarea');
-                        textarea.className = "cell-textarea";
-                        textarea.value = data[field] || '';
-                        const autoResize = (el) => { el.style.height = '54px'; el.style.height = el.scrollHeight + 'px'; };
-                        textarea.oninput = () => autoResize(textarea);
-                        textarea.onblur = () => { if (textarea.value !== (data[field] || '')) updateCell(data.id, field, textarea.value); };
-                        td.appendChild(textarea);
-                        setTimeout(() => autoResize(textarea), 0);
+                        const w = document.createElement('div'); w.className = "admin-textarea-wrapper";
+                        const ta = document.createElement('textarea'); ta.className = "cell-textarea";
+                        ta.value = data[field] || '';
+                        const adj = () => { ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px'; };
+                        ta.oninput = adj;
+                        ta.onblur = () => { if (ta.value !== (data[field] || '')) updateCell(data.id, field, ta.value); };
+                        w.appendChild(ta); td.appendChild(w);
+                        setTimeout(adj, 0);
+                    } else if (field === 'support') {
+                        const c = document.createElement('div'); c.className = "flex gap-4 justify-center items-center h-[54px] px-[15px]";
+                        const cur = Array.isArray(data[field]) ? data[field] : [];
+                        [1, 2].forEach(i => {
+                            const rb = document.createElement('input'); rb.type = "checkbox"; rb.className = "round-radio"; rb.checked = cur.includes(i);
+                            rb.onchange = () => updateCell(data.id, field, rb.checked ? [...cur, i] : cur.filter(v => v !== i));
+                            c.appendChild(rb);
+                        });
+                        td.appendChild(c);
                     } else if (['awake', 'ultimate'].includes(field)) {
-                        const cb = document.createElement('input');
-                        cb.type = "checkbox"; cb.className = "simple-checkbox";
-                        cb.checked = !!data[field];
+                        const w = document.createElement('div'); w.className = "flex items-center justify-center h-[54px]";
+                        const cb = document.createElement('input'); cb.type = "checkbox"; cb.className = "simple-checkbox"; cb.checked = !!data[field];
                         cb.onchange = () => updateCell(data.id, field, cb.checked);
-                        const wrapper = document.createElement('div');
-                        wrapper.className = "flex items-center justify-center h-[54px]";
-                        wrapper.appendChild(cb);
-                        td.appendChild(wrapper);
+                        w.appendChild(cb); td.appendChild(w);
                     } else {
-                        const wrapper = document.createElement('div');
-                        wrapper.className = "cell-input-wrapper";
-                        const input = document.createElement('input');
-                        input.className = "cell-input";
-                        if (['reinforce', 'light'].includes(field)) input.classList.add('reinforce-text');
-                        input.value = data[field] || '';
-                        
-                        const adjustWidth = () => {
-                            const span = document.createElement('span');
-                            span.style.visibility = 'hidden'; span.style.position = 'absolute'; span.style.whiteSpace = 'pre';
-                            span.style.font = window.getComputedStyle(input).font;
-                            span.innerText = input.value || '';
-                            document.body.appendChild(span);
-                            const textWidth = span.getBoundingClientRect().width;
-                            document.body.removeChild(span);
-                            td.style.width = Math.max(100, (textWidth + 40)) + 'px';
+                        const w = document.createElement('div'); w.className = "admin-cell-wrapper";
+                        const inp = document.createElement('input'); inp.className = "cell-input";
+                        inp.value = data[field] || '';
+                        if (field === 'light' || field === 'reinforce') inp.style.color = "#99ffff";
+                        else if (field === 'skill') inp.style.color = "#ff9933";
+                        else if (field === 'status') { inp.style.color = "#ffcc00"; inp.style.fontWeight = "900"; }
+                        const adjW = () => {
+                            const tmp = document.createElement('span'); 
+                            tmp.style.visibility='hidden'; tmp.style.position='absolute'; tmp.style.fontSize='12px';
+                            tmp.style.fontWeight = window.getComputedStyle(inp).fontWeight;
+                            tmp.innerText = inp.value || ' '; document.body.appendChild(tmp);
+                            let finalW = tmp.getBoundingClientRect().width + 30;
+                            inp.parentElement.style.width = Math.max(60, finalW) + 'px';
+                            document.body.removeChild(tmp);
                         };
-                        
-                        input.oninput = adjustWidth;
-                        input.onblur = () => { if (input.value !== (data[field] || '')) updateCell(data.id, field, input.value); };
-                        wrapper.appendChild(input);
-                        td.appendChild(wrapper);
-                        setTimeout(adjustWidth, 0);
+                        inp.oninput = adjW;
+                        inp.onblur = () => { if (inp.value !== (data[field] || '')) updateCell(data.id, field, inp.value); };
+                        w.appendChild(inp); td.appendChild(w);
+                        setTimeout(adjW, 0);
                     }
                 } else {
                     if (['job', 'type', 'gift'].includes(field)) {
                         td.innerHTML = data[field] ? `<div class="px-[15px]"><img src="${data[field]}" class="preview-img"></div>` : '-';
-                    } else if (field === 'status') {
-                        const statusLabels = { '6성': '★★★★★★', '5성': '★★★★★', '4성': '★★★★', '3성': '★★★' };
-                        td.innerHTML = `<span class="growth-text px-[15px]">${statusLabels[data[field]] || '-'}</span>`;
                     } else if (field === 'support') {
-                        const currentValues = Array.isArray(data[field]) ? data[field] : [];
-                        td.innerHTML = `<div class="flex gap-1.5 justify-center py-4 px-[15px]"><span class="badge-box ${currentValues.includes(1) ? 'active' : ''}">배틀</span><span class="badge-box ${currentValues.includes(2) ? 'active' : ''}">서포트</span></div>`;
+                        const cur = Array.isArray(data[field]) ? data[field] : [];
+                        td.innerHTML = `<div class="flex gap-1.5 justify-center py-4 px-[15px]"><span class="badge-box ${cur.includes(1) ? 'active' : ''}">배틀</span><span class="badge-box ${cur.includes(2) ? 'active' : ''}">서포트</span></div>`;
                     } else if (['awake', 'ultimate'].includes(field)) {
                         td.innerHTML = data[field] ? '<div class="px-[15px]"><i class="fa-solid fa-check text-[#ff9933]"></i></div>' : '-';
                     } else {
-                        const span = document.createElement('span');
-                        span.className = "display-multiline";
-                        if (['extra1', 'extra2', 'extra3'].includes(field)) span.style.textAlign = 'left';
-                        if (['reinforce', 'light'].includes(field)) span.classList.add('reinforce-text');
-                        span.innerText = data[field] || '-';
-                        td.appendChild(span);
+                        const s = document.createElement('span'); 
+                        if (['name', 'status', 'light', 'reinforce', 'level'].includes(field)) s.className = "display-center";
+                        else s.className = "display-multiline";
+                        if (field === 'light' || field === 'reinforce') s.style.color = "#99ffff";
+                        if (field === 'skill') s.style.color = "#ff9933";
+                        if (field === 'status') s.style.color = "#ffcc00";
+                        s.innerText = data[field] || '-'; td.appendChild(s);
                     }
                 }
                 tr.appendChild(td);
@@ -589,47 +432,75 @@
 
             if (isAdmin) {
                 const delTd = document.createElement('td');
-                delTd.style.width = "60px";
-                const delBtn = document.createElement('button');
-                delBtn.className = "text-zinc-600 hover:text-red-500 p-2 w-full h-full flex items-center justify-center";
-                delBtn.innerHTML = '<i class="fa-solid fa-trash-can"></i>';
-                delBtn.onclick = async () => { 
-                    if (await showConfirm('삭제할까요?')) {
-                        const colName = COLLECTION_MAP[activeTab];
-                        await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', colName, data.id)); 
-                    }
-                };
-                delTd.appendChild(delBtn);
+                delTd.className = "text-center";
+                delTd.innerHTML = '<button class="text-zinc-600 hover:text-red-500 p-2"><i class="fa-solid fa-trash-can"></i></button>';
+                delTd.onclick = async () => { if(confirm('삭제하시겠습니까?')) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', COLLECTION_MAP[activeTab], data.id)); };
                 tr.appendChild(delTd);
             }
             travelerTableBody.appendChild(tr);
         }
 
-        async function updateCell(id, field, value) {
-            if (!auth.currentUser || auth.currentUser.isAnonymous) return;
-            const colName = COLLECTION_MAP[activeTab];
-            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', colName, id), { [field]: value });
+        async function updateCell(id, f, v) { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', COLLECTION_MAP[activeTab], id), { [f]: v }); }
+
+        function handlePaste(e, cb) {
+            const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+            for (const item of items) {
+                if (item.type.indexOf("image") !== -1) {
+                    const reader = new FileReader();
+                    reader.onload = (ev) => {
+                        const img = new Image(); img.src = ev.target.result;
+                        img.onload = () => {
+                            const cv = document.createElement('canvas'); const maxW = 120; const sc = maxW / img.width;
+                            cv.width = maxW; cv.height = img.height * sc;
+                            cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+                            cb(cv.toDataURL('image/webp', 0.8));
+                        };
+                    };
+                    reader.readAsDataURL(item.getAsFile());
+                }
+            }
         }
 
         addCharBtn.onclick = async () => {
-            const colName = COLLECTION_MAP[activeTab];
-            const colRef = collection(db, 'artifacts', appId, 'public', 'data', colName);
-            const snapshot = await getDocs(colRef);
-            let maxOrder = -1;
-            snapshot.forEach(doc => { if (doc.data().order > maxOrder) maxOrder = doc.data().order; });
-            const defaultStatus = activeTab === '5star' ? '5성' : '4성';
-            await addDoc(colRef, {
-                job: '', name: '새 캐릭터', status: defaultStatus, support: [], awake: false, ultimate: false, order: maxOrder + 1, timestamp: Date.now()
+            const col = collection(db, 'artifacts', appId, 'public', 'data', COLLECTION_MAP[activeTab]);
+            const snap = await getDocs(col);
+            let maxO = snap.docs.reduce((max, d) => Math.max(max, d.data().order ?? -1), -1);
+            await addDoc(col, { 
+                name: '새 캐릭터', 
+                status: activeTab === '5star' ? '5성' : '4성', 
+                order: maxO + 1,
+                light: '', reinforce: '', level: '', skill: '', crystal: '', accessory: '', basestat: '', extra1: '', extra2: '', extra3: '', support: []
             });
         };
 
-        adminBtn.onclick = () => { loginModal.classList.remove('hidden'); loginPassword.value = ''; loginPassword.focus(); };
-        const handleLogin = async () => {
-            try { await signInWithEmailAndPassword(auth, ADMIN_EMAIL, loginPassword.value); loginModal.classList.add('hidden'); } catch (e) { loginPassword.value = ''; loginPassword.focus(); }
+        adminBtn.onclick = () => { document.getElementById('loginModal').classList.remove('hidden'); loginPasswordInput.focus(); };
+
+        // 엔터키 로그인 이벤트 추가
+        loginPasswordInput.onkeydown = (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                doLoginBtn.click();
+            }
         };
-        doLoginBtn.onclick = handleLogin;
-        loginPassword.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleLogin(); });
-        logoutBtn.onclick = async () => { if (await showConfirm('로그아웃?')) { await signOut(auth); location.reload(); } };
+
+        doLoginBtn.onclick = async () => { 
+            try { 
+                await signInWithEmailAndPassword(auth, ADMIN_EMAIL, loginPasswordInput.value); 
+                document.getElementById('loginModal').classList.add('hidden'); 
+            } catch(e) { alert('인증 실패'); }
+        };
+        logoutBtn.onclick = async () => { await signOut(auth); location.reload(); };
+
+        Sortable.create(travelerTableBody, {
+            animation: 150, handle: '.drag-handle-cell',
+            onEnd: async () => {
+                const batch = writeBatch(db);
+                Array.from(travelerTableBody.querySelectorAll('tr')).forEach((row, idx) => {
+                    batch.update(doc(db, 'artifacts', appId, 'public', 'data', COLLECTION_MAP[activeTab], row.getAttribute('data-id')), { order: idx });
+                });
+                batch.commit();
+            }
+        });
     </script>
 </body>
 </html>
