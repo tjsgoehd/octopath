@@ -14,8 +14,7 @@
             --bg-dark: #0d0d0c; 
             --card-bg: #1a1a18; 
             --accent: #d97706; 
-            --cell-bg: transparent; 
-            --status-color: #ffcc00; /* 성장상태 전용 색상 변경 */
+            --status-color: #ffcc00; 
             --highlight: #99ffff;
             --check-accent: #99ffff; 
             --box-accent: #FF9933;   
@@ -29,6 +28,54 @@
             overflow-x: hidden; 
         }
         
+        header { background: #141412; border-bottom: 1px solid rgba(217, 119, 6, 0.2); }
+        
+        .tab-btn {
+            padding: 12px 24px;
+            font-size: 13px;
+            font-weight: 900;
+            color: #666;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+        .tab-btn.active {
+            color: var(--status-color);
+            border-bottom-color: var(--status-color);
+            background: rgba(255, 204, 0, 0.05);
+        }
+
+        /* 검색창 스타일 */
+        .search-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            margin-right: 24px;
+        }
+        .search-input {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 6px 15px 6px 35px;
+            font-size: 11px;
+            color: #fff;
+            outline: none;
+            transition: all 0.3s ease;
+            width: 180px;
+        }
+        .search-input:focus {
+            border-color: var(--status-color);
+            background: rgba(255,255,255,0.07);
+            width: 240px;
+        }
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            font-size: 12px;
+            color: #666;
+        }
+
         .table-container { 
             background: #141412; 
             border-radius: 12px; 
@@ -73,7 +120,7 @@
             padding: 0 !important; 
             height: 54px; 
             position: relative; 
-            background-color: var(--cell-bg);
+            background-color: transparent;
             text-align: center;
             vertical-align: middle;
         }
@@ -81,112 +128,41 @@
         .drag-handle-cell {
             width: 44px !important;
             min-width: 44px !important;
-            max-width: 44px !important;
             cursor: grab;
-            padding: 0 !important;
             border-right: 1px solid rgba(255,255,255,0.1) !important;
-            position: relative; 
         }
         
         .drag-handle-inner {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
-            opacity: 0.3;
-            z-index: 10;
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0.3; transition: all 0.2s ease; height: 100%;
         }
         
-        .drag-handle-cell:hover .drag-handle-inner {
-            background-color: rgba(255,255,255,0.07);
-            opacity: 1;
-        }
-        
-        .drag-handle-cell:active { cursor: grabbing; }
+        .drag-handle-cell:hover .drag-handle-inner { background-color: rgba(255,255,255,0.07); opacity: 1; }
 
-        .cell-input-wrapper {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            height: 100%;
-            padding: 0 15px;
-            box-sizing: border-box;
-        }
-
-        .cell-input { 
-            width: 100%;
-            background: transparent; 
-            border: none; 
-            color: inherit; 
-            text-align: center; 
-            outline: none; 
-            padding: 0 !important;
-            box-sizing: border-box; 
-        }
+        .cell-input-wrapper { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; padding: 0 15px; box-sizing: border-box; }
+        .cell-input { width: 100%; background: transparent; border: none; color: inherit; text-align: center; outline: none; }
         
         .cell-textarea {
-            width: 100%;
-            min-height: 54px;
-            background: transparent;
-            border: none;
-            color: inherit;
-            text-align: left; 
-            outline: none;
-            padding: 18px 15px !important; 
-            box-sizing: border-box;
-            resize: none;
-            overflow: hidden;
-            display: block;
-            line-height: 1.4;
-            vertical-align: middle;
-            white-space: pre-wrap;
+            width: 100%; min-height: 54px; background: transparent; border: none; color: inherit; 
+            text-align: left; outline: none; padding: 18px 15px !important; box-sizing: border-box;
+            resize: none; overflow: hidden; display: block; line-height: 1.4; white-space: pre-wrap;
         }
         
-        .display-multiline {
-            display: block;
-            padding: 12px 15px !important;
-            white-space: pre-wrap; 
-            line-height: 1.5;
-            box-sizing: border-box;
-            text-align: center; 
-            word-break: keep-all;
-        }
+        .display-multiline { display: block; padding: 12px 15px !important; white-space: pre-wrap; line-height: 1.5; text-align: center; word-break: keep-all; }
 
         .reinforce-text { color: var(--highlight) !important; font-weight: bold; }
         .growth-text { color: var(--status-color) !important; font-weight: 900; }
 
-        /* 성장상태 드롭다운 스타일 수정 */
         .status-select {
-            background: transparent; border: none; 
-            width: 100%; height: 54px;
-            text-align: center; 
-            text-align-last: center; /* 드롭다운 닫혔을 때 가운데 정렬 */
-            font-weight: 900; 
-            cursor: pointer; 
-            appearance: none; 
-            outline: none;
-            padding: 0 15px; 
-            color: var(--status-color); /* #ffcc00 적용 */
-        }
-        
-        .status-select option {
-            background: var(--card-bg);
+            background: transparent; border: none; width: 100%; height: 54px;
+            text-align: center; text-align-last: center; font-weight: 900; 
+            cursor: pointer; appearance: none; outline: none; padding: 0 15px; 
             color: var(--status-color);
-            text-align: center;
         }
         
-        .image-cell-wrapper {
-            display: flex; align-items: center; justify-content: center; 
-            width: 100%; height: 54px;
-            cursor: pointer; padding: 0 15px; box-sizing: border-box; outline: none;
-        }
+        .status-select option { background: var(--card-bg); color: var(--status-color); text-align: center; }
         
+        .image-cell-wrapper { display: flex; align-items: center; justify-content: center; width: 100%; height: 54px; cursor: pointer; padding: 0 15px; }
         .preview-img { max-height: 40px; max-width: 100%; object-fit: contain; pointer-events: none; }
 
         .badge-box {
@@ -208,25 +184,41 @@
     <div id="loading" class="loading-overlay">
         <div class="flex flex-col items-center gap-4">
             <div class="w-12 h-12 border-4 border-amber-500/20 border-t-amber-500 rounded-full animate-spin"></div>
-            <p class="text-[11px] font-black text-amber-500 uppercase tracking-widest">System Booting...</p>
+            <p class="text-[11px] font-black text-amber-500 uppercase tracking-widest">Loading Archive...</p>
         </div>
     </div>
 
-    <header class="sticky top-0 z-50 bg-[#141412]/95 border-b border-amber-900/30 px-6 py-4 flex justify-between items-center backdrop-blur-sm">
-        <div class="flex items-center gap-3">
-            <div class="p-2 bg-amber-900/20 rounded-lg border border-amber-600/30"><i class="fa-solid fa-feather-pointed text-amber-500 text-xl"></i></div>
-            <div>
-                <h1 class="text-lg font-black tracking-tight text-amber-50 italic uppercase">은빛독수리 아카이브</h1>
-                <p class="text-[9px] text-amber-600 font-bold uppercase tracking-[0.3em]">SILVER EAGLE ARCHIVE</p>
+    <!-- HEADER -->
+    <header class="sticky top-0 z-50 backdrop-blur-sm">
+        <div class="px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="p-2 bg-amber-900/20 rounded-lg border border-amber-600/30"><i class="fa-solid fa-feather-pointed text-amber-500 text-xl"></i></div>
+                <div>
+                    <h1 class="text-lg font-black tracking-tight text-amber-50 italic uppercase">은빛독수리 아카이브</h1>
+                    <p class="text-[9px] text-amber-600 font-bold uppercase tracking-[0.3em]">SILVER EAGLE ARCHIVE</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <button id="addCharBtn" class="hidden flex items-center gap-2 px-4 py-2 bg-amber-600 text-black rounded-lg text-xs font-black hover:bg-amber-500 transition-all shadow-lg shadow-amber-900/20">
+                    <i class="fa-solid fa-plus"></i> 캐릭터 추가
+                </button>
+                <div id="userInfo" class="hidden text-[10px] text-zinc-500 font-mono border-l border-white/10 pl-4 h-6 flex items-center"></div>
+                <button id="adminBtn" class="px-4 py-2 rounded-lg text-xs font-bold border border-amber-500/50 text-amber-500 hover:bg-amber-500 hover:text-black transition-all">ADMIN LOGIN</button>
+                <button id="logoutBtn" class="hidden px-4 py-2 rounded-lg text-xs font-bold border border-red-500/50 text-red-500 hover:bg-red-500 hover:text-white transition-all">로그아웃</button>
             </div>
         </div>
-        <div class="flex items-center gap-4">
-            <button id="addCharBtn" class="hidden flex items-center gap-2 px-4 py-2 bg-amber-600 text-black rounded-lg text-xs font-black hover:bg-amber-500 transition-all shadow-lg shadow-amber-900/20">
-                <i class="fa-solid fa-plus"></i> 캐릭터 추가
-            </button>
-            <div id="userInfo" class="hidden text-[10px] text-zinc-500 font-mono border-l border-white/10 pl-4 h-6 flex items-center"></div>
-            <button id="adminBtn" class="px-4 py-2 rounded-lg text-xs font-bold border border-amber-500/50 text-amber-500 hover:bg-amber-500 hover:text-black transition-all">ADMIN LOGIN</button>
-            <button id="logoutBtn" class="hidden px-4 py-2 rounded-lg text-xs font-bold border border-red-500/50 text-red-500 hover:bg-red-500 hover:text-white transition-all">로그아웃</button>
+        
+        <!-- TABS & SEARCH -->
+        <div class="flex items-center justify-between border-t border-white/5 px-6 bg-[#141412]/50">
+            <div class="flex">
+                <button id="tab-5star" class="tab-btn active" onclick="switchTab('5star')">5성 (불러오는 중...)</button>
+                <button id="tab-lowstar" class="tab-btn" onclick="switchTab('lowstar')">4성/3성 (불러오는 중...)</button>
+            </div>
+            <!-- 검색창: 초기 상태는 hidden, 일반 사용자 로그인 시에만 스크립트로 표시함 -->
+            <div id="searchWrapper" class="search-wrapper hidden">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" id="charSearch" placeholder="캐릭터 이름 또는 정보 검색..." class="search-input">
+            </div>
         </div>
     </header>
 
@@ -235,7 +227,7 @@
             <table id="mainTable">
                 <thead>
                     <tr id="headerRow">
-                        <th id="dragHeader" class="hidden" style="width: 44px; min-width: 44px; border-right: 1px solid rgba(255,255,255,0.1);">↕</th>
+                        <th id="dragHeader" class="hidden" style="width: 44px; min-width: 44px;">↕</th>
                         <th>직업</th>
                         <th>캐릭터</th>
                         <th>이름</th>
@@ -291,8 +283,8 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, signInAnonymously, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, writeBatch, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, writeBatch, getDocs, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAjbApqAPhrZXcnR2P_xd-nvrZOvZp67CI",
@@ -322,9 +314,28 @@
         const doLoginBtn = document.getElementById('doLogin');
         const uiModal = document.getElementById('uiModal');
         const uiModalMsg = document.getElementById('uiModalMsg');
+        const charSearch = document.getElementById('charSearch');
+        const searchWrapper = document.getElementById('searchWrapper');
 
         let currentUser = null;
         let sortable = null;
+        let activeTab = '5star';
+        let unsubscribeCurrent = null;
+        let unsubscribeCounts = [];
+        let rawData = [];
+
+        const COLLECTION_MAP = {
+            '5star': 'travelers',
+            'lowstar': 'travelers_lowstar'
+        };
+
+        window.switchTab = (tab) => {
+            activeTab = tab;
+            charSearch.value = '';
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`tab-${tab}`).classList.add('active');
+            loadTable();
+        };
 
         const showConfirm = (msg) => {
             return new Promise((resolve) => {
@@ -336,43 +347,80 @@
         };
 
         const initAuth = async () => {
-            try {
-                await setPersistence(auth, browserLocalPersistence);
-                onAuthStateChanged(auth, async (user) => {
-                    currentUser = user;
-                    const isAdmin = user && !user.isAnonymous;
-                    adminBtn.classList.toggle('hidden', isAdmin);
-                    logoutBtn.classList.toggle('hidden', !isAdmin);
-                    adminHeader.classList.toggle('hidden', !isAdmin);
-                    dragHeader.classList.toggle('hidden', !isAdmin);
-                    addCharBtn.classList.toggle('hidden', !isAdmin);
-                    if (isAdmin) {
-                        userInfo.classList.remove('hidden');
-                        userInfo.innerHTML = `<span class="bg-amber-500/10 text-amber-500 px-2 py-0.5 rounded text-[9px] font-black mr-2">ADMIN</span> ${user.email}`;
-                    } else {
-                        userInfo.classList.add('hidden');
-                        if (!user) await signInAnonymously(auth);
-                    }
-                    loadTable();
-                    loadingOverlay.style.display = 'none';
-                });
-            } catch (e) { 
+            onAuthStateChanged(auth, async (user) => {
+                currentUser = user;
+                const isAdmin = user && !user.isAnonymous;
+                
+                // UI 제어
+                adminBtn.classList.toggle('hidden', isAdmin);
+                logoutBtn.classList.toggle('hidden', !isAdmin);
+                adminHeader.classList.toggle('hidden', !isAdmin);
+                dragHeader.classList.toggle('hidden', !isAdmin);
+                addCharBtn.classList.toggle('hidden', !isAdmin);
+                
+                // 검색창 제어: 관리자 모드에는 필요 없으므로 isAdmin이 아닐 때만 노출
+                searchWrapper.classList.toggle('hidden', isAdmin);
+                if (isAdmin) charSearch.value = ''; // 관리자로 전환 시 검색어 초기화
+                
+                if (isAdmin) {
+                    userInfo.classList.remove('hidden');
+                    userInfo.innerHTML = `<span class="bg-amber-500/10 text-amber-500 px-2 py-0.5 rounded text-[9px] font-black mr-2">ADMIN</span> ${user.email}`;
+                } else {
+                    userInfo.classList.add('hidden');
+                    if (!user) await signInAnonymously(auth);
+                }
+                
+                updateAllCounts();
+                loadTable();
                 loadingOverlay.style.display = 'none';
-            }
+            });
         };
         initAuth();
 
+        function updateAllCounts() {
+            unsubscribeCounts.forEach(unsub => unsub());
+            unsubscribeCounts = [];
+            const tabs = ['5star', 'lowstar'];
+            tabs.forEach(t => {
+                const colRef = collection(db, 'artifacts', appId, 'public', 'data', COLLECTION_MAP[t]);
+                const unsub = onSnapshot(colRef, (snap) => {
+                    const label = t === '5star' ? '5성' : '4성/3성';
+                    document.getElementById(`tab-${t}`).innerText = `${label} (${snap.size}명)`;
+                });
+                unsubscribeCounts.push(unsub);
+            });
+        }
+
         function loadTable() {
-            const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'travelers');
-            onSnapshot(colRef, (snapshot) => {
-                travelerTableBody.innerHTML = '';
-                const items = [];
-                snapshot.forEach(d => items.push({ id: d.id, ...d.data() }));
-                items.sort((a, b) => (a.order ?? 9999) - (b.order ?? 9999) || (b.timestamp || 0) - (a.timestamp || 0));
-                items.forEach(item => renderRow(item));
+            if (unsubscribeCurrent) unsubscribeCurrent();
+            const colName = COLLECTION_MAP[activeTab];
+            const colRef = collection(db, 'artifacts', appId, 'public', 'data', colName);
+            
+            unsubscribeCurrent = onSnapshot(colRef, (snapshot) => {
+                rawData = [];
+                snapshot.forEach(d => rawData.push({ id: d.id, ...d.data() }));
+                rawData.sort((a, b) => (a.order ?? 9999) - (b.order ?? 9999) || (b.timestamp || 0) - (a.timestamp || 0));
+                
+                renderFilteredTable();
                 if (currentUser && !currentUser.isAnonymous) enableSorting();
             });
         }
+
+        function renderFilteredTable() {
+            const searchTerm = charSearch.value.toLowerCase().trim();
+            travelerTableBody.innerHTML = '';
+            
+            const filtered = rawData.filter(item => {
+                // 관리자 모드(검색창 숨김)이거나 검색어가 없으면 모두 표시
+                if (searchWrapper.classList.contains('hidden') || !searchTerm) return true;
+                const searchString = `${item.name} ${item.accessory} ${item.extra1} ${item.extra2} ${item.extra3}`.toLowerCase();
+                return searchString.includes(searchTerm);
+            });
+
+            filtered.forEach(item => renderRow(item));
+        }
+
+        charSearch.addEventListener('input', renderFilteredTable);
 
         function enableSorting() {
             if (sortable) sortable.destroy();
@@ -382,9 +430,10 @@
                 onEnd: async function() {
                     const rows = Array.from(travelerTableBody.querySelectorAll('tr'));
                     const batch = writeBatch(db);
+                    const colName = COLLECTION_MAP[activeTab];
                     rows.forEach((row, index) => {
                         const id = row.getAttribute('data-id');
-                        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'travelers', id);
+                        const docRef = doc(db, 'artifacts', appId, 'public', 'data', colName, id);
                         batch.update(docRef, { order: index });
                     });
                     await batch.commit();
@@ -444,8 +493,11 @@
                         td.appendChild(wrapper);
                     } else if (field === 'status') {
                         const select = document.createElement('select');
-                        const statusOptions = [{ label: '★★★★★★', value: '6성' }, { label: '★★★★★', value: '5성' }, { label: '★★★★', value: '4성' }, { label: '★★★', value: '3성' }];
-                        select.className = `status-select`; /* 전용 클래스로 변경 */
+                        const statusOptions = activeTab === '5star' 
+                            ? [{ label: '★★★★★★', value: '6성' }, { label: '★★★★★', value: '5성' }]
+                            : [{ label: '★★★★', value: '4성' }, { label: '★★★', value: '3성' }];
+                        
+                        select.className = `status-select`;
                         statusOptions.forEach(opt => {
                             const o = document.createElement('option');
                             o.value = opt.value; o.text = opt.label;
@@ -503,8 +555,7 @@
                             document.body.appendChild(span);
                             const textWidth = span.getBoundingClientRect().width;
                             document.body.removeChild(span);
-                            td.style.width = (textWidth + 40) + 'px';
-                            td.style.minWidth = (textWidth + 40) + 'px';
+                            td.style.width = Math.max(100, (textWidth + 40)) + 'px';
                         };
                         
                         input.oninput = adjustWidth;
@@ -542,7 +593,12 @@
                 const delBtn = document.createElement('button');
                 delBtn.className = "text-zinc-600 hover:text-red-500 p-2 w-full h-full flex items-center justify-center";
                 delBtn.innerHTML = '<i class="fa-solid fa-trash-can"></i>';
-                delBtn.onclick = async () => { if (await showConfirm('삭제할까요?')) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'travelers', data.id)); };
+                delBtn.onclick = async () => { 
+                    if (await showConfirm('삭제할까요?')) {
+                        const colName = COLLECTION_MAP[activeTab];
+                        await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', colName, data.id)); 
+                    }
+                };
                 delTd.appendChild(delBtn);
                 tr.appendChild(delTd);
             }
@@ -551,15 +607,19 @@
 
         async function updateCell(id, field, value) {
             if (!auth.currentUser || auth.currentUser.isAnonymous) return;
-            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'travelers', id), { [field]: value });
+            const colName = COLLECTION_MAP[activeTab];
+            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', colName, id), { [field]: value });
         }
 
         addCharBtn.onclick = async () => {
-            const snapshot = await getDocs(collection(db, 'artifacts', appId, 'public', 'data', 'travelers'));
+            const colName = COLLECTION_MAP[activeTab];
+            const colRef = collection(db, 'artifacts', appId, 'public', 'data', colName);
+            const snapshot = await getDocs(colRef);
             let maxOrder = -1;
             snapshot.forEach(doc => { if (doc.data().order > maxOrder) maxOrder = doc.data().order; });
-            await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'travelers'), {
-                job: '', name: '새 캐릭터', status: '5성', support: [], awake: false, ultimate: false, order: maxOrder + 1, timestamp: Date.now()
+            const defaultStatus = activeTab === '5star' ? '5성' : '4성';
+            await addDoc(colRef, {
+                job: '', name: '새 캐릭터', status: defaultStatus, support: [], awake: false, ultimate: false, order: maxOrder + 1, timestamp: Date.now()
             });
         };
 
