@@ -54,14 +54,13 @@
             position: relative;
         }
 
-        /* Custom Scrollbar */
         .table-container::-webkit-scrollbar { height: 10px; width: 8px; }
         .table-container::-webkit-scrollbar-track { background: #000000; border-radius: 10px; }
         .table-container::-webkit-scrollbar-thumb { background: #333330; border-radius: 10px; border: 2px solid #000000; }
         .table-container::-webkit-scrollbar-thumb:hover { background: var(--accent); }
         .table-container { scrollbar-width: thin; scrollbar-color: #333330 #000000; }
 
-        table { width: max-content; min-width: 100%; border-spacing: 0; border-collapse: separate; }
+        table { width: max-content; min-width: 100%; border-spacing: 0; border-collapse: separate; table-layout: fixed; }
 
         th { 
             background: #2d2d26 !important; 
@@ -80,43 +79,46 @@
             padding: 0 !important; 
             height: 54px; 
             text-align: center; vertical-align: middle;
-            background: #141412; /* 고정 열을 위해 배경색 명시 */
+            background: #141412;
+            overflow: hidden;
         }
 
-        /* --- 열 고정 관련 스타일 --- */
-        /* 드래그 핸들 고정 (관리자 모드) */
-        .sticky-col-drag { position: sticky; left: 0; z-index: 30 !important; }
-        /* 직업 고정 */
-        .sticky-col-job { position: sticky; z-index: 25; }
-        /* 캐릭터 고정 */
-        .sticky-col-type { position: sticky; z-index: 25; }
-        /* 이름 고정 */
-        .sticky-col-name { position: sticky; z-index: 25; }
+        .sticky-col-drag { position: sticky; left: 0; z-index: 30 !important; width: 44px; }
+        .sticky-col-job { position: sticky; z-index: 25; width: 80px; }
+        .sticky-col-type { position: sticky; z-index: 25; width: 80px; }
+        .sticky-col-name { position: sticky; z-index: 25; border-right: 2px solid rgba(217, 119, 6, 0.3) !important; width: 120px; }
 
-        /* 고정 열 z-index 조정 (헤더가 위로) */
         thead th.sticky-col-job, thead th.sticky-col-type, thead th.sticky-col-name, thead th.sticky-col-drag { z-index: 40 !important; }
-        
-        /* 고정 영역 그림자 효과 */
         .sticky-shadow { box-shadow: 4px 0 8px -4px rgba(0,0,0,0.5); }
-        /* ----------------------- */
 
-        .admin-cell-wrapper { display: inline-flex; align-items: center; justify-content: center; padding: 0 15px; min-height: 54px; box-sizing: border-box; min-width: 60px; }
-        .cell-input { background: transparent; border: none; color: inherit; text-align: center; outline: none; padding: 0; width: 100%; display: block; }
+        /* 열 너비 강제 고정 */
+        .col-std { width: 100px; }
+        .col-short { width: 70px; }
+        .col-wide { width: 420px; }
+        .col-extra { width: 470px; }
+
+        .admin-cell-wrapper { 
+            display: flex; align-items: center; justify-content: center; 
+            padding: 0 10px; height: 54px; box-sizing: border-box; 
+            width: 100%; overflow: hidden;
+        }
+        .cell-input { 
+            background: transparent; border: none; color: inherit; 
+            text-align: center; outline: none; padding: 0; 
+            width: 100%; display: block; overflow: hidden; text-overflow: ellipsis;
+        }
 
         .admin-textarea-wrapper { display: flex; align-items: center; padding: 12px 15px; min-height: 54px; box-sizing: border-box; width: 100%; }
         .cell-textarea { width: 100%; background: transparent; border: none; color: inherit; text-align: left; outline: none; padding: 0 !important; resize: none; overflow: hidden; display: block; line-height: 1.5; white-space: pre-wrap; height: auto; }
 
-        .fixed-col-wide { min-width: 420px; width: 420px; }
-        .fixed-col-extra { min-width: 470px; width: 470px; }
-
-        .drag-handle-cell { width: 44px !important; min-width: 44px !important; cursor: grab; background: #1a1a18; }
+        .drag-handle-cell { cursor: grab; background: #1a1a18; }
         .drag-handle-inner { display: flex; align-items: center; justify-content: center; opacity: 0.3; transition: 0.2s; height: 100%; }
         .drag-handle-cell:hover .drag-handle-inner { background: rgba(255,255,255,0.07); opacity: 1; }
 
         .display-multiline { display: block; padding: 12px 15px !important; white-space: pre-wrap; line-height: 1.5; text-align: left; word-break: keep-all; }
         .display-center { display: block; padding: 12px 15px !important; white-space: pre-wrap; line-height: 1.5; text-align: center; word-break: keep-all; }
 
-        .image-cell-wrapper { display: flex; align-items: center; justify-content: center; width: 100%; height: 54px; cursor: pointer; padding: 0 15px; min-width: 50px; }
+        .image-cell-wrapper { display: flex; align-items: center; justify-content: center; width: 100%; height: 54px; cursor: pointer; padding: 0 10px; }
         .preview-img { max-height: 40px; max-width: 100%; object-fit: contain; }
 
         .badge-box {
@@ -149,7 +151,6 @@
 </head>
 <body class="min-h-screen pb-12">
 
-    <!-- Loading Overlay -->
     <div id="loading" class="loading-overlay">
         <div class="flex flex-col items-center gap-4">
             <div class="w-12 h-12 border-4 border-amber-500/20 border-t-amber-500 rounded-full animate-spin"></div>
@@ -198,18 +199,41 @@
     <main class="w-full px-4 py-6">
         <div class="table-container shadow-2xl">
             <table id="mainTable">
+                <colgroup>
+                    <col id="col-drag" class="hidden" style="width: 44px;">
+                    <col style="width: 80px;"> <!-- 직업 -->
+                    <col style="width: 80px;"> <!-- 캐릭터 -->
+                    <col style="width: 120px;"> <!-- 이름 -->
+                    <col style="width: 100px;"> <!-- 성장상태 -->
+                    <col style="width: 70px;"> <!-- 등화 -->
+                    <col style="width: 120px;"> <!-- 등화(배틀/서포트) -->
+                    <col style="width: 90px;"> <!-- 등화(스탯) -->
+                    <col style="width: 70px;"> <!-- 레벨 -->
+                    <col style="width: 70px;"> <!-- 천부 -->
+                    <col style="width: 80px;"> <!-- 필살기 -->
+                    <col style="width: 60px;"> <!-- 각성 -->
+                    <col style="width: 60px;"> <!-- 오의 -->
+                    <col style="width: 80px;"> <!-- 등불 -->
+                    <col style="width: 150px;"> <!-- 악세명 -->
+                    <col style="width: 150px;"> <!-- 악세(스탯) -->
+                    <col style="width: 420px;"> <!-- 악세(효과) -->
+                    <col style="width: 470px;"> <!-- 서포트 어빌 -->
+                    <col style="width: 470px;"> <!-- 필살기 정보 -->
+                    <col style="width: 470px;"> <!-- EX 어빌 -->
+                    <col id="col-admin" class="hidden" style="width: 60px;">
+                </colgroup>
                 <thead>
                     <tr id="headerRow">
-                        <th id="dragHeader" class="hidden sticky-col-drag" style="width: 44px;">↕</th>
+                        <th id="dragHeader" class="hidden sticky-col-drag">↕</th>
                         <th id="th-job" class="sticky-col-job">직업</th>
                         <th id="th-type" class="sticky-col-type">캐릭터</th>
                         <th id="th-name" class="sticky-col-name sticky-shadow">이름</th>
-                        <th>성장상태</th><th>등화</th><th>등화(배틀/서포트)</th><th>등화(스탯)</th><th>레벨</th><th>천부</th><th>필살기</th><th>각성</th><th>오의</th><th>등불</th><th>악세명</th><th>악세(스탯)</th>
-                        <th class="fixed-col-wide">악세(효과)</th>
-                        <th class="fixed-col-extra">서포트 어빌</th> 
-                        <th class="fixed-col-extra">필살기 정보</th> 
-                        <th class="fixed-col-extra">EX 어빌</th> 
-                        <th id="adminHeader" class="hidden bg-red-900/20 text-red-500" style="width: 60px;">기능</th>
+                        <th>성장상태</th><th>등화</th><th>등화(배/서)</th><th>등화(스탯)</th><th>레벨</th><th>천부</th><th>필살기</th><th>각성</th><th>오의</th><th>등불</th><th>악세명</th><th>악세(스탯)</th>
+                        <th>악세(효과)</th>
+                        <th>서포트 어빌</th> 
+                        <th>필살기 정보</th> 
+                        <th>EX 어빌</th> 
+                        <th id="adminHeader" class="hidden bg-red-900/20 text-red-500">기능</th>
                     </tr>
                 </thead>
                 <tbody id="travelerTableBody" class="divide-y divide-white/5"></tbody>
@@ -217,7 +241,6 @@
         </div>
     </main>
 
-    <!-- Admin Login Modal -->
     <div id="loginModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-black/85 backdrop-blur-md p-6">
         <div class="bg-[#1a1a18] border border-amber-900/40 p-8 rounded-[2.5rem] w-full max-w-md text-center">
             <h2 class="text-xl font-black text-amber-500 mb-10 italic uppercase">Admin Verify</h2>
@@ -227,7 +250,6 @@
         </div>
     </div>
 
-    <!-- Custom Delete Confirmation Modal -->
     <div id="deleteConfirmModal" class="fixed inset-0 z-[200] hidden flex items-center justify-center bg-black/90 backdrop-blur-sm p-6">
         <div class="bg-[#1a1a18] border border-red-900/40 p-8 rounded-[2rem] w-full max-w-sm text-center">
             <div class="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -288,7 +310,6 @@
 
         const COLLECTION_MAP = { '5star': 'travelers', 'lowstar': 'travelers_lowstar' };
 
-        // 고정 위치 계산 로직 함수
         function updateStickyPositions() {
             const isAdmin = currentUser && !currentUser.isAnonymous;
             const dragH = document.getElementById('dragHeader');
@@ -320,9 +341,7 @@
                     await deleteDoc(docRef);
                     deleteIdPending = null;
                     deleteConfirmModal.classList.add('hidden');
-                } catch (error) {
-                    console.error("삭제 에러:", error);
-                }
+                } catch (error) { console.error("삭제 에러:", error); }
             }
         };
 
@@ -347,6 +366,8 @@
             adminHeader.classList.toggle('hidden', !isAdmin);
             dragHeader.classList.toggle('hidden', !isAdmin);
             addCharBtn.classList.toggle('hidden', !isAdmin);
+            document.getElementById('col-drag').classList.toggle('hidden', !isAdmin);
+            document.getElementById('col-admin').classList.toggle('hidden', !isAdmin);
             userTools.classList.toggle('hidden', isAdmin); 
             if (isAdmin) {
                 userInfo.classList.remove('hidden');
@@ -358,7 +379,7 @@
             loadTable();
             updateAllCounts();
             loadingOverlay.style.display = 'none';
-            setTimeout(updateStickyPositions, 100); // UI 갱신 후 위치 계산
+            setTimeout(updateStickyPositions, 100);
         });
 
         function updateAllCounts() {
@@ -388,13 +409,8 @@
             travelerTableBody.innerHTML = '';
             rawData.filter(i => {
                 if (!searchTerm) return true;
-                if (filterField === 'all') {
-                    const allData = Object.values(i).join(' ').toLowerCase();
-                    return allData.includes(searchTerm);
-                } else {
-                    const targetData = (i[filterField] || '').toString().toLowerCase();
-                    return targetData.includes(searchTerm);
-                }
+                if (filterField === 'all') return Object.values(i).join(' ').toLowerCase().includes(searchTerm);
+                return (i[filterField] || '').toString().toLowerCase().includes(searchTerm);
             }).forEach(i => renderRow(i));
         }
         
@@ -406,7 +422,6 @@
             const tr = document.createElement('tr');
             tr.setAttribute('data-id', data.id);
 
-            // Left offset calculation for body cells
             let currentOffset = 0;
 
             if (isAdmin) {
@@ -423,10 +438,9 @@
             fields.forEach(field => {
                 const td = document.createElement('td');
                 
-                // 적용되는 고정 클래스 설정
                 if (field === 'job') { td.classList.add('sticky-col-job'); td.style.left = currentOffset + 'px'; }
-                if (field === 'type') { td.classList.add('sticky-col-type'); td.style.left = (currentOffset + document.getElementById('th-job').offsetWidth) + 'px'; }
-                if (field === 'name') { td.classList.add('sticky-col-name', 'sticky-shadow'); td.style.left = (currentOffset + document.getElementById('th-job').offsetWidth + document.getElementById('th-type').offsetWidth) + 'px'; }
+                if (field === 'type') { td.classList.add('sticky-col-type'); td.style.left = (currentOffset + 80) + 'px'; }
+                if (field === 'name') { td.classList.add('sticky-col-name', 'sticky-shadow'); td.style.left = (currentOffset + 160) + 'px'; }
 
                 if (isAdmin) {
                     if (['job', 'type', 'gift'].includes(field)) {
@@ -435,9 +449,7 @@
                             const img = document.createElement('img'); img.src = data[field]; img.className = "preview-img";
                             img.onclick = (e) => { e.stopPropagation(); updateCell(data.id, field, ''); };
                             w.appendChild(img);
-                        } else {
-                            w.innerHTML = '<i class="fa-solid fa-image opacity-10 text-[10px]"></i>';
-                        }
+                        } else { w.innerHTML = '<i class="fa-solid fa-image opacity-10 text-[10px]"></i>'; }
                         w.onpaste = (e) => handlePaste(e, (res) => updateCell(data.id, field, res));
                         td.appendChild(w);
                     } else if (['extra1', 'extra2', 'extra3', 'extra4'].includes(field)) {
@@ -450,7 +462,7 @@
                         w.appendChild(ta); td.appendChild(w);
                         setTimeout(adj, 0);
                     } else if (field === 'support') {
-                        const c = document.createElement('div'); c.className = "flex gap-4 justify-center items-center h-[54px] px-[15px]";
+                        const c = document.createElement('div'); c.className = "flex gap-4 justify-center items-center h-[54px] px-2";
                         const cur = Array.isArray(data[field]) ? data[field] : [];
                         [1, 2].forEach(i => {
                             const rb = document.createElement('input'); rb.type = "checkbox"; rb.className = "round-radio"; rb.checked = cur.includes(i);
@@ -470,28 +482,18 @@
                         if (field === 'light' || field === 'reinforce') inp.style.color = "#99ffff";
                         else if (field === 'skill') inp.style.color = "#ff9933";
                         else if (field === 'status') { inp.style.color = "#ffcc00"; inp.style.fontWeight = "900"; }
-                        const adjW = () => {
-                            const tmp = document.createElement('span'); 
-                            tmp.style.visibility='hidden'; tmp.style.position='absolute'; tmp.style.fontSize='12px';
-                            tmp.style.fontWeight = window.getComputedStyle(inp).fontWeight;
-                            tmp.innerText = inp.value || ' '; document.body.appendChild(tmp);
-                            let finalW = tmp.getBoundingClientRect().width + 30;
-                            inp.parentElement.style.width = Math.max(60, finalW) + 'px';
-                            document.body.removeChild(tmp);
-                        };
-                        inp.oninput = adjW;
+                        
                         inp.onblur = () => { if (inp.value !== (data[field] || '')) updateCell(data.id, field, inp.value); };
                         w.appendChild(inp); td.appendChild(w);
-                        setTimeout(adjW, 0);
                     }
                 } else {
                     if (['job', 'type', 'gift'].includes(field)) {
-                        td.innerHTML = data[field] ? `<div class="px-[15px]"><img src="${data[field]}" class="preview-img"></div>` : '-';
+                        td.innerHTML = data[field] ? `<div class="px-2"><img src="${data[field]}" class="preview-img"></div>` : '-';
                     } else if (field === 'support') {
                         const cur = Array.isArray(data[field]) ? data[field] : [];
-                        td.innerHTML = `<div class="flex gap-1.5 justify-center py-4 px-[15px]"><span class="badge-box ${cur.includes(1) ? 'active' : ''}">배틀</span><span class="badge-box ${cur.includes(2) ? 'active' : ''}">서포트</span></div>`;
+                        td.innerHTML = `<div class="flex gap-1.5 justify-center py-4 px-2"><span class="badge-box ${cur.includes(1) ? 'active' : ''}">배틀</span><span class="badge-box ${cur.includes(2) ? 'active' : ''}">서포트</span></div>`;
                     } else if (['awake', 'ultimate'].includes(field)) {
-                        td.innerHTML = data[field] ? '<div class="px-[15px]"><i class="fa-solid fa-check text-[#ff9933]"></i></div>' : '-';
+                        td.innerHTML = data[field] ? '<div class="px-2"><i class="fa-solid fa-check text-[#ff9933]"></i></div>' : '-';
                     } else {
                         const s = document.createElement('span'); 
                         if (['name', 'status', 'light', 'reinforce', 'level'].includes(field)) s.className = "display-center";
@@ -520,7 +522,10 @@
             travelerTableBody.appendChild(tr);
         }
 
-        async function updateCell(id, f, v) { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', COLLECTION_MAP[activeTab], id), { [f]: v }); }
+        async function updateCell(id, f, v) { 
+            try { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', COLLECTION_MAP[activeTab], id), { [f]: v }); } 
+            catch(e) { console.error("Update Error:", e); }
+        }
 
         function handlePaste(e, cb) {
             const items = (e.clipboardData || e.originalEvent.clipboardData).items;
@@ -554,7 +559,6 @@
         };
 
         adminBtn.onclick = () => { document.getElementById('loginModal').classList.remove('hidden'); loginPasswordInput.focus(); };
-
         loginPasswordInput.onkeydown = (e) => { if (e.key === 'Enter') { e.preventDefault(); doLoginBtn.click(); } };
 
         doLoginBtn.onclick = async () => { 
@@ -576,7 +580,6 @@
             }
         });
 
-        // 윈도우 리사이즈 시 고정 위치 재계산
         window.addEventListener('resize', updateStickyPositions);
     </script>
 </body>
