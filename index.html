@@ -77,13 +77,10 @@
             border-bottom: 1px solid rgba(255,255,255,0.03); 
             border-right: 1px solid rgba(255,255,255,0.02); 
             padding: 0 !important; 
-            height: 54px; 
-            max-height: 54px;
             min-height: 54px;
             text-align: center; 
             vertical-align: middle;
             background: #141412;
-            overflow: hidden;
             box-sizing: border-box;
         }
 
@@ -95,16 +92,15 @@
         thead th.sticky-col-job, thead th.sticky-col-type, thead th.sticky-col-name, thead th.sticky-col-drag { z-index: 40 !important; }
         .sticky-shadow { box-shadow: 4px 0 8px -4px rgba(0,0,0,0.5); }
 
-        /* 수정된 셀 래퍼 및 인풋 스타일: 깜빡임 방지 핵심 */
+        /* 수정된 셀 래퍼: 내용에 따라 높이가 늘어나도록 유연하게 설정 */
         .admin-cell-wrapper { 
             display: flex; 
             align-items: center; 
             justify-content: center; 
             padding: 0; 
-            height: 54px !important; 
+            min-height: 54px; 
             width: 100%; 
             box-sizing: border-box; 
-            overflow: hidden;
         }
         .cell-input { 
             background: transparent !important; 
@@ -115,26 +111,26 @@
             padding: 0 10px !important; 
             margin: 0 !important;
             width: 100% !important; 
-            height: 100% !important;
+            height: 54px !important;
             display: flex !important;
             align-items: center;
             justify-content: center;
             box-sizing: border-box !important;
             box-shadow: none !important;
-            line-height: normal !important; /* 브라우저별 높이 변동 방지 */
+            line-height: normal !important;
         }
 
         .admin-textarea-wrapper { 
             display: flex; 
-            align-items: center; 
+            align-items: stretch; 
             padding: 0; 
-            height: 54px !important; 
+            min-height: 54px; 
             box-sizing: border-box; 
             width: 100%; 
         }
         .cell-textarea { 
             width: 100% !important; 
-            height: 100% !important;
+            min-height: 54px !important;
             background: transparent !important; 
             border: none !important; 
             color: inherit; 
@@ -152,13 +148,13 @@
         }
 
         .drag-handle-cell { cursor: grab; background: #1a1a18; }
-        .drag-handle-inner { display: flex; align-items: center; justify-content: center; opacity: 0.3; transition: 0.2s; height: 100%; }
+        .drag-handle-inner { display: flex; align-items: center; justify-content: center; opacity: 0.3; transition: 0.2s; height: 100%; min-height: 54px; }
         .drag-handle-cell:hover .drag-handle-inner { background: rgba(255,255,255,0.07); opacity: 1; }
 
-        .display-multiline { display: block; padding: 12px 15px !important; white-space: pre-wrap; line-height: 1.5; text-align: left; word-break: keep-all; }
-        .display-center { display: block; padding: 12px 15px !important; white-space: pre-wrap; line-height: 1.5; text-align: center; word-break: keep-all; }
+        .display-multiline { display: block; padding: 12px 15px !important; white-space: pre-wrap; line-height: 1.5; text-align: left; word-break: keep-all; min-height: 54px; box-sizing: border-box; }
+        .display-center { display: flex; align-items: center; justify-content: center; padding: 12px 15px !important; white-space: pre-wrap; line-height: 1.5; text-align: center; word-break: keep-all; min-height: 54px; box-sizing: border-box; }
 
-        .image-cell-wrapper { display: flex; align-items: center; justify-content: center; width: 100%; height: 54px; cursor: pointer; padding: 0 10px; box-sizing: border-box; }
+        .image-cell-wrapper { display: flex; align-items: center; justify-content: center; width: 100%; min-height: 54px; cursor: pointer; padding: 0 10px; box-sizing: border-box; }
         .preview-img { max-height: 40px; max-width: 100%; object-fit: contain; }
 
         .badge-box {
@@ -184,7 +180,7 @@
         .filter-select:hover { border-color: rgba(217, 119, 6, 0.4); color: #fff; }
         .filter-select option { background: #1a1a18; color: #ccc; }
 
-        .delete-btn-wrapper { display: flex; align-items: center; justify-content: center; height: 54px; width: 60px; }
+        .delete-btn-wrapper { display: flex; align-items: center; justify-content: center; min-height: 54px; width: 60px; }
         .delete-btn { color: #444; transition: all 0.2s; padding: 10px; cursor: pointer; }
         .delete-btn:hover { color: #ef4444; transform: scale(1.1); }
     </style>
@@ -496,10 +492,15 @@
                         const w = document.createElement('div'); w.className = "admin-textarea-wrapper";
                         const ta = document.createElement('textarea'); ta.className = "cell-textarea";
                         ta.value = data[field] || '';
-                        // 텍스트에리아는 내용에 따라 높이를 조절하되 셀 기본 높이 54px을 최소로 유지
-                        const adj = () => { 
-                           // textarea 높이 조절 로직은 그대로 두되 부모 래퍼는 54px 고정
+                        
+                        const adjustHeight = () => {
+                            ta.style.height = 'auto';
+                            ta.style.height = Math.max(54, ta.scrollHeight) + 'px';
                         };
+                        
+                        ta.oninput = adjustHeight;
+                        setTimeout(adjustHeight, 0); // 초기 렌더링 시 높이 조절
+                        
                         ta.onblur = () => { if (ta.value !== (data[field] || '')) updateCell(data.id, field, ta.value); };
                         w.appendChild(ta); td.appendChild(w);
                     } else if (field === 'support') {
@@ -529,12 +530,12 @@
                     }
                 } else {
                     if (['job', 'type', 'gift'].includes(field)) {
-                        td.innerHTML = data[field] ? `<div class="px-2 h-[54px] flex items-center justify-center"><img src="${data[field]}" class="preview-img"></div>` : '-';
+                        td.innerHTML = data[field] ? `<div class="px-2 min-h-[54px] flex items-center justify-center"><img src="${data[field]}" class="preview-img"></div>` : '-';
                     } else if (field === 'support') {
                         const cur = Array.isArray(data[field]) ? data[field] : [];
-                        td.innerHTML = `<div class="flex gap-1.5 justify-center items-center h-[54px] px-2"><span class="badge-box ${cur.includes(1) ? 'active' : ''}">배틀</span><span class="badge-box ${cur.includes(2) ? 'active' : ''}">서포트</span></div>`;
+                        td.innerHTML = `<div class="flex gap-1.5 justify-center items-center min-h-[54px] px-2"><span class="badge-box ${cur.includes(1) ? 'active' : ''}">배틀</span><span class="badge-box ${cur.includes(2) ? 'active' : ''}">서포트</span></div>`;
                     } else if (['awake', 'ultimate'].includes(field)) {
-                        td.innerHTML = data[field] ? '<div class="px-2 h-[54px] flex items-center justify-center"><i class="fa-solid fa-check text-[#ff9933]"></i></div>' : '-';
+                        td.innerHTML = data[field] ? '<div class="px-2 min-h-[54px] flex items-center justify-center"><i class="fa-solid fa-check text-[#ff9933]"></i></div>' : '-';
                     } else {
                         const s = document.createElement('span'); 
                         if (['name', 'status', 'light', 'reinforce', 'level'].includes(field)) s.className = "display-center";
