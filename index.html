@@ -169,6 +169,7 @@
                     <option value="extra1">악세(효과)</option>
                     <option value="extra2">서포트</option>
                     <option value="extra3">필살기</option>
+                    <option value="extra4">EX 어빌</option>
                 </select>
                 <input type="text" id="charSearch" placeholder="검색어를 입력하세요.." class="bg-white/5 border border-white/10 rounded-full px-4 py-1.5 text-[11px] text-white outline-none focus:border-amber-500/50 w-[220px]">
             </div>
@@ -185,6 +186,7 @@
                         <th class="fixed-col-wide">악세(효과)</th>
                         <th class="fixed-col-extra">서포트 어빌</th> 
                         <th class="fixed-col-extra">필살기 정보</th> 
+                        <th class="fixed-col-extra">EX 어빌</th> 
                         <th id="adminHeader" class="hidden bg-red-900/20 text-red-500" style="width: 60px;">기능</th>
                     </tr>
                 </thead>
@@ -265,9 +267,6 @@
 
         const COLLECTION_MAP = { '5star': 'travelers', 'lowstar': 'travelers_lowstar' };
 
-        /**
-         * FIXED: Custom Modal Logic instead of window.confirm()
-         */
         window.deleteRow = (id) => {
             deleteIdPending = id;
             deleteConfirmModal.classList.remove('hidden');
@@ -371,7 +370,7 @@
                 tr.appendChild(dTd);
             }
 
-            const fields = ['job', 'type', 'name', 'status', 'light', 'support', 'reinforce', 'level', 'gift', 'skill', 'awake', 'ultimate', 'crystal', 'accessory', 'basestat', 'extra1', 'extra2', 'extra3'];
+            const fields = ['job', 'type', 'name', 'status', 'light', 'support', 'reinforce', 'level', 'gift', 'skill', 'awake', 'ultimate', 'crystal', 'accessory', 'basestat', 'extra1', 'extra2', 'extra3', 'extra4'];
             
             fields.forEach(field => {
                 const td = document.createElement('td');
@@ -387,7 +386,7 @@
                         }
                         w.onpaste = (e) => handlePaste(e, (res) => updateCell(data.id, field, res));
                         td.appendChild(w);
-                    } else if (['extra1', 'extra2', 'extra3'].includes(field)) {
+                    } else if (['extra1', 'extra2', 'extra3', 'extra4'].includes(field)) {
                         const w = document.createElement('div'); w.className = "admin-textarea-wrapper";
                         const ta = document.createElement('textarea'); ta.className = "cell-textarea";
                         ta.value = data[field] || '';
@@ -496,7 +495,7 @@
                 name: '새 캐릭터', 
                 status: activeTab === '5star' ? '5성' : '4성', 
                 order: maxO + 1,
-                light: '', reinforce: '', level: '', skill: '', crystal: '', accessory: '', basestat: '', extra1: '', extra2: '', extra3: '', support: []
+                light: '', reinforce: '', level: '', skill: '', crystal: '', accessory: '', basestat: '', extra1: '', extra2: '', extra3: '', extra4: '', support: []
             });
         };
 
