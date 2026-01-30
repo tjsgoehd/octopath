@@ -92,7 +92,6 @@
         thead th.sticky-col-job, thead th.sticky-col-type, thead th.sticky-col-name, thead th.sticky-col-drag { z-index: 40 !important; }
         .sticky-shadow { box-shadow: 4px 0 8px -4px rgba(0,0,0,0.5); }
 
-        /* 수정된 셀 래퍼: 내용에 따라 높이가 늘어나도록 유연하게 설정 */
         .admin-cell-wrapper { 
             display: flex; 
             align-items: center; 
@@ -145,6 +144,7 @@
             white-space: pre-wrap; 
             box-sizing: border-box !important;
             box-shadow: none !important;
+            word-break: keep-all;
         }
 
         .drag-handle-cell { cursor: grab; background: #1a1a18; }
@@ -493,13 +493,16 @@
                         const ta = document.createElement('textarea'); ta.className = "cell-textarea";
                         ta.value = data[field] || '';
                         
+                        // 깜빡임 해결: height:auto를 사용하지 않고 scrollHeight에 맞춰 늘리기만 함
                         const adjustHeight = () => {
-                            ta.style.height = 'auto';
-                            ta.style.height = Math.max(54, ta.scrollHeight) + 'px';
+                            const newHeight = Math.max(54, ta.scrollHeight);
+                            if (parseFloat(ta.style.height) !== newHeight) {
+                                ta.style.height = newHeight + 'px';
+                            }
                         };
                         
                         ta.oninput = adjustHeight;
-                        setTimeout(adjustHeight, 0); // 초기 렌더링 시 높이 조절
+                        setTimeout(adjustHeight, 0); 
                         
                         ta.onblur = () => { if (ta.value !== (data[field] || '')) updateCell(data.id, field, ta.value); };
                         w.appendChild(ta); td.appendChild(w);
