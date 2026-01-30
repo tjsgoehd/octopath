@@ -76,7 +76,7 @@
             border-bottom: 1px solid rgba(255,255,255,0.03); 
             border-right: 1px solid rgba(255,255,255,0.02); 
             padding: 0 !important; 
-            height: 54px; /* Fixed base height */
+            height: 54px; 
             text-align: center; 
             vertical-align: middle;
             background: #141412;
@@ -92,7 +92,6 @@
         thead th.sticky-col-job, thead th.sticky-col-type, thead th.sticky-col-name, thead th.sticky-col-drag { z-index: 40 !important; }
         .sticky-shadow { box-shadow: 4px 0 8px -4px rgba(0,0,0,0.5); }
 
-        /* Anti-flicker Textarea Logic */
         .admin-textarea-wrapper { 
             display: grid;
             width: 100%;
@@ -100,7 +99,6 @@
             align-items: center;
         }
         
-        /* Using field-sizing for modern browsers to prevent height jump */
         .cell-textarea { 
             grid-area: 1 / 1 / 2 / 2;
             width: 100% !important; 
@@ -117,7 +115,7 @@
             line-height: 1.5; 
             white-space: pre-wrap; 
             box-sizing: border-box !important;
-            field-sizing: content; /* Automatic sizing without JS intervention */
+            field-sizing: content; 
         }
 
         .cell-input { 
@@ -136,7 +134,7 @@
         .drag-handle-inner { display: flex; align-items: center; justify-content: center; opacity: 0.3; transition: 0.2s; height: 100%; min-height: 54px; }
         .drag-handle-cell:hover .drag-handle-inner { background: rgba(255,255,255,0.07); opacity: 1; }
 
-        .display-multiline { display: block; padding: 12px 15px !important; white-space: pre-wrap; line-height: 1.5; text-align: left; word-break: keep-all; min-height: 54px; box-sizing: border-box; }
+        .display-multiline { display: flex; align-items: center; padding: 12px 15px !important; white-space: pre-wrap; line-height: 1.5; text-align: left; word-break: keep-all; min-height: 54px; box-sizing: border-box; }
         .display-center { display: flex; align-items: center; justify-content: center; padding: 12px 15px !important; white-space: pre-wrap; line-height: 1.5; text-align: center; word-break: keep-all; min-height: 54px; box-sizing: border-box; }
 
         .image-cell-wrapper { display: flex; align-items: center; justify-content: center; width: 100%; min-height: 54px; cursor: pointer; padding: 0 10px; box-sizing: border-box; }
@@ -451,12 +449,7 @@
                         const w = document.createElement('div'); w.className = "admin-textarea-wrapper";
                         const ta = document.createElement('textarea'); ta.className = "cell-textarea";
                         ta.value = data[field] || '';
-                        
-                        // Height management without flicker: 
-                        // We use CSS field-sizing: content + a manual check on mount
                         ta.onblur = () => { if (ta.value !== (data[field] || '')) updateCell(data.id, field, ta.value); };
-                        
-                        // Handle browsers without field-sizing support gracefully
                         const syncHeight = () => {
                             if (!CSS.supports('field-sizing', 'content')) {
                                 ta.style.height = '54px';
@@ -500,8 +493,14 @@
                         td.innerHTML = data[field] ? '<div class="px-2 h-[54px] flex items-center justify-center"><i class="fa-solid fa-check text-[#ff9933]"></i></div>' : '-';
                     } else {
                         const s = document.createElement('span'); 
-                        if (['name', 'status', 'light', 'reinforce', 'level'].includes(field)) s.className = "display-center";
-                        else s.className = "display-multiline";
+                        // 정렬 기준 수정
+                        const centerFields = ['name', 'status', 'light', 'reinforce', 'level', 'skill', 'crystal'];
+                        if (centerFields.includes(field)) {
+                            s.className = "display-center";
+                        } else {
+                            s.className = "display-multiline";
+                        }
+                        
                         if (field === 'light' || field === 'reinforce') s.style.color = "#99ffff";
                         if (field === 'skill') s.style.color = "#ff9933";
                         if (field === 'status') s.style.color = "#ffcc00";
@@ -553,11 +552,19 @@
             });
         };
 
-        adminBtn.onclick = () => { document.getElementById('loginModal').classList.remove('hidden'); loginPasswordInput.focus(); };
-        doLoginBtn.onclick = async () => { 
+        const executeLogin = async () => {
             try { await signInWithEmailAndPassword(auth, ADMIN_EMAIL, loginPasswordInput.value); document.getElementById('loginModal').classList.add('hidden'); } 
             catch(e) { alert('인증 실패'); }
         };
+
+        adminBtn.onclick = () => { document.getElementById('loginModal').classList.remove('hidden'); loginPasswordInput.focus(); };
+        doLoginBtn.onclick = executeLogin;
+        
+        // 엔터키 로그인 처리
+        loginPasswordInput.onkeydown = (e) => {
+            if (e.key === 'Enter') executeLogin();
+        };
+
         logoutBtn.onclick = async () => { await signOut(auth); location.reload(); };
 
         Sortable.create(travelerTableBody, {
