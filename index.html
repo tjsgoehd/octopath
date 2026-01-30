@@ -58,7 +58,6 @@
         .table-container::-webkit-scrollbar-track { background: #000000; border-radius: 10px; }
         .table-container::-webkit-scrollbar-thumb { background: #333330; border-radius: 10px; border: 2px solid #000000; }
         .table-container::-webkit-scrollbar-thumb:hover { background: var(--accent); }
-        .table-container { scrollbar-width: thin; scrollbar-color: #333330 #000000; }
 
         table { width: max-content; min-width: 100%; border-spacing: 0; border-collapse: separate; table-layout: fixed; }
 
@@ -77,11 +76,12 @@
             border-bottom: 1px solid rgba(255,255,255,0.03); 
             border-right: 1px solid rgba(255,255,255,0.02); 
             padding: 0 !important; 
-            min-height: 54px;
+            height: 54px; /* Fixed base height */
             text-align: center; 
             vertical-align: middle;
             background: #141412;
             box-sizing: border-box;
+            overflow: hidden;
         }
 
         .sticky-col-drag { position: sticky; left: 0; z-index: 30 !important; width: 44px; }
@@ -92,42 +92,17 @@
         thead th.sticky-col-job, thead th.sticky-col-type, thead th.sticky-col-name, thead th.sticky-col-drag { z-index: 40 !important; }
         .sticky-shadow { box-shadow: 4px 0 8px -4px rgba(0,0,0,0.5); }
 
-        .admin-cell-wrapper { 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            padding: 0; 
-            min-height: 54px; 
-            width: 100%; 
-            box-sizing: border-box; 
-        }
-        .cell-input { 
-            background: transparent !important; 
-            border: 0 !important; 
-            color: inherit; 
-            text-align: center; 
-            outline: none !important; 
-            padding: 0 10px !important; 
-            margin: 0 !important;
-            width: 100% !important; 
-            height: 54px !important;
-            display: flex !important;
-            align-items: center;
-            justify-content: center;
-            box-sizing: border-box !important;
-            box-shadow: none !important;
-            line-height: normal !important;
-        }
-
+        /* Anti-flicker Textarea Logic */
         .admin-textarea-wrapper { 
-            display: flex; 
-            align-items: stretch; 
-            padding: 0; 
-            min-height: 54px; 
-            box-sizing: border-box; 
-            width: 100%; 
+            display: grid;
+            width: 100%;
+            min-height: 54px;
+            align-items: center;
         }
+        
+        /* Using field-sizing for modern browsers to prevent height jump */
         .cell-textarea { 
+            grid-area: 1 / 1 / 2 / 2;
             width: 100% !important; 
             min-height: 54px !important;
             background: transparent !important; 
@@ -139,12 +114,22 @@
             margin: 0 !important; 
             resize: none; 
             overflow: hidden; 
-            display: block; 
             line-height: 1.5; 
             white-space: pre-wrap; 
             box-sizing: border-box !important;
-            box-shadow: none !important;
-            word-break: keep-all;
+            field-sizing: content; /* Automatic sizing without JS intervention */
+        }
+
+        .cell-input { 
+            background: transparent !important; 
+            border: 0 !important; 
+            color: inherit; 
+            text-align: center; 
+            outline: none !important; 
+            padding: 0 10px !important; 
+            width: 100% !important; 
+            height: 54px !important;
+            box-sizing: border-box !important;
         }
 
         .drag-handle-cell { cursor: grab; background: #1a1a18; }
@@ -170,15 +155,11 @@
         
         .loading-overlay { background: rgba(0,0,0,0.9); display: flex; position: fixed; inset: 0; z-index: 9999; align-items: center; justify-content: center; }
 
-        .search-container { display: flex; align-items: center; gap: 8px; }
         .filter-select {
             background: #1a1a18; border: 1px solid rgba(255,255,255,0.1);
             border-radius: 8px; color: #a1a18b; font-size: 11px; font-weight: 700; 
             padding: 6px 10px; outline: none; cursor: pointer;
-            transition: all 0.2s ease;
         }
-        .filter-select:hover { border-color: rgba(217, 119, 6, 0.4); color: #fff; }
-        .filter-select option { background: #1a1a18; color: #ccc; }
 
         .delete-btn-wrapper { display: flex; align-items: center; justify-content: center; min-height: 54px; width: 60px; }
         .delete-btn { color: #444; transition: all 0.2s; padding: 10px; cursor: pointer; }
@@ -218,7 +199,7 @@
                 <button id="tab-5star" class="tab-btn active" onclick="window.switchTab('5star')">5성 (...)</button>
                 <button id="tab-lowstar" class="tab-btn" onclick="window.switchTab('lowstar')">4성/3성 (...)</button>
             </div>
-            <div id="userTools" class="search-container py-2">
+            <div id="userTools" class="flex items-center gap-2 py-2">
                 <select id="searchFieldFilter" class="filter-select">
                     <option value="all">전체</option>
                     <option value="basestat">악세(스탯)</option>
@@ -237,25 +218,25 @@
             <table id="mainTable">
                 <colgroup>
                     <col id="col-drag" class="hidden" style="width: 44px;">
-                    <col style="width: 80px;"> <!-- 직업 -->
-                    <col style="width: 80px;"> <!-- 캐릭터 -->
-                    <col style="width: 120px;"> <!-- 이름 -->
-                    <col style="width: 100px;"> <!-- 성장상태 -->
-                    <col style="width: 70px;"> <!-- 등화 -->
-                    <col style="width: 120px;"> <!-- 등화(배틀/서포트) -->
-                    <col style="width: 90px;"> <!-- 등화(스탯) -->
-                    <col style="width: 70px;"> <!-- 레벨 -->
-                    <col style="width: 70px;"> <!-- 천부 -->
-                    <col style="width: 80px;"> <!-- 필살기 -->
-                    <col style="width: 60px;"> <!-- 각성 -->
-                    <col style="width: 60px;"> <!-- 오의 -->
-                    <col style="width: 80px;"> <!-- 등불 -->
-                    <col style="width: 150px;"> <!-- 악세명 -->
-                    <col style="width: 150px;"> <!-- 악세(스탯) -->
-                    <col style="width: 420px;"> <!-- 악세(효과) -->
-                    <col style="width: 470px;"> <!-- 서포트 어빌 -->
-                    <col style="width: 470px;"> <!-- 필살기 정보 -->
-                    <col style="width: 470px;"> <!-- EX 어빌 -->
+                    <col style="width: 80px;">
+                    <col style="width: 80px;">
+                    <col style="width: 120px;">
+                    <col style="width: 100px;">
+                    <col style="width: 70px;">
+                    <col style="width: 120px;">
+                    <col style="width: 90px;">
+                    <col style="width: 70px;">
+                    <col style="width: 70px;">
+                    <col style="width: 80px;">
+                    <col style="width: 60px;">
+                    <col style="width: 60px;">
+                    <col style="width: 80px;">
+                    <col style="width: 150px;">
+                    <col style="width: 150px;">
+                    <col style="width: 420px;">
+                    <col style="width: 470px;">
+                    <col style="width: 470px;">
+                    <col style="width: 470px;">
                     <col id="col-admin" class="hidden" style="width: 60px;">
                 </colgroup>
                 <thead>
@@ -265,10 +246,7 @@
                         <th id="th-type" class="sticky-col-type">캐릭터</th>
                         <th id="th-name" class="sticky-col-name sticky-shadow">이름</th>
                         <th>성장상태</th><th>등화</th><th>등화(배/서)</th><th>등화(스탯)</th><th>레벨</th><th>천부</th><th>필살기</th><th>각성</th><th>오의</th><th>등불</th><th>악세명</th><th>악세(스탯)</th>
-                        <th>악세(효과)</th>
-                        <th>서포트 어빌</th> 
-                        <th>필살기 정보</th> 
-                        <th>EX 어빌</th> 
+                        <th>악세(효과)</th><th>서포트 어빌</th><th>필살기 정보</th><th>EX 어빌</th> 
                         <th id="adminHeader" class="hidden bg-red-900/20 text-red-500">기능</th>
                     </tr>
                 </thead>
@@ -292,10 +270,10 @@
                 <i class="fa-solid fa-triangle-exclamation text-red-500 text-2xl"></i>
             </div>
             <h2 class="text-lg font-black text-white mb-2 italic">정말 삭제하시겠습니까?</h2>
-            <p class="text-zinc-500 text-xs mb-10 leading-relaxed">이 작업은 되돌릴 수 없으며,<br>해당 캐릭터의 모든 정보가 영구 삭제됩니다.</p>
+            <p class="text-zinc-500 text-xs mb-10 leading-relaxed">이 작업은 되돌릴 수 없으며,<br>모든 정보가 영구 삭제됩니다.</p>
             <div class="flex gap-3">
-                <button id="cancelDeleteBtn" class="flex-1 py-4 bg-zinc-800 text-zinc-400 font-bold rounded-xl text-xs hover:bg-zinc-700 transition-all">취소</button>
-                <button id="confirmDeleteBtn" class="flex-1 py-4 bg-red-600 text-white font-black rounded-xl text-xs hover:bg-red-500 transition-all shadow-lg shadow-red-900/20">삭제 실행</button>
+                <button id="cancelDeleteBtn" class="flex-1 py-4 bg-zinc-800 text-zinc-400 font-bold rounded-xl text-xs">취소</button>
+                <button id="confirmDeleteBtn" class="flex-1 py-4 bg-red-600 text-white font-black rounded-xl text-xs shadow-lg shadow-red-900/20">삭제 실행</button>
             </div>
         </div>
     </div>
@@ -333,7 +311,6 @@
         const userInfo = document.getElementById('userInfo');
         const loginPasswordInput = document.getElementById('loginPassword');
         const doLoginBtn = document.getElementById('doLogin');
-
         const deleteConfirmModal = document.getElementById('deleteConfirmModal');
         const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
         const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
@@ -352,39 +329,24 @@
             const jobH = document.getElementById('th-job');
             const typeH = document.getElementById('th-type');
             const nameH = document.getElementById('th-name');
-
             let currentLeft = 0;
-            if (isAdmin && !dragH.classList.contains('hidden')) {
-                dragH.style.left = currentLeft + 'px';
-                currentLeft += dragH.offsetWidth;
-            }
-            jobH.style.left = currentLeft + 'px';
-            currentLeft += jobH.offsetWidth;
-            typeH.style.left = currentLeft + 'px';
-            currentLeft += typeH.offsetWidth;
+            if (isAdmin && !dragH.classList.contains('hidden')) { dragH.style.left = currentLeft + 'px'; currentLeft += dragH.offsetWidth; }
+            jobH.style.left = currentLeft + 'px'; currentLeft += jobH.offsetWidth;
+            typeH.style.left = currentLeft + 'px'; currentLeft += typeH.offsetWidth;
             nameH.style.left = currentLeft + 'px';
         }
 
-        window.deleteRow = (id) => {
-            deleteIdPending = id;
-            deleteConfirmModal.classList.remove('hidden');
-        };
-
+        window.deleteRow = (id) => { deleteIdPending = id; deleteConfirmModal.classList.remove('hidden'); };
         confirmDeleteBtn.onclick = async () => {
             if (deleteIdPending) {
                 try {
-                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', COLLECTION_MAP[activeTab], deleteIdPending);
-                    await deleteDoc(docRef);
+                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', COLLECTION_MAP[activeTab], deleteIdPending));
                     deleteIdPending = null;
                     deleteConfirmModal.classList.add('hidden');
-                } catch (error) { console.error("삭제 에러:", error); }
+                } catch (e) { console.error(e); }
             }
         };
-
-        cancelDeleteBtn.onclick = () => {
-            deleteIdPending = null;
-            deleteConfirmModal.classList.add('hidden');
-        };
+        cancelDeleteBtn.onclick = () => { deleteIdPending = null; deleteConfirmModal.classList.add('hidden'); };
 
         window.switchTab = (tab) => {
             activeTab = tab;
@@ -421,8 +383,7 @@
         function updateAllCounts() {
             ['5star', 'lowstar'].forEach(t => {
                 onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', COLLECTION_MAP[t]), (snap) => {
-                    let gifts = 0;
-                    snap.forEach(d => { if (d.data().gift?.trim()) gifts++; });
+                    let gifts = 0; snap.forEach(d => { if (d.data().gift?.trim()) gifts++; });
                     const btn = document.getElementById(`tab-${t}`);
                     if (btn) btn.innerText = `${t === '5star' ? '5성' : '4성/3성'} (${gifts}명/${snap.size}명)`;
                 });
@@ -449,7 +410,7 @@
                 return (i[filterField] || '').toString().toLowerCase().includes(searchTerm);
             }).forEach(i => renderRow(i));
         }
-        
+
         charSearch.oninput = renderTable;
         searchFieldFilter.onchange = renderTable;
 
@@ -457,7 +418,6 @@
             const isAdmin = currentUser && !currentUser.isAnonymous;
             const tr = document.createElement('tr');
             tr.setAttribute('data-id', data.id);
-
             let currentOffset = 0;
 
             if (isAdmin) {
@@ -473,7 +433,6 @@
             
             fields.forEach(field => {
                 const td = document.createElement('td');
-                
                 if (field === 'job') { td.classList.add('sticky-col-job'); td.style.left = currentOffset + 'px'; }
                 if (field === 'type') { td.classList.add('sticky-col-type'); td.style.left = (currentOffset + 80) + 'px'; }
                 if (field === 'name') { td.classList.add('sticky-col-name', 'sticky-shadow'); td.style.left = (currentOffset + 160) + 'px'; }
@@ -493,19 +452,20 @@
                         const ta = document.createElement('textarea'); ta.className = "cell-textarea";
                         ta.value = data[field] || '';
                         
-                        // 깜빡임 해결: height:auto를 사용하지 않고 scrollHeight에 맞춰 늘리기만 함
-                        const adjustHeight = () => {
-                            const newHeight = Math.max(54, ta.scrollHeight);
-                            if (parseFloat(ta.style.height) !== newHeight) {
-                                ta.style.height = newHeight + 'px';
+                        // Height management without flicker: 
+                        // We use CSS field-sizing: content + a manual check on mount
+                        ta.onblur = () => { if (ta.value !== (data[field] || '')) updateCell(data.id, field, ta.value); };
+                        
+                        // Handle browsers without field-sizing support gracefully
+                        const syncHeight = () => {
+                            if (!CSS.supports('field-sizing', 'content')) {
+                                ta.style.height = '54px';
+                                ta.style.height = ta.scrollHeight + 'px';
                             }
                         };
-                        
-                        ta.oninput = adjustHeight;
-                        setTimeout(adjustHeight, 0); 
-                        
-                        ta.onblur = () => { if (ta.value !== (data[field] || '')) updateCell(data.id, field, ta.value); };
+                        ta.addEventListener('input', syncHeight);
                         w.appendChild(ta); td.appendChild(w);
+                        setTimeout(syncHeight, 0);
                     } else if (field === 'support') {
                         const c = document.createElement('div'); c.className = "flex gap-4 justify-center items-center h-[54px] px-2";
                         const cur = Array.isArray(data[field]) ? data[field] : [];
@@ -521,24 +481,23 @@
                         cb.onchange = () => updateCell(data.id, field, cb.checked);
                         w.appendChild(cb); td.appendChild(w);
                     } else {
-                        const w = document.createElement('div'); w.className = "admin-cell-wrapper";
+                        const w = document.createElement('div'); w.className = "flex items-center justify-center";
                         const inp = document.createElement('input'); inp.className = "cell-input";
                         inp.value = data[field] || '';
                         if (field === 'light' || field === 'reinforce') inp.style.color = "#99ffff";
                         else if (field === 'skill') inp.style.color = "#ff9933";
                         else if (field === 'status') { inp.style.color = "#ffcc00"; inp.style.fontWeight = "900"; }
-                        
                         inp.onblur = () => { if (inp.value !== (data[field] || '')) updateCell(data.id, field, inp.value); };
                         w.appendChild(inp); td.appendChild(w);
                     }
                 } else {
                     if (['job', 'type', 'gift'].includes(field)) {
-                        td.innerHTML = data[field] ? `<div class="px-2 min-h-[54px] flex items-center justify-center"><img src="${data[field]}" class="preview-img"></div>` : '-';
+                        td.innerHTML = data[field] ? `<div class="px-2 h-[54px] flex items-center justify-center"><img src="${data[field]}" class="preview-img"></div>` : '-';
                     } else if (field === 'support') {
                         const cur = Array.isArray(data[field]) ? data[field] : [];
-                        td.innerHTML = `<div class="flex gap-1.5 justify-center items-center min-h-[54px] px-2"><span class="badge-box ${cur.includes(1) ? 'active' : ''}">배틀</span><span class="badge-box ${cur.includes(2) ? 'active' : ''}">서포트</span></div>`;
+                        td.innerHTML = `<div class="flex gap-1.5 justify-center items-center h-[54px] px-2"><span class="badge-box ${cur.includes(1) ? 'active' : ''}">배틀</span><span class="badge-box ${cur.includes(2) ? 'active' : ''}">서포트</span></div>`;
                     } else if (['awake', 'ultimate'].includes(field)) {
-                        td.innerHTML = data[field] ? '<div class="px-2 min-h-[54px] flex items-center justify-center"><i class="fa-solid fa-check text-[#ff9933]"></i></div>' : '-';
+                        td.innerHTML = data[field] ? '<div class="px-2 h-[54px] flex items-center justify-center"><i class="fa-solid fa-check text-[#ff9933]"></i></div>' : '-';
                     } else {
                         const s = document.createElement('span'); 
                         if (['name', 'status', 'light', 'reinforce', 'level'].includes(field)) s.className = "display-center";
@@ -554,14 +513,7 @@
 
             if (isAdmin) {
                 const delTd = document.createElement('td');
-                const delWrapper = document.createElement('div');
-                delWrapper.className = "delete-btn-wrapper";
-                const delBtn = document.createElement('div');
-                delBtn.className = "delete-btn";
-                delBtn.innerHTML = '<i class="fa-solid fa-trash-can"></i>';
-                delBtn.onclick = () => window.deleteRow(data.id);
-                delWrapper.appendChild(delBtn);
-                delTd.appendChild(delWrapper);
+                delTd.innerHTML = `<div class="delete-btn-wrapper"><div class="delete-btn" onclick="window.deleteRow('${data.id}')"><i class="fa-solid fa-trash-can"></i></div></div>`;
                 tr.appendChild(delTd);
             }
             travelerTableBody.appendChild(tr);
@@ -569,7 +521,7 @@
 
         async function updateCell(id, f, v) { 
             try { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', COLLECTION_MAP[activeTab], id), { [f]: v }); } 
-            catch(e) { console.error("Update Error:", e); }
+            catch(e) { console.error(e); }
         }
 
         function handlePaste(e, cb) {
@@ -596,21 +548,15 @@
             const snap = await getDocs(col);
             let maxO = snap.docs.reduce((max, d) => Math.max(max, d.data().order ?? -1), -1);
             await addDoc(col, { 
-                name: '새 캐릭터', 
-                status: activeTab === '5star' ? '5성' : '4성', 
-                order: maxO + 1,
+                name: '새 캐릭터', status: activeTab === '5star' ? '5성' : '4성', order: maxO + 1,
                 light: '', reinforce: '', level: '', skill: '', crystal: '', accessory: '', basestat: '', extra1: '', extra2: '', extra3: '', extra4: '', support: []
             });
         };
 
         adminBtn.onclick = () => { document.getElementById('loginModal').classList.remove('hidden'); loginPasswordInput.focus(); };
-        loginPasswordInput.onkeydown = (e) => { if (e.key === 'Enter') { e.preventDefault(); doLoginBtn.click(); } };
-
         doLoginBtn.onclick = async () => { 
-            try { 
-                await signInWithEmailAndPassword(auth, ADMIN_EMAIL, loginPasswordInput.value); 
-                document.getElementById('loginModal').classList.add('hidden'); 
-            } catch(e) { alert('인증 실패'); }
+            try { await signInWithEmailAndPassword(auth, ADMIN_EMAIL, loginPasswordInput.value); document.getElementById('loginModal').classList.add('hidden'); } 
+            catch(e) { alert('인증 실패'); }
         };
         logoutBtn.onclick = async () => { await signOut(auth); location.reload(); };
 
@@ -624,7 +570,6 @@
                 await batch.commit();
             }
         });
-
         window.addEventListener('resize', updateStickyPositions);
     </script>
 </body>
