@@ -51,6 +51,7 @@
             border-radius: 12px; 
             border: 1px solid rgba(255,255,255,0.05); 
             overflow-x: auto;
+            position: relative;
         }
 
         /* Custom Scrollbar */
@@ -79,7 +80,25 @@
             padding: 0 !important; 
             height: 54px; 
             text-align: center; vertical-align: middle;
+            background: #141412; /* 고정 열을 위해 배경색 명시 */
         }
+
+        /* --- 열 고정 관련 스타일 --- */
+        /* 드래그 핸들 고정 (관리자 모드) */
+        .sticky-col-drag { position: sticky; left: 0; z-index: 30 !important; }
+        /* 직업 고정 */
+        .sticky-col-job { position: sticky; z-index: 25; }
+        /* 캐릭터 고정 */
+        .sticky-col-type { position: sticky; z-index: 25; }
+        /* 이름 고정 */
+        .sticky-col-name { position: sticky; z-index: 25; border-right: 2px solid rgba(217, 119, 6, 0.3) !important; }
+
+        /* 고정 열 z-index 조정 (헤더가 위로) */
+        thead th.sticky-col-job, thead th.sticky-col-type, thead th.sticky-col-name, thead th.sticky-col-drag { z-index: 40 !important; }
+        
+        /* 고정 영역 그림자 효과 */
+        .sticky-shadow { box-shadow: 4px 0 8px -4px rgba(0,0,0,0.5); }
+        /* ----------------------- */
 
         .admin-cell-wrapper { display: inline-flex; align-items: center; justify-content: center; padding: 0 15px; min-height: 54px; box-sizing: border-box; min-width: 60px; }
         .cell-input { background: transparent; border: none; color: inherit; text-align: center; outline: none; padding: 0; width: 100%; display: block; }
@@ -90,7 +109,7 @@
         .fixed-col-wide { min-width: 420px; width: 420px; }
         .fixed-col-extra { min-width: 470px; width: 470px; }
 
-        .drag-handle-cell { width: 44px !important; min-width: 44px !important; cursor: grab; }
+        .drag-handle-cell { width: 44px !important; min-width: 44px !important; cursor: grab; background: #1a1a18; }
         .drag-handle-inner { display: flex; align-items: center; justify-content: center; opacity: 0.3; transition: 0.2s; height: 100%; }
         .drag-handle-cell:hover .drag-handle-inner { background: rgba(255,255,255,0.07); opacity: 1; }
 
@@ -181,8 +200,11 @@
             <table id="mainTable">
                 <thead>
                     <tr id="headerRow">
-                        <th id="dragHeader" class="hidden" style="width: 44px;">↕</th>
-                        <th>직업</th><th>캐릭터</th><th>이름</th><th>성장상태</th><th>등화</th><th>등화(배틀/서포트)</th><th>등화(스탯)</th><th>레벨</th><th>천부</th><th>필살기</th><th>각성</th><th>오의</th><th>등불</th><th>악세명</th><th>악세(스탯)</th>
+                        <th id="dragHeader" class="hidden sticky-col-drag" style="width: 44px;">↕</th>
+                        <th id="th-job" class="sticky-col-job">직업</th>
+                        <th id="th-type" class="sticky-col-type">캐릭터</th>
+                        <th id="th-name" class="sticky-col-name sticky-shadow">이름</th>
+                        <th>성장상태</th><th>등화</th><th>등화(배틀/서포트)</th><th>등화(스탯)</th><th>레벨</th><th>천부</th><th>필살기</th><th>각성</th><th>오의</th><th>등불</th><th>악세명</th><th>악세(스탯)</th>
                         <th class="fixed-col-wide">악세(효과)</th>
                         <th class="fixed-col-extra">서포트 어빌</th> 
                         <th class="fixed-col-extra">필살기 정보</th> 
@@ -254,7 +276,6 @@
         const loginPasswordInput = document.getElementById('loginPassword');
         const doLoginBtn = document.getElementById('doLogin');
 
-        // Custom Modal Elements
         const deleteConfirmModal = document.getElementById('deleteConfirmModal');
         const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
         const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
@@ -266,6 +287,26 @@
         let deleteIdPending = null;
 
         const COLLECTION_MAP = { '5star': 'travelers', 'lowstar': 'travelers_lowstar' };
+
+        // 고정 위치 계산 로직 함수
+        function updateStickyPositions() {
+            const isAdmin = currentUser && !currentUser.isAnonymous;
+            const dragH = document.getElementById('dragHeader');
+            const jobH = document.getElementById('th-job');
+            const typeH = document.getElementById('th-type');
+            const nameH = document.getElementById('th-name');
+
+            let currentLeft = 0;
+            if (isAdmin && !dragH.classList.contains('hidden')) {
+                dragH.style.left = currentLeft + 'px';
+                currentLeft += dragH.offsetWidth;
+            }
+            jobH.style.left = currentLeft + 'px';
+            currentLeft += jobH.offsetWidth;
+            typeH.style.left = currentLeft + 'px';
+            currentLeft += typeH.offsetWidth;
+            nameH.style.left = currentLeft + 'px';
+        }
 
         window.deleteRow = (id) => {
             deleteIdPending = id;
@@ -317,6 +358,7 @@
             loadTable();
             updateAllCounts();
             loadingOverlay.style.display = 'none';
+            setTimeout(updateStickyPositions, 100); // UI 갱신 후 위치 계산
         });
 
         function updateAllCounts() {
@@ -336,6 +378,7 @@
                 rawData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
                 rawData.sort((a, b) => (a.order ?? 9999) - (b.order ?? 9999));
                 renderTable();
+                setTimeout(updateStickyPositions, 100);
             });
         }
 
@@ -363,17 +406,28 @@
             const tr = document.createElement('tr');
             tr.setAttribute('data-id', data.id);
 
+            // Left offset calculation for body cells
+            let currentOffset = 0;
+
             if (isAdmin) {
                 const dTd = document.createElement('td');
-                dTd.className = "drag-handle-cell";
+                dTd.className = "drag-handle-cell sticky-col-drag";
+                dTd.style.left = '0px';
                 dTd.innerHTML = '<div class="drag-handle-inner"><i class="fa-solid fa-grip-vertical"></i></div>';
                 tr.appendChild(dTd);
+                currentOffset += 44; 
             }
 
             const fields = ['job', 'type', 'name', 'status', 'light', 'support', 'reinforce', 'level', 'gift', 'skill', 'awake', 'ultimate', 'crystal', 'accessory', 'basestat', 'extra1', 'extra2', 'extra3', 'extra4'];
             
             fields.forEach(field => {
                 const td = document.createElement('td');
+                
+                // 적용되는 고정 클래스 설정
+                if (field === 'job') { td.classList.add('sticky-col-job'); td.style.left = currentOffset + 'px'; }
+                if (field === 'type') { td.classList.add('sticky-col-type'); td.style.left = (currentOffset + document.getElementById('th-job').offsetWidth) + 'px'; }
+                if (field === 'name') { td.classList.add('sticky-col-name', 'sticky-shadow'); td.style.left = (currentOffset + document.getElementById('th-job').offsetWidth + document.getElementById('th-type').offsetWidth) + 'px'; }
+
                 if (isAdmin) {
                     if (['job', 'type', 'gift'].includes(field)) {
                         const w = document.createElement('div'); w.className = "image-cell-wrapper";
@@ -521,6 +575,9 @@
                 await batch.commit();
             }
         });
+
+        // 윈도우 리사이즈 시 고정 위치 재계산
+        window.addEventListener('resize', updateStickyPositions);
     </script>
 </body>
 </html>
