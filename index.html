@@ -86,30 +86,59 @@
             color: #a1a18b !important; 
             font-size: 11px; 
             padding: 12px 15px; 
-            border-right: 1px solid rgba(255,255,255,0.05); 
+            /* 비침 현상 해결을 위해 border-right 대신 box-shadow inset 사용 */
+            border-right: none;
+            box-shadow: inset -1px 0 0 rgba(255,255,255,0.05);
             position: sticky; top: 0; z-index: 20; 
             white-space: nowrap; text-align: center;
         }
 
         td { 
             font-size: 12px; 
-            border-bottom: 1px solid rgba(255,255,255,0.03); 
-            border-right: 1px solid rgba(255,255,255,0.02); 
             padding: 0 !important; 
             height: 54px; 
             text-align: center; 
             vertical-align: middle;
             background: #141412;
             box-sizing: border-box;
+            /* 하단 구분선은 그대로 유지 */
+            border-bottom: 1px solid #1c1c1a;
+            /* 비침 현상 해결을 위해 border-right 대신 box-shadow inset 사용 */
+            border-right: none;
+            box-shadow: inset -1px 0 0 #1c1c1a;
         }
 
-        /* 고정 컬럼 */
-        .sticky-col-drag { position: sticky; left: 0; z-index: 30 !important; width: 44px; }
-        .sticky-col-job { position: sticky; z-index: 25; width: 80px; }
-        .sticky-col-type { position: sticky; z-index: 25; width: 80px; }
-        .sticky-col-name { position: sticky; z-index: 25; width: 120px; }
+        /* 고정 컬럼 스타일 - border 제거 및 box-shadow로 비침 해결 */
+        .sticky-col-drag { 
+            position: sticky; left: 0; z-index: 30 !important; width: 44px;
+            box-shadow: inset -1px 0 0 #1c1c1a;
+        }
+        .sticky-col-job { 
+            position: sticky; z-index: 25; width: 80px;
+            box-shadow: inset -1px 0 0 #1c1c1a;
+        }
+        .sticky-col-type { 
+            position: sticky; z-index: 25; width: 80px;
+            box-shadow: inset -1px 0 0 #1c1c1a;
+        }
+        .sticky-col-name { 
+            position: sticky; z-index: 25; width: 120px;
+            /* 이름 열은 우측에 약간의 포인트를 주기 위해 구분선 색상 조정 가능 */
+            box-shadow: inset -1px 0 0 #1c1c1a;
+        }
+
+        /* 머리글(th) 고정 컬럼 전용 스타일 - 배경색에 맞춘 inset 그림자 */
+        thead th.sticky-col-drag { box-shadow: inset -1px 0 0 rgba(255,255,255,0.05); }
+        thead th.sticky-col-job { box-shadow: inset -1px 0 0 rgba(255,255,255,0.05); }
+        thead th.sticky-col-type { box-shadow: inset -1px 0 0 rgba(255,255,255,0.05); }
+        thead th.sticky-col-name { box-shadow: inset -1px 0 0 rgba(255,255,255,0.05), 4px 0 8px -4px rgba(0,0,0,0.5); }
+
         thead th.sticky-col-job, thead th.sticky-col-type, thead th.sticky-col-name, thead th.sticky-col-drag { z-index: 40 !important; }
-        .sticky-shadow { box-shadow: 4px 0 8px -4px rgba(0,0,0,0.5); }
+
+        /* 그림자 효과가 적용된 열은 inset 테두리와 함께 그림자 추가 */
+        .sticky-shadow { 
+            box-shadow: inset -1px 0 0 #1c1c1a, 4px 0 8px -4px rgba(0,0,0,0.5); 
+        }
 
         .admin-textarea-wrapper { display: grid; width: 100%; min-height: 54px; align-items: center; }
         .cell-textarea { 
@@ -237,7 +266,7 @@
                         <th id="dragHeader" class="hidden sticky-col-drag">↕</th>
                         <th id="th-job" class="sticky-col-job">직업</th>
                         <th id="th-type" class="sticky-col-type">캐릭터</th>
-                        <th id="th-name" class="sticky-col-name sticky-shadow">이름</th>
+                        <th id="th-name" class="sticky-col-name">이름</th>
                         <th>성장상태</th><th>등화</th><th>등화(배/서)</th><th>등화(스탯)</th><th>레벨</th><th>천부</th><th>필살기</th><th>각성</th><th>오의</th><th>등불</th><th>악세명</th><th>악세(스탯)</th>
                         <th>악세(효과)</th><th>서포트 어빌</th><th>필살기 정보</th><th>EX 어빌</th> 
                         <th id="adminHeader" class="hidden bg-red-900/20 text-red-500">기능</th>
@@ -326,10 +355,8 @@
 
         const COLLECTION_MAP = { '5star': 'travelers', 'lowstar': 'travelers_lowstar' };
 
-        // 플로팅 스크롤 동기화 로직 - 정밀 수정됨
         function initFloatingScroll() {
             const syncSize = () => {
-                // table.scrollWidth를 사용하여 전체 너비를 정확히 가져옴
                 const tableWidth = mainTable.scrollWidth;
                 floatingScrollInner.style.width = tableWidth + 'px';
             };
@@ -338,10 +365,8 @@
                 const rect = tableScroll.getBoundingClientRect();
                 const windowHeight = window.innerHeight;
                 
-                // 표의 하단이 화면 끝보다 아래에 있고, 표의 상단이 화면에 걸쳐 있을 때
                 if (rect.bottom > windowHeight && rect.top < windowHeight - 50) {
                     floatingScrollContainer.style.display = 'block';
-                    // 실시간 위치 동기화
                     floatingScrollContainer.scrollLeft = tableScroll.scrollLeft;
                 } else {
                     floatingScrollContainer.style.display = 'none';
@@ -366,7 +391,6 @@
                 handleVisibility();
             });
             
-            // 초기 실행 및 데이터 변경 시 재실행을 위해 노출
             syncSize();
             handleVisibility();
             return syncSize;
@@ -625,5 +649,3 @@
     </script>
 </body>
 </html>
-
-
