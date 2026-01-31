@@ -46,18 +46,37 @@
             background: rgba(255, 204, 0, 0.05);
         }
 
+        /* 스크롤바 디자인 */
+        .custom-scrollbar::-webkit-scrollbar { height: 10px; width: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #000000; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #333330; border-radius: 10px; border: 2px solid #000000; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+        /* 플로팅 가로 스크롤바 */
+        #floatingScrollContainer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 14px;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(4px);
+            z-index: 100;
+            overflow-x: auto;
+            overflow-y: hidden;
+            display: none; /* 스크립트로 제어 */
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+        #floatingScrollInner { height: 1px; }
+
         .table-container { 
             background: #141412; 
             border-radius: 12px; 
             border: 1px solid rgba(255,255,255,0.05); 
             overflow-x: auto;
             position: relative;
+            margin-bottom: 20px;
         }
-
-        .table-container::-webkit-scrollbar { height: 10px; width: 8px; }
-        .table-container::-webkit-scrollbar-track { background: #000000; border-radius: 10px; }
-        .table-container::-webkit-scrollbar-thumb { background: #333330; border-radius: 10px; border: 2px solid #000000; }
-        .table-container::-webkit-scrollbar-thumb:hover { background: var(--accent); }
 
         table { width: max-content; min-width: 100%; border-spacing: 0; border-collapse: separate; table-layout: fixed; }
 
@@ -81,53 +100,29 @@
             vertical-align: middle;
             background: #141412;
             box-sizing: border-box;
-            overflow: hidden;
         }
 
+        /* 고정 컬럼 */
         .sticky-col-drag { position: sticky; left: 0; z-index: 30 !important; width: 44px; }
         .sticky-col-job { position: sticky; z-index: 25; width: 80px; }
         .sticky-col-type { position: sticky; z-index: 25; width: 80px; }
         .sticky-col-name { position: sticky; z-index: 25; width: 120px; }
-
         thead th.sticky-col-job, thead th.sticky-col-type, thead th.sticky-col-name, thead th.sticky-col-drag { z-index: 40 !important; }
         .sticky-shadow { box-shadow: 4px 0 8px -4px rgba(0,0,0,0.5); }
 
-        .admin-textarea-wrapper { 
-            display: grid;
-            width: 100%;
-            min-height: 54px;
-            align-items: center;
-        }
-        
+        /* 입력 및 텍스트 영역 */
+        .admin-textarea-wrapper { display: grid; width: 100%; min-height: 54px; align-items: center; }
         .cell-textarea { 
-            grid-area: 1 / 1 / 2 / 2;
-            width: 100% !important; 
-            min-height: 54px !important;
-            background: transparent !important; 
-            border: none !important; 
-            color: inherit; 
-            text-align: left; 
-            outline: none !important; 
-            padding: 12px 15px !important; 
-            margin: 0 !important; 
-            resize: none; 
-            overflow: hidden; 
-            line-height: 1.5; 
-            white-space: pre-wrap; 
-            box-sizing: border-box !important;
-            field-sizing: content; 
+            grid-area: 1 / 1 / 2 / 2; width: 100% !important; min-height: 54px !important;
+            background: transparent !important; border: none !important; color: inherit; 
+            text-align: left; outline: none !important; padding: 12px 15px !important; 
+            margin: 0 !important; resize: none; overflow: hidden; line-height: 1.5; 
+            white-space: pre-wrap; box-sizing: border-box !important; field-sizing: content; 
         }
-
         .cell-input { 
-            background: transparent !important; 
-            border: 0 !important; 
-            color: inherit; 
-            text-align: center; 
-            outline: none !important; 
-            padding: 0 10px !important; 
-            width: 100% !important; 
-            height: 54px !important;
-            box-sizing: border-box !important;
+            background: transparent !important; border: 0 !important; color: inherit; 
+            text-align: center; outline: none !important; padding: 0 10px !important; 
+            width: 100% !important; height: 54px !important; box-sizing: border-box !important;
         }
 
         .drag-handle-cell { cursor: grab; background: #1a1a18; }
@@ -164,7 +159,7 @@
         .delete-btn:hover { color: #ef4444; transform: scale(1.1); }
     </style>
 </head>
-<body class="min-h-screen pb-12">
+<body class="min-h-screen pb-20">
 
     <div id="loading" class="loading-overlay">
         <div class="flex flex-col items-center gap-4">
@@ -211,8 +206,8 @@
         </div>
     </header>
 
-    <main class="w-full px-4 py-6">
-        <div class="table-container shadow-2xl">
+    <main class="w-full px-4 py-4">
+        <div id="tableScroll" class="table-container shadow-2xl custom-scrollbar">
             <table id="mainTable">
                 <colgroup>
                     <col id="col-drag" class="hidden" style="width: 44px;">
@@ -253,7 +248,12 @@
         </div>
     </main>
 
-    <div id="loginModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-black/85 backdrop-blur-md p-6">
+    <!-- 하단 플로팅 가로 스크롤바 -->
+    <div id="floatingScrollContainer" class="custom-scrollbar">
+        <div id="floatingScrollInner"></div>
+    </div>
+
+    <div id="loginModal" class="fixed inset-0 z-[110] hidden flex items-center justify-center bg-black/85 backdrop-blur-md p-6">
         <div class="bg-[#1a1a18] border border-amber-900/40 p-8 rounded-[2.5rem] w-full max-w-md text-center">
             <h2 class="text-xl font-black text-amber-500 mb-10 italic uppercase">Admin Verify</h2>
             <input type="password" id="loginPassword" placeholder="••••••" class="w-full bg-black/40 border border-white/5 rounded-2xl py-4 text-center tracking-[0.5em] outline-none focus:border-amber-500/40 text-white mb-6">
@@ -313,6 +313,12 @@
         const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
         const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
 
+        // 플로팅 스크롤 요소
+        const tableScroll = document.getElementById('tableScroll');
+        const mainTable = document.getElementById('mainTable');
+        const floatingScrollContainer = document.getElementById('floatingScrollContainer');
+        const floatingScrollInner = document.getElementById('floatingScrollInner');
+
         let currentUser = null;
         let activeTab = '5star';
         let rawData = [];
@@ -320,6 +326,48 @@
         let deleteIdPending = null;
 
         const COLLECTION_MAP = { '5star': 'travelers', 'lowstar': 'travelers_lowstar' };
+
+        // 플로팅 스크롤 동기화 로직
+        function initFloatingScroll() {
+            // 1. 크기 동기화
+            floatingScrollInner.style.width = mainTable.scrollWidth + 'px';
+
+            // 2. 가시성 제어 (표가 화면에 걸쳐 있을 때만 표시)
+            const handleVisibility = () => {
+                const rect = tableScroll.getBoundingClientRect();
+                const windowHeight = window.innerHeight;
+                
+                // 표의 하단이 화면 하단보다 아래에 있고, 표의 상단이 화면 하단보다 위에 있을 때 표시
+                if (rect.bottom > windowHeight && rect.top < windowHeight - 50) {
+                    floatingScrollContainer.style.display = 'block';
+                    floatingScrollContainer.scrollLeft = tableScroll.scrollLeft;
+                } else {
+                    floatingScrollContainer.style.display = 'none';
+                }
+            };
+
+            // 3. 양방향 스크롤 동기화
+            floatingScrollContainer.onscroll = () => {
+                if (tableScroll.scrollLeft !== floatingScrollContainer.scrollLeft) {
+                    tableScroll.scrollLeft = floatingScrollContainer.scrollLeft;
+                }
+            };
+
+            tableScroll.onscroll = () => {
+                if (floatingScrollContainer.scrollLeft !== tableScroll.scrollLeft) {
+                    floatingScrollContainer.scrollLeft = tableScroll.scrollLeft;
+                }
+            };
+
+            window.addEventListener('scroll', handleVisibility);
+            window.addEventListener('resize', () => {
+                floatingScrollInner.style.width = mainTable.scrollWidth + 'px';
+                handleVisibility();
+            });
+            
+            // 초기 실행
+            handleVisibility();
+        }
 
         function updateStickyPositions() {
             const isAdmin = currentUser && !currentUser.isAnonymous;
@@ -375,7 +423,6 @@
             loadTable();
             updateAllCounts();
             loadingOverlay.style.display = 'none';
-            setTimeout(updateStickyPositions, 100);
         });
 
         function updateAllCounts() {
@@ -394,7 +441,10 @@
                 rawData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
                 rawData.sort((a, b) => (a.order ?? 9999) - (b.order ?? 9999));
                 renderTable();
-                setTimeout(updateStickyPositions, 100);
+                setTimeout(() => {
+                    updateStickyPositions();
+                    initFloatingScroll();
+                }, 100);
             });
         }
 
@@ -452,8 +502,7 @@
                         ta.onblur = () => { if (ta.value !== (data[field] || '')) updateCell(data.id, field, ta.value); };
                         const syncHeight = () => {
                             if (!CSS.supports('field-sizing', 'content')) {
-                                ta.style.height = '54px';
-                                ta.style.height = ta.scrollHeight + 'px';
+                                ta.style.height = '54px'; ta.style.height = ta.scrollHeight + 'px';
                             }
                         };
                         ta.addEventListener('input', syncHeight);
@@ -493,14 +542,8 @@
                         td.innerHTML = data[field] ? '<div class="px-2 h-[54px] flex items-center justify-center"><i class="fa-solid fa-check text-[#ff9933]"></i></div>' : '-';
                     } else {
                         const s = document.createElement('span'); 
-                        // 정렬 기준 수정
-                        const centerFields = ['name', 'status', 'light', 'reinforce', 'level', 'skill', 'crystal'];
-                        if (centerFields.includes(field)) {
-                            s.className = "display-center";
-                        } else {
-                            s.className = "display-multiline";
-                        }
-                        
+                        const centerFields = ['name', 'status', 'light', 'reinforce', 'level', 'skill', 'crystal', 'ultimate'];
+                        s.className = centerFields.includes(field) ? "display-center" : "display-multiline";
                         if (field === 'light' || field === 'reinforce') s.style.color = "#99ffff";
                         if (field === 'skill') s.style.color = "#ff9933";
                         if (field === 'status') s.style.color = "#ffcc00";
@@ -559,12 +602,7 @@
 
         adminBtn.onclick = () => { document.getElementById('loginModal').classList.remove('hidden'); loginPasswordInput.focus(); };
         doLoginBtn.onclick = executeLogin;
-        
-        // 엔터키 로그인 처리
-        loginPasswordInput.onkeydown = (e) => {
-            if (e.key === 'Enter') executeLogin();
-        };
-
+        loginPasswordInput.onkeydown = (e) => { if (e.key === 'Enter') executeLogin(); };
         logoutBtn.onclick = async () => { await signOut(auth); location.reload(); };
 
         Sortable.create(travelerTableBody, {
@@ -577,15 +615,6 @@
                 await batch.commit();
             }
         });
-        window.addEventListener('resize', updateStickyPositions);
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
