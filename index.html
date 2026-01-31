@@ -86,7 +86,6 @@
             color: #a1a18b !important; 
             font-size: 11px; 
             padding: 12px 15px; 
-            /* 비침 현상 해결을 위해 border-right 대신 box-shadow inset 사용 */
             border-right: none;
             box-shadow: inset -1px 0 0 rgba(255,255,255,0.05);
             position: sticky; top: 0; z-index: 20; 
@@ -101,33 +100,16 @@
             vertical-align: middle;
             background: #141412;
             box-sizing: border-box;
-            /* 하단 구분선은 그대로 유지 */
             border-bottom: 1px solid #1c1c1a;
-            /* 비침 현상 해결을 위해 border-right 대신 box-shadow inset 사용 */
             border-right: none;
             box-shadow: inset -1px 0 0 #1c1c1a;
         }
 
-        /* 고정 컬럼 스타일 - border 제거 및 box-shadow로 비침 해결 */
-        .sticky-col-drag { 
-            position: sticky; left: 0; z-index: 30 !important; width: 44px;
-            box-shadow: inset -1px 0 0 #1c1c1a;
-        }
-        .sticky-col-job { 
-            position: sticky; z-index: 25; width: 80px;
-            box-shadow: inset -1px 0 0 #1c1c1a;
-        }
-        .sticky-col-type { 
-            position: sticky; z-index: 25; width: 80px;
-            box-shadow: inset -1px 0 0 #1c1c1a;
-        }
-        .sticky-col-name { 
-            position: sticky; z-index: 25; width: 120px;
-            /* 이름 열은 우측에 약간의 포인트를 주기 위해 구분선 색상 조정 가능 */
-            box-shadow: inset -1px 0 0 #1c1c1a;
-        }
+        .sticky-col-drag { position: sticky; left: 0; z-index: 30 !important; width: 44px; box-shadow: inset -1px 0 0 #1c1c1a; }
+        .sticky-col-job { position: sticky; z-index: 25; width: 80px; box-shadow: inset -1px 0 0 #1c1c1a; }
+        .sticky-col-type { position: sticky; z-index: 25; width: 80px; box-shadow: inset -1px 0 0 #1c1c1a; }
+        .sticky-col-name { position: sticky; z-index: 25; width: 120px; box-shadow: inset -1px 0 0 #1c1c1a; }
 
-        /* 머리글(th) 고정 컬럼 전용 스타일 - 배경색에 맞춘 inset 그림자 */
         thead th.sticky-col-drag { box-shadow: inset -1px 0 0 rgba(255,255,255,0.05); }
         thead th.sticky-col-job { box-shadow: inset -1px 0 0 rgba(255,255,255,0.05); }
         thead th.sticky-col-type { box-shadow: inset -1px 0 0 rgba(255,255,255,0.05); }
@@ -135,10 +117,7 @@
 
         thead th.sticky-col-job, thead th.sticky-col-type, thead th.sticky-col-name, thead th.sticky-col-drag { z-index: 40 !important; }
 
-        /* 그림자 효과가 적용된 열은 inset 테두리와 함께 그림자 추가 */
-        .sticky-shadow { 
-            box-shadow: inset -1px 0 0 #1c1c1a, 4px 0 8px -4px rgba(0,0,0,0.5); 
-        }
+        .sticky-shadow { box-shadow: inset -1px 0 0 #1c1c1a, 4px 0 8px -4px rgba(0,0,0,0.5); }
 
         .admin-textarea-wrapper { display: grid; width: 100%; min-height: 54px; align-items: center; }
         .cell-textarea { 
@@ -186,6 +165,9 @@
         .delete-btn-wrapper { display: flex; align-items: center; justify-content: center; min-height: 54px; width: 60px; }
         .delete-btn { color: #444; transition: all 0.2s; padding: 10px; cursor: pointer; }
         .delete-btn:hover { color: #ef4444; transform: scale(1.1); }
+        
+        /* 마이너스 수치 강조 컬러 */
+        .negative-value { color: #B22222; font-weight: 700; }
     </style>
 </head>
 <body class="min-h-screen pb-20">
@@ -277,10 +259,7 @@
         </div>
     </main>
 
-    <!-- 하단 플로팅 가로 스크롤바 -->
-    <div id="floatingScrollContainer" class="custom-scrollbar">
-        <div id="floatingScrollInner"></div>
-    </div>
+    <div id="floatingScrollContainer" class="custom-scrollbar"><div id="floatingScrollInner"></div></div>
 
     <div id="loginModal" class="fixed inset-0 z-[110] hidden flex items-center justify-center bg-black/85 backdrop-blur-md p-6">
         <div class="bg-[#1a1a18] border border-amber-900/40 p-8 rounded-[2.5rem] w-full max-w-md text-center">
@@ -341,7 +320,6 @@
         const deleteConfirmModal = document.getElementById('deleteConfirmModal');
         const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
         const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
-
         const tableScroll = document.getElementById('tableScroll');
         const mainTable = document.getElementById('mainTable');
         const floatingScrollContainer = document.getElementById('floatingScrollContainer');
@@ -356,43 +334,20 @@
         const COLLECTION_MAP = { '5star': 'travelers', 'lowstar': 'travelers_lowstar' };
 
         function initFloatingScroll() {
-            const syncSize = () => {
-                const tableWidth = mainTable.scrollWidth;
-                floatingScrollInner.style.width = tableWidth + 'px';
-            };
-
+            const syncSize = () => { floatingScrollInner.style.width = mainTable.scrollWidth + 'px'; };
             const handleVisibility = () => {
                 const rect = tableScroll.getBoundingClientRect();
                 const windowHeight = window.innerHeight;
-                
                 if (rect.bottom > windowHeight && rect.top < windowHeight - 50) {
                     floatingScrollContainer.style.display = 'block';
                     floatingScrollContainer.scrollLeft = tableScroll.scrollLeft;
-                } else {
-                    floatingScrollContainer.style.display = 'none';
-                }
+                } else { floatingScrollContainer.style.display = 'none'; }
             };
-
-            floatingScrollContainer.onscroll = () => {
-                if (Math.abs(tableScroll.scrollLeft - floatingScrollContainer.scrollLeft) > 1) {
-                    tableScroll.scrollLeft = floatingScrollContainer.scrollLeft;
-                }
-            };
-
-            tableScroll.onscroll = () => {
-                if (Math.abs(floatingScrollContainer.scrollLeft - tableScroll.scrollLeft) > 1) {
-                    floatingScrollContainer.scrollLeft = tableScroll.scrollLeft;
-                }
-            };
-
+            floatingScrollContainer.onscroll = () => { if (Math.abs(tableScroll.scrollLeft - floatingScrollContainer.scrollLeft) > 1) tableScroll.scrollLeft = floatingScrollContainer.scrollLeft; };
+            tableScroll.onscroll = () => { if (Math.abs(floatingScrollContainer.scrollLeft - tableScroll.scrollLeft) > 1) floatingScrollContainer.scrollLeft = tableScroll.scrollLeft; };
             window.addEventListener('scroll', handleVisibility);
-            window.addEventListener('resize', () => {
-                syncSize();
-                handleVisibility();
-            });
-            
-            syncSize();
-            handleVisibility();
+            window.addEventListener('resize', () => { syncSize(); handleVisibility(); });
+            syncSize(); handleVisibility();
             return syncSize;
         }
 
@@ -414,11 +369,8 @@
         window.deleteRow = (id) => { deleteIdPending = id; deleteConfirmModal.classList.remove('hidden'); };
         confirmDeleteBtn.onclick = async () => {
             if (deleteIdPending) {
-                try {
-                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', COLLECTION_MAP[activeTab], deleteIdPending));
-                    deleteIdPending = null;
-                    deleteConfirmModal.classList.add('hidden');
-                } catch (e) { console.error(e); }
+                try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', COLLECTION_MAP[activeTab], deleteIdPending)); deleteIdPending = null; deleteConfirmModal.classList.add('hidden'); } 
+                catch (e) { console.error(e); }
             }
         };
         cancelDeleteBtn.onclick = () => { deleteIdPending = null; deleteConfirmModal.classList.add('hidden'); };
@@ -470,11 +422,7 @@
                 rawData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
                 rawData.sort((a, b) => (a.order ?? 9999) - (b.order ?? 9999));
                 renderTable();
-                setTimeout(() => {
-                    updateStickyPositions();
-                    refreshScrollSize = initFloatingScroll();
-                    if (refreshScrollSize) refreshScrollSize();
-                }, 200);
+                setTimeout(() => { updateStickyPositions(); refreshScrollSize = initFloatingScroll(); if (refreshScrollSize) refreshScrollSize(); }, 200);
             });
         }
 
@@ -531,11 +479,7 @@
                         const ta = document.createElement('textarea'); ta.className = "cell-textarea";
                         ta.value = data[field] || '';
                         ta.onblur = () => { if (ta.value !== (data[field] || '')) updateCell(data.id, field, ta.value); };
-                        const syncHeight = () => {
-                            if (!CSS.supports('field-sizing', 'content')) {
-                                ta.style.height = '54px'; ta.style.height = ta.scrollHeight + 'px';
-                            }
-                        };
+                        const syncHeight = () => { if (!CSS.supports('field-sizing', 'content')) { ta.style.height = '54px'; ta.style.height = ta.scrollHeight + 'px'; } };
                         ta.addEventListener('input', syncHeight);
                         w.appendChild(ta); td.appendChild(w);
                         setTimeout(syncHeight, 0);
@@ -578,7 +522,16 @@
                         if (field === 'light' || field === 'reinforce') s.style.color = "#99ffff";
                         if (field === 'skill') s.style.color = "#ff9933";
                         if (field === 'status') s.style.color = "#ffcc00";
-                        s.innerText = data[field] || '-'; td.appendChild(s);
+                        
+                        // 악세(스탯) 열의 마이너스 수치 강조 로직
+                        if (field === 'basestat' && data[field]) {
+                            const val = data[field].toString();
+                            // '-' 기호와 뒤따르는 숫자를 찾아 감싸기
+                            s.innerHTML = val.replace(/-\d+/g, (match) => `<span class="negative-value">${match}</span>`);
+                        } else {
+                            s.innerText = data[field] || '-';
+                        }
+                        td.appendChild(s);
                     }
                 }
                 tr.appendChild(td);
@@ -592,10 +545,7 @@
             travelerTableBody.appendChild(tr);
         }
 
-        async function updateCell(id, f, v) { 
-            try { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', COLLECTION_MAP[activeTab], id), { [f]: v }); } 
-            catch(e) { console.error(e); }
-        }
+        async function updateCell(id, f, v) { try { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', COLLECTION_MAP[activeTab], id), { [f]: v }); } catch(e) { console.error(e); } }
 
         function handlePaste(e, cb) {
             const items = (e.clipboardData || e.originalEvent.clipboardData).items;
@@ -626,11 +576,7 @@
             });
         };
 
-        const executeLogin = async () => {
-            try { await signInWithEmailAndPassword(auth, ADMIN_EMAIL, loginPasswordInput.value); document.getElementById('loginModal').classList.add('hidden'); } 
-            catch(e) { alert('인증 실패'); }
-        };
-
+        const executeLogin = async () => { try { await signInWithEmailAndPassword(auth, ADMIN_EMAIL, loginPasswordInput.value); document.getElementById('loginModal').classList.add('hidden'); } catch(e) { alert('인증 실패'); } };
         adminBtn.onclick = () => { document.getElementById('loginModal').classList.remove('hidden'); loginPasswordInput.focus(); };
         doLoginBtn.onclick = executeLogin;
         loginPasswordInput.onkeydown = (e) => { if (e.key === 'Enter') executeLogin(); };
@@ -640,9 +586,7 @@
             animation: 150, handle: '.drag-handle-cell',
             onEnd: async () => {
                 const batch = writeBatch(db);
-                Array.from(travelerTableBody.querySelectorAll('tr')).forEach((row, idx) => {
-                    batch.update(doc(db, 'artifacts', appId, 'public', 'data', COLLECTION_MAP[activeTab], row.getAttribute('data-id')), { order: idx });
-                });
+                Array.from(travelerTableBody.querySelectorAll('tr')).forEach((row, idx) => { batch.update(doc(db, 'artifacts', appId, 'public', 'data', COLLECTION_MAP[activeTab], row.getAttribute('data-id')), { order: idx }); });
                 await batch.commit();
             }
         });
