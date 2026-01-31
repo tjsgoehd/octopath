@@ -59,12 +59,12 @@
             left: 0;
             right: 0;
             height: 14px;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(4px);
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
             z-index: 100;
             overflow-x: auto;
             overflow-y: hidden;
-            display: none; /* 스크립트로 제어 */
+            display: none; 
             border-top: 1px solid rgba(255,255,255,0.05);
         }
         #floatingScrollInner { height: 1px; }
@@ -110,7 +110,6 @@
         thead th.sticky-col-job, thead th.sticky-col-type, thead th.sticky-col-name, thead th.sticky-col-drag { z-index: 40 !important; }
         .sticky-shadow { box-shadow: 4px 0 8px -4px rgba(0,0,0,0.5); }
 
-        /* 입력 및 텍스트 영역 */
         .admin-textarea-wrapper { display: grid; width: 100%; min-height: 54px; align-items: center; }
         .cell-textarea { 
             grid-area: 1 / 1 / 2 / 2; width: 100% !important; min-height: 54px !important;
@@ -313,7 +312,6 @@
         const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
         const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
 
-        // 플로팅 스크롤 요소
         const tableScroll = document.getElementById('tableScroll');
         const mainTable = document.getElementById('mainTable');
         const floatingScrollContainer = document.getElementById('floatingScrollContainer');
@@ -327,47 +325,53 @@
 
         const COLLECTION_MAP = { '5star': 'travelers', 'lowstar': 'travelers_lowstar' };
 
-        // 플로팅 스크롤 동기화 로직
+        // 플로팅 스크롤 동기화 로직 - 정밀 수정됨
         function initFloatingScroll() {
-            // 1. 크기 동기화
-            floatingScrollInner.style.width = mainTable.scrollWidth + 'px';
+            const syncSize = () => {
+                // table.scrollWidth를 사용하여 전체 너비를 정확히 가져옴
+                const tableWidth = mainTable.scrollWidth;
+                floatingScrollInner.style.width = tableWidth + 'px';
+            };
 
-            // 2. 가시성 제어 (표가 화면에 걸쳐 있을 때만 표시)
             const handleVisibility = () => {
                 const rect = tableScroll.getBoundingClientRect();
                 const windowHeight = window.innerHeight;
                 
-                // 표의 하단이 화면 하단보다 아래에 있고, 표의 상단이 화면 하단보다 위에 있을 때 표시
+                // 표의 하단이 화면 끝보다 아래에 있고, 표의 상단이 화면에 걸쳐 있을 때
                 if (rect.bottom > windowHeight && rect.top < windowHeight - 50) {
                     floatingScrollContainer.style.display = 'block';
+                    // 실시간 위치 동기화
                     floatingScrollContainer.scrollLeft = tableScroll.scrollLeft;
                 } else {
                     floatingScrollContainer.style.display = 'none';
                 }
             };
 
-            // 3. 양방향 스크롤 동기화
             floatingScrollContainer.onscroll = () => {
-                if (tableScroll.scrollLeft !== floatingScrollContainer.scrollLeft) {
+                if (Math.abs(tableScroll.scrollLeft - floatingScrollContainer.scrollLeft) > 1) {
                     tableScroll.scrollLeft = floatingScrollContainer.scrollLeft;
                 }
             };
 
             tableScroll.onscroll = () => {
-                if (floatingScrollContainer.scrollLeft !== tableScroll.scrollLeft) {
+                if (Math.abs(floatingScrollContainer.scrollLeft - tableScroll.scrollLeft) > 1) {
                     floatingScrollContainer.scrollLeft = tableScroll.scrollLeft;
                 }
             };
 
             window.addEventListener('scroll', handleVisibility);
             window.addEventListener('resize', () => {
-                floatingScrollInner.style.width = mainTable.scrollWidth + 'px';
+                syncSize();
                 handleVisibility();
             });
             
-            // 초기 실행
+            // 초기 실행 및 데이터 변경 시 재실행을 위해 노출
+            syncSize();
             handleVisibility();
+            return syncSize;
         }
+
+        let refreshScrollSize = null;
 
         function updateStickyPositions() {
             const isAdmin = currentUser && !currentUser.isAnonymous;
@@ -443,8 +447,9 @@
                 renderTable();
                 setTimeout(() => {
                     updateStickyPositions();
-                    initFloatingScroll();
-                }, 100);
+                    refreshScrollSize = initFloatingScroll();
+                    if (refreshScrollSize) refreshScrollSize();
+                }, 200);
             });
         }
 
@@ -457,6 +462,7 @@
                 if (filterField === 'all') return Object.values(i).join(' ').toLowerCase().includes(searchTerm);
                 return (i[filterField] || '').toString().toLowerCase().includes(searchTerm);
             }).forEach(i => renderRow(i));
+            if (refreshScrollSize) refreshScrollSize();
         }
 
         charSearch.oninput = renderTable;
