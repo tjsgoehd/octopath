@@ -207,8 +207,8 @@
             <div id="userTools" class="flex items-center gap-2 py-2">
                 <select id="searchFieldFilter" class="filter-select">
                     <option value="all">전체</option>
-                    <option value="basestat">악세(스탯)</option>
-                    <option value="extra1">악세(효과)</option>
+                    <option value="basestat">스킬명</option>
+                    <option value="extra1">스킬내용</option>
                     <option value="extra2">서포트</option>
                     <option value="extra3">필살기</option>
                     <option value="extra4">EX 어빌</option>
@@ -349,7 +349,14 @@
 
         window.switchTab = (tab) => {
             activeTab = tab;
-            if (searchFieldFilter) searchFieldFilter.value = 'all';
+            if (searchFieldFilter) {
+                if (tab === 'beast') {
+                    searchFieldFilter.innerHTML = '<option value="all">전체</option><option value="basestat">스킬명</option><option value="extra1">스킬내용</option>';
+                } else {
+                    searchFieldFilter.innerHTML = '<option value="all">전체</option><option value="basestat">악세(스탯)</option><option value="extra1">악세(효과)</option><option value="extra2">서포트</option><option value="extra3">필살기</option><option value="extra4">EX 어빌</option>';
+                }
+                searchFieldFilter.value = 'all';
+            }
             if (charSearch) charSearch.value = '';
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.id === `tab-${tab}`));
             renderHeader();
@@ -369,7 +376,7 @@
                 hHtml += '<th id="th-job" class="sticky-col-job">직업</th>';
                 hHtml += '<th id="th-type" class="sticky-col-type">캐릭터</th>';
                 hHtml += '<th id="th-name" class="sticky-col-name">이름</th>';
-                hHtml += '<th>악세명</th><th>악세(스탯)</th><th>악세(효과)</th>';
+                hHtml += '<th>준비턴 / 재사용턴</th><th>스킬명</th><th>스킬내용</th>';
                 if (isAdmin) hHtml += '<th class="bg-red-900/20 text-red-500">기능</th>';
                 
                 cHtml += '<col style="width: 80px;"><col style="width: 80px;"><col style="width: 120px;"><col style="width: 170px;"><col style="width: 220px;"><col style="width: 580px;">';
@@ -477,7 +484,8 @@
                 if (field === 'name') { td.classList.add('sticky-col-name', 'sticky-shadow'); td.style.left = (currentOffset + 160) + 'px'; }
 
                 if (isAdmin) {
-                    if (['job', 'type', 'gift'].includes(field)) {
+                    // [직업] 열이 지염수 탭일 때는 텍스트 필드로 변경됨
+                    if ((field === 'type' || field === 'gift') || (field === 'job' && activeTab !== 'beast')) {
                         const w = document.createElement('div'); w.className = "image-cell-wrapper";
                         if (data[field]) {
                             const img = document.createElement('img'); img.src = data[field]; img.className = "preview-img";
@@ -510,6 +518,7 @@
                         cb.onchange = () => updateCell(data.id, field, cb.checked);
                         w.appendChild(cb); td.appendChild(w);
                     } else {
+                        // 지염수 탭의 [직업]도 이쪽(텍스트 필드)을 타게 됨
                         const w = document.createElement('div'); w.className = "flex items-center justify-center";
                         const inp = document.createElement('input'); inp.className = "cell-input";
                         inp.value = data[field] || '';
@@ -520,7 +529,7 @@
                         w.appendChild(inp); td.appendChild(w);
                     }
                 } else {
-                    if (['job', 'type', 'gift'].includes(field)) {
+                    if ((field === 'type' || field === 'gift') || (field === 'job' && activeTab !== 'beast')) {
                         td.innerHTML = data[field] ? `<div class="px-2 h-[54px] flex items-center justify-center"><img src="${data[field]}" class="preview-img"></div>` : '-';
                     } else if (field === 'support') {
                         const cur = Array.isArray(data[field]) ? data[field] : [];
@@ -529,8 +538,8 @@
                         td.innerHTML = data[field] ? '<div class="px-2 h-[54px] flex items-center justify-center"><i class="fa-solid fa-check text-[#ff9933]"></i></div>' : '-';
                     } else {
                         const s = document.createElement('span'); 
-                        const centerFields = ['name', 'status', 'light', 'reinforce', 'level', 'skill', 'crystal', 'ultimate'];
-                        s.className = centerFields.includes(field) ? "display-center" : "display-multiline";
+                        const centerFields = ['name', 'status', 'light', 'reinforce', 'level', 'skill', 'crystal', 'ultimate', 'job'];
+                        s.className = (centerFields.includes(field)) ? "display-center" : "display-multiline";
                         if (field === 'light' || field === 'reinforce') s.style.color = "#99ffff";
                         if (field === 'skill') s.style.color = "#ff9933";
                         if (field === 'status') s.style.color = "#ffcc00";
