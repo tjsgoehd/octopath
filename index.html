@@ -202,6 +202,7 @@
             <div class="flex">
                 <button id="tab-5star" class="tab-btn active" onclick="window.switchTab('5star')">5성 (...)</button>
                 <button id="tab-lowstar" class="tab-btn" onclick="window.switchTab('lowstar')">4성/3성 (...)</button>
+                <button id="tab-beast" class="tab-btn" onclick="window.switchTab('beast')">지염수 (...)</button>
             </div>
             <div id="userTools" class="flex items-center gap-2 py-2">
                 <select id="searchFieldFilter" class="filter-select">
@@ -220,39 +221,9 @@
     <main class="w-full px-4 py-4">
         <div id="tableScroll" class="table-container shadow-2xl custom-scrollbar">
             <table id="mainTable">
-                <colgroup>
-                    <col id="col-drag" class="hidden" style="width: 44px;">
-                    <col style="width: 80px;">
-                    <col style="width: 80px;">
-                    <col style="width: 120px;">
-                    <col style="width: 100px;">
-                    <col style="width: 70px;">
-                    <col style="width: 120px;">
-                    <col style="width: 90px;">
-                    <col style="width: 70px;">
-                    <col style="width: 70px;">
-                    <col style="width: 80px;">
-                    <col style="width: 60px;">
-                    <col style="width: 60px;">
-                    <col style="width: 80px;">
-                    <col style="width: 170px;">
-                    <col style="width: 220px;">
-                    <col style="width: 470px;">
-                    <col style="width: 580px;">
-                    <col style="width: 470px;">
-                    <col style="width: 470px;">
-                    <col id="col-admin" class="hidden" style="width: 60px;">
-                </colgroup>
+                <colgroup id="tableColGroup"></colgroup>
                 <thead>
-                    <tr id="headerRow">
-                        <th id="dragHeader" class="hidden sticky-col-drag">↕</th>
-                        <th id="th-job" class="sticky-col-job">직업</th>
-                        <th id="th-type" class="sticky-col-type">캐릭터</th>
-                        <th id="th-name" class="sticky-col-name">이름</th>
-                        <th>성장상태</th><th>등화</th><th>등화(배/서)</th><th>등화(스탯)</th><th>레벨</th><th>천부</th><th>필살기</th><th>각성</th><th>오의</th><th>등불</th><th>악세명</th><th>악세(스탯)</th>
-                        <th>악세(효과)</th><th>서포트 어빌</th><th>필살기 정보</th><th>EX 어빌</th> 
-                        <th id="adminHeader" class="hidden bg-red-900/20 text-red-500">기능</th>
-                    </tr>
+                    <tr id="headerRow"></tr>
                 </thead>
                 <tbody id="travelerTableBody" class="divide-y divide-white/5"></tbody>
             </table>
@@ -307,8 +278,6 @@
         const travelerTableBody = document.getElementById('travelerTableBody');
         const adminBtn = document.getElementById('adminBtn');
         const logoutBtn = document.getElementById('logoutBtn');
-        const adminHeader = document.getElementById('adminHeader');
-        const dragHeader = document.getElementById('dragHeader');
         const addCharBtn = document.getElementById('addCharBtn');
         const loadingOverlay = document.getElementById('loading');
         const charSearch = document.getElementById('charSearch');
@@ -324,6 +293,8 @@
         const mainTable = document.getElementById('mainTable');
         const floatingScrollContainer = document.getElementById('floatingScrollContainer');
         const floatingScrollInner = document.getElementById('floatingScrollInner');
+        const headerRow = document.getElementById('headerRow');
+        const tableColGroup = document.getElementById('tableColGroup');
 
         let currentUser = null;
         let activeTab = '5star';
@@ -331,7 +302,7 @@
         let unsubscribeCurrent = null;
         let deleteIdPending = null;
 
-        const COLLECTION_MAP = { '5star': 'travelers', 'lowstar': 'travelers_lowstar' };
+        const COLLECTION_MAP = { '5star': 'travelers', 'lowstar': 'travelers_lowstar', 'beast': 'travelers_beast' };
 
         function initFloatingScroll() {
             const syncSize = () => { floatingScrollInner.style.width = mainTable.scrollWidth + 'px'; };
@@ -359,8 +330,9 @@
             const jobH = document.getElementById('th-job');
             const typeH = document.getElementById('th-type');
             const nameH = document.getElementById('th-name');
+            if (!jobH || !typeH || !nameH) return;
             let currentLeft = 0;
-            if (isAdmin && !dragH.classList.contains('hidden')) { dragH.style.left = currentLeft + 'px'; currentLeft += dragH.offsetWidth; }
+            if (isAdmin && dragH && !dragH.classList.contains('hidden')) { dragH.style.left = currentLeft + 'px'; currentLeft += dragH.offsetWidth; }
             jobH.style.left = currentLeft + 'px'; currentLeft += jobH.offsetWidth;
             typeH.style.left = currentLeft + 'px'; currentLeft += typeH.offsetWidth;
             nameH.style.left = currentLeft + 'px';
@@ -380,19 +352,50 @@
             if (searchFieldFilter) searchFieldFilter.value = 'all';
             if (charSearch) charSearch.value = '';
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.id === `tab-${tab}`));
+            renderHeader();
             loadTable();
         };
+
+        function renderHeader() {
+            const isAdmin = currentUser && !currentUser.isAnonymous;
+            let hHtml = '';
+            let cHtml = '';
+            
+            if (activeTab === 'beast') {
+                if (isAdmin) { 
+                    hHtml += '<th id="dragHeader" class="sticky-col-drag">↕</th>'; 
+                    cHtml += '<col style="width: 44px;">';
+                }
+                hHtml += '<th id="th-job" class="sticky-col-job">직업</th>';
+                hHtml += '<th id="th-type" class="sticky-col-type">캐릭터</th>';
+                hHtml += '<th id="th-name" class="sticky-col-name">이름</th>';
+                hHtml += '<th>악세명</th><th>악세(스탯)</th><th>악세(효과)</th>';
+                if (isAdmin) hHtml += '<th class="bg-red-900/20 text-red-500">기능</th>';
+                
+                cHtml += '<col style="width: 80px;"><col style="width: 80px;"><col style="width: 120px;"><col style="width: 170px;"><col style="width: 220px;"><col style="width: 580px;">';
+                if (isAdmin) cHtml += '<col style="width: 60px;">';
+            } else {
+                if (isAdmin) {
+                    hHtml += '<th id="dragHeader" class="sticky-col-drag">↕</th>';
+                    cHtml += '<col style="width: 44px;">';
+                }
+                hHtml += '<th id="th-job" class="sticky-col-job">직업</th><th id="th-type" class="sticky-col-type">캐릭터</th><th id="th-name" class="sticky-col-name">이름</th>';
+                hHtml += '<th>성장상태</th><th>등화</th><th>등화(배/서)</th><th>등화(스탯)</th><th>레벨</th><th>천부</th><th>필살기</th><th>각성</th><th>오의</th><th>등불</th><th>악세명</th><th>악세(스탯)</th><th>악세(효과)</th><th>서포트 어빌</th><th>필살기 정보</th><th>EX 어빌</th>';
+                if (isAdmin) hHtml += '<th class="bg-red-900/20 text-red-500">기능</th>';
+                
+                cHtml += '<col style="width: 80px;"><col style="width: 80px;"><col style="width: 120px;"><col style="width: 100px;"><col style="width: 70px;"><col style="width: 120px;"><col style="width: 90px;"><col style="width: 70px;"><col style="width: 70px;"><col style="width: 80px;"><col style="width: 60px;"><col style="width: 60px;"><col style="width: 80px;"><col style="width: 170px;"><col style="width: 220px;"><col style="width: 470px;"><col style="width: 580px;"><col style="width: 470px;"><col style="width: 470px;">';
+                if (isAdmin) cHtml += '<col style="width: 60px;">';
+            }
+            headerRow.innerHTML = hHtml;
+            tableColGroup.innerHTML = cHtml;
+        }
 
         onAuthStateChanged(auth, async (user) => {
             currentUser = user;
             const isAdmin = user && !user.isAnonymous;
             adminBtn.classList.toggle('hidden', isAdmin);
             logoutBtn.classList.toggle('hidden', !isAdmin);
-            adminHeader.classList.toggle('hidden', !isAdmin);
-            dragHeader.classList.toggle('hidden', !isAdmin);
             addCharBtn.classList.toggle('hidden', !isAdmin);
-            document.getElementById('col-drag').classList.toggle('hidden', !isAdmin);
-            document.getElementById('col-admin').classList.toggle('hidden', !isAdmin);
             userTools.classList.toggle('hidden', isAdmin); 
             if (isAdmin) {
                 userInfo.classList.remove('hidden');
@@ -401,17 +404,21 @@
                 userInfo.classList.add('hidden');
                 if (!user) await signInAnonymously(auth);
             }
+            renderHeader();
             loadTable();
             updateAllCounts();
             loadingOverlay.style.display = 'none';
         });
 
         function updateAllCounts() {
-            ['5star', 'lowstar'].forEach(t => {
+            ['5star', 'lowstar', 'beast'].forEach(t => {
                 onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', COLLECTION_MAP[t]), (snap) => {
                     let gifts = 0; snap.forEach(d => { if (d.data().gift?.trim()) gifts++; });
                     const btn = document.getElementById(`tab-${t}`);
-                    if (btn) btn.innerText = `${t === '5star' ? '5성' : '4성/3성'} (${gifts}명/${snap.size}명)`;
+                    if (btn) {
+                        const label = t === '5star' ? '5성' : t === 'lowstar' ? '4성/3성' : '지염수';
+                        btn.innerText = `${label} (${gifts}명/${snap.size}명)`;
+                    }
                 });
             });
         }
@@ -456,7 +463,12 @@
                 currentOffset += 44; 
             }
 
-            const fields = ['job', 'type', 'name', 'status', 'light', 'support', 'reinforce', 'level', 'gift', 'skill', 'awake', 'ultimate', 'crystal', 'accessory', 'basestat', 'extra1', 'extra2', 'extra3', 'extra4'];
+            let fields = [];
+            if (activeTab === 'beast') {
+                fields = ['job', 'type', 'name', 'accessory', 'basestat', 'extra1'];
+            } else {
+                fields = ['job', 'type', 'name', 'status', 'light', 'support', 'reinforce', 'level', 'gift', 'skill', 'awake', 'ultimate', 'crystal', 'accessory', 'basestat', 'extra1', 'extra2', 'extra3', 'extra4'];
+            }
             
             fields.forEach(field => {
                 const td = document.createElement('td');
@@ -523,10 +535,8 @@
                         if (field === 'skill') s.style.color = "#ff9933";
                         if (field === 'status') s.style.color = "#ffcc00";
                         
-                        // 악세(스탯) 열의 마이너스 수치 강조 로직
                         if (field === 'basestat' && data[field]) {
                             const val = data[field].toString();
-                            // '-' 기호와 뒤따르는 숫자를 찾아 감싸기
                             s.innerHTML = val.replace(/-\d+/g, (match) => `<span class="negative-value">${match}</span>`);
                         } else {
                             s.innerText = data[field] || '-';
@@ -570,10 +580,11 @@
             const col = collection(db, 'artifacts', appId, 'public', 'data', COLLECTION_MAP[activeTab]);
             const snap = await getDocs(col);
             let maxO = snap.docs.reduce((max, d) => Math.max(max, d.data().order ?? -1), -1);
-            await addDoc(col, { 
-                name: '새 캐릭터', status: activeTab === '5star' ? '5성' : '4성', order: maxO + 1,
-                light: '', reinforce: '', level: '', skill: '', crystal: '', accessory: '', basestat: '', extra1: '', extra2: '', extra3: '', extra4: '', support: []
-            });
+            let newObj = { name: '새 데이터', order: maxO + 1, job: '', type: '', accessory: '', basestat: '', extra1: '' };
+            if (activeTab !== 'beast') {
+                Object.assign(newObj, { status: activeTab === '5star' ? '5성' : '4성', light: '', reinforce: '', level: '', skill: '', crystal: '', extra2: '', extra3: '', extra4: '', support: [] });
+            }
+            await addDoc(col, newObj);
         };
 
         const executeLogin = async () => { try { await signInWithEmailAndPassword(auth, ADMIN_EMAIL, loginPasswordInput.value); document.getElementById('loginModal').classList.add('hidden'); } catch(e) { alert('인증 실패'); } };
@@ -593,4 +604,3 @@
     </script>
 </body>
 </html>
-
