@@ -105,12 +105,6 @@
             box-shadow: inset -1px 0 0 #1c1c1a;
         }
 
-        /* 지염수 탭 전용 행 높이 상향 및 유연화 */
-        .beast-row td {
-            height: auto;
-            min-height: 80px;
-        }
-
         .sticky-col-drag { position: sticky; left: 0; z-index: 30 !important; width: 44px; box-shadow: inset -1px 0 0 #1c1c1a; }
         .sticky-col-job { position: sticky; z-index: 25; width: 80px; box-shadow: inset -1px 0 0 #1c1c1a; }
         .sticky-col-type { position: sticky; z-index: 25; width: 80px; box-shadow: inset -1px 0 0 #1c1c1a; }
@@ -126,8 +120,6 @@
         .sticky-shadow { box-shadow: inset -1px 0 0 #1c1c1a, 4px 0 8px -4px rgba(0,0,0,0.5); }
 
         .admin-textarea-wrapper { display: grid; width: 100%; min-height: 54px; align-items: center; }
-        .beast-row .admin-textarea-wrapper { min-height: 80px; }
-        
         .cell-textarea { 
             grid-area: 1 / 1 / 2 / 2; width: 100% !important; min-height: 54px !important;
             background: transparent !important; border: none !important; color: inherit; 
@@ -135,31 +127,21 @@
             margin: 0 !important; resize: none; overflow: hidden; line-height: 1.5; 
             white-space: pre-wrap; box-sizing: border-box !important; field-sizing: content; 
         }
-        .beast-row .cell-textarea { min-height: 80px !important; }
-
         .cell-input { 
             background: transparent !important; border: 0 !important; color: inherit; 
             text-align: center; outline: none !important; padding: 0 10px !important; 
             width: 100% !important; height: 54px !important; box-sizing: border-box !important;
         }
-        .beast-row .cell-input { height: 80px !important; }
 
         .drag-handle-cell { cursor: grab; background: #1a1a18; }
         .drag-handle-inner { display: flex; align-items: center; justify-content: center; opacity: 0.3; transition: 0.2s; height: 100%; min-height: 54px; }
         .drag-handle-cell:hover .drag-handle-inner { background: rgba(255,255,255,0.07); opacity: 1; }
 
         .display-multiline { display: flex; align-items: center; padding: 12px 15px !important; white-space: pre-wrap; line-height: 1.5; text-align: left; word-break: keep-all; min-height: 54px; box-sizing: border-box; }
-        .beast-row .display-multiline { min-height: 80px; }
-        
         .display-center { display: flex; align-items: center; justify-content: center; padding: 12px 15px !important; white-space: pre-wrap; line-height: 1.5; text-align: center; word-break: keep-all; min-height: 54px; box-sizing: border-box; }
-        .beast-row .display-center { min-height: 80px; }
 
         .image-cell-wrapper { display: flex; align-items: center; justify-content: center; width: 100%; min-height: 54px; cursor: pointer; padding: 0 10px; box-sizing: border-box; }
-        .beast-row .image-cell-wrapper { min-height: 80px; }
-        
         .preview-img { max-height: 40px; max-width: 100%; object-fit: contain; }
-        /* 지염수 탭 이미지 확대 */
-        .beast-row .preview-img { max-height: 70px; }
 
         .badge-box {
             display: inline-flex; align-items: center; justify-content: center;
@@ -181,7 +163,6 @@
         }
 
         .delete-btn-wrapper { display: flex; align-items: center; justify-content: center; min-height: 54px; width: 60px; }
-        .beast-row .delete-btn-wrapper { min-height: 80px; }
         .delete-btn { color: #444; transition: all 0.2s; padding: 10px; cursor: pointer; }
         .delete-btn:hover { color: #ef4444; transform: scale(1.1); }
         
@@ -221,13 +202,12 @@
             <div class="flex">
                 <button id="tab-5star" class="tab-btn active" onclick="window.switchTab('5star')">5성 (...)</button>
                 <button id="tab-lowstar" class="tab-btn" onclick="window.switchTab('lowstar')">4성/3성 (...)</button>
-                <button id="tab-beast" class="tab-btn" onclick="window.switchTab('beast')">지염수 (...)</button>
             </div>
             <div id="userTools" class="flex items-center gap-2 py-2">
                 <select id="searchFieldFilter" class="filter-select">
                     <option value="all">전체</option>
-                    <option value="basestat">스킬명</option>
-                    <option value="extra1">스킬내용</option>
+                    <option value="basestat">악세(스탯)</option>
+                    <option value="extra1">악세(효과)</option>
                     <option value="extra2">서포트</option>
                     <option value="extra3">필살기</option>
                     <option value="extra4">EX 어빌</option>
@@ -240,9 +220,39 @@
     <main class="w-full px-4 py-4">
         <div id="tableScroll" class="table-container shadow-2xl custom-scrollbar">
             <table id="mainTable">
-                <colgroup id="tableColGroup"></colgroup>
+                <colgroup>
+                    <col id="col-drag" class="hidden" style="width: 44px;">
+                    <col style="width: 80px;">
+                    <col style="width: 80px;">
+                    <col style="width: 120px;">
+                    <col style="width: 100px;">
+                    <col style="width: 70px;">
+                    <col style="width: 120px;">
+                    <col style="width: 90px;">
+                    <col style="width: 70px;">
+                    <col style="width: 70px;">
+                    <col style="width: 80px;">
+                    <col style="width: 60px;">
+                    <col style="width: 60px;">
+                    <col style="width: 80px;">
+                    <col style="width: 170px;">
+                    <col style="width: 220px;">
+                    <col style="width: 470px;">
+                    <col style="width: 580px;">
+                    <col style="width: 470px;">
+                    <col style="width: 470px;">
+                    <col id="col-admin" class="hidden" style="width: 60px;">
+                </colgroup>
                 <thead>
-                    <tr id="headerRow"></tr>
+                    <tr id="headerRow">
+                        <th id="dragHeader" class="hidden sticky-col-drag">↕</th>
+                        <th id="th-job" class="sticky-col-job">직업</th>
+                        <th id="th-type" class="sticky-col-type">캐릭터</th>
+                        <th id="th-name" class="sticky-col-name">이름</th>
+                        <th>성장상태</th><th>등화</th><th>등화(배/서)</th><th>등화(스탯)</th><th>레벨</th><th>천부</th><th>필살기</th><th>각성</th><th>오의</th><th>등불</th><th>악세명</th><th>악세(스탯)</th>
+                        <th>악세(효과)</th><th>서포트 어빌</th><th>필살기 정보</th><th>EX 어빌</th> 
+                        <th id="adminHeader" class="hidden bg-red-900/20 text-red-500">기능</th>
+                    </tr>
                 </thead>
                 <tbody id="travelerTableBody" class="divide-y divide-white/5"></tbody>
             </table>
@@ -297,6 +307,8 @@
         const travelerTableBody = document.getElementById('travelerTableBody');
         const adminBtn = document.getElementById('adminBtn');
         const logoutBtn = document.getElementById('logoutBtn');
+        const adminHeader = document.getElementById('adminHeader');
+        const dragHeader = document.getElementById('dragHeader');
         const addCharBtn = document.getElementById('addCharBtn');
         const loadingOverlay = document.getElementById('loading');
         const charSearch = document.getElementById('charSearch');
@@ -312,8 +324,6 @@
         const mainTable = document.getElementById('mainTable');
         const floatingScrollContainer = document.getElementById('floatingScrollContainer');
         const floatingScrollInner = document.getElementById('floatingScrollInner');
-        const headerRow = document.getElementById('headerRow');
-        const tableColGroup = document.getElementById('tableColGroup');
 
         let currentUser = null;
         let activeTab = '5star';
@@ -321,7 +331,7 @@
         let unsubscribeCurrent = null;
         let deleteIdPending = null;
 
-        const COLLECTION_MAP = { '5star': 'travelers', 'lowstar': 'travelers_lowstar', 'beast': 'travelers_beast' };
+        const COLLECTION_MAP = { '5star': 'travelers', 'lowstar': 'travelers_lowstar' };
 
         function initFloatingScroll() {
             const syncSize = () => { floatingScrollInner.style.width = mainTable.scrollWidth + 'px'; };
@@ -349,9 +359,8 @@
             const jobH = document.getElementById('th-job');
             const typeH = document.getElementById('th-type');
             const nameH = document.getElementById('th-name');
-            if (!jobH || !typeH || !nameH) return;
             let currentLeft = 0;
-            if (isAdmin && dragH && !dragH.classList.contains('hidden')) { dragH.style.left = currentLeft + 'px'; currentLeft += dragH.offsetWidth; }
+            if (isAdmin && !dragH.classList.contains('hidden')) { dragH.style.left = currentLeft + 'px'; currentLeft += dragH.offsetWidth; }
             jobH.style.left = currentLeft + 'px'; currentLeft += jobH.offsetWidth;
             typeH.style.left = currentLeft + 'px'; currentLeft += typeH.offsetWidth;
             nameH.style.left = currentLeft + 'px';
@@ -368,62 +377,22 @@
 
         window.switchTab = (tab) => {
             activeTab = tab;
-            if (searchFieldFilter) {
-                if (tab === 'beast') {
-                    searchFieldFilter.innerHTML = '<option value="all">전체</option><option value="basestat">스킬명</option><option value="extra1">스킬내용</option><option value="extra3">습득방법</option>';
-                } else {
-                    searchFieldFilter.innerHTML = '<option value="all">전체</option><option value="basestat">악세(스탯)</option><option value="extra1">악세(효과)</option><option value="extra2">서포트</option><option value="extra3">필살기</option><option value="extra4">EX 어빌</option>';
-                }
-                searchFieldFilter.value = 'all';
-            }
+            if (searchFieldFilter) searchFieldFilter.value = 'all';
             if (charSearch) charSearch.value = '';
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.id === `tab-${tab}`));
-            renderHeader();
             loadTable();
         };
-
-        function renderHeader() {
-            const isAdmin = currentUser && !currentUser.isAnonymous;
-            let hHtml = '';
-            let cHtml = '';
-            
-            if (activeTab === 'beast') {
-                if (isAdmin) { 
-                    hHtml += '<th id="dragHeader" class="sticky-col-drag">↕</th>'; 
-                    cHtml += '<col style="width: 44px;">';
-                }
-                hHtml += '<th id="th-job" class="sticky-col-job">직업</th>';
-                hHtml += '<th id="th-type" class="sticky-col-type">캐릭터</th>';
-                hHtml += '<th id="th-name" class="sticky-col-name">이름</th>';
-                hHtml += '<th>BP소모</th>';
-                hHtml += '<th>준비턴 / 재사용턴</th><th>스킬명</th><th>스킬내용</th><th>습득방법</th>';
-                if (isAdmin) hHtml += '<th class="bg-red-900/20 text-red-500">기능</th>';
-                
-                // 지염수 탭 특정 열 자동 너비 조절
-                cHtml += '<col style="width: auto; min-width: 100px;"><col style="width: 80px;"><col style="width: auto; min-width: 120px;"><col style="width: auto; min-width: 100px;"><col style="width: auto; min-width: 180px;"><col style="width: auto; min-width: 220px;"><col style="width: 580px;"><col style="width: 250px;">';
-                if (isAdmin) cHtml += '<col style="width: 60px;">';
-            } else {
-                if (isAdmin) {
-                    hHtml += '<th id="dragHeader" class="sticky-col-drag">↕</th>';
-                    cHtml += '<col style="width: 44px;">';
-                }
-                hHtml += '<th id="th-job" class="sticky-col-job">직업</th><th id="th-type" class="sticky-col-type">캐릭터</th><th id="th-name" class="sticky-col-name">이름</th>';
-                hHtml += '<th>성장상태</th><th>등화</th><th>등화(배/서)</th><th>등화(스탯)</th><th>레벨</th><th>천부</th><th>필살기</th><th>각성</th><th>오의</th><th>등불</th><th>악세명</th><th>악세(스탯)</th><th>악세(효과)</th><th>서포트 어빌</th><th>필살기 정보</th><th>EX 어빌</th>';
-                if (isAdmin) hHtml += '<th class="bg-red-900/20 text-red-500">기능</th>';
-                
-                cHtml += '<col style="width: 80px;"><col style="width: 80px;"><col style="width: 120px;"><col style="width: 100px;"><col style="width: 70px;"><col style="width: 120px;"><col style="width: 90px;"><col style="width: 70px;"><col style="width: 70px;"><col style="width: 80px;"><col style="width: 60px;"><col style="width: 60px;"><col style="width: 80px;"><col style="width: 170px;"><col style="width: 220px;"><col style="width: 470px;"><col style="width: 580px;"><col style="width: 470px;"><col style="width: 470px;">';
-                if (isAdmin) cHtml += '<col style="width: 60px;">';
-            }
-            headerRow.innerHTML = hHtml;
-            tableColGroup.innerHTML = cHtml;
-        }
 
         onAuthStateChanged(auth, async (user) => {
             currentUser = user;
             const isAdmin = user && !user.isAnonymous;
             adminBtn.classList.toggle('hidden', isAdmin);
             logoutBtn.classList.toggle('hidden', !isAdmin);
+            adminHeader.classList.toggle('hidden', !isAdmin);
+            dragHeader.classList.toggle('hidden', !isAdmin);
             addCharBtn.classList.toggle('hidden', !isAdmin);
+            document.getElementById('col-drag').classList.toggle('hidden', !isAdmin);
+            document.getElementById('col-admin').classList.toggle('hidden', !isAdmin);
             userTools.classList.toggle('hidden', isAdmin); 
             if (isAdmin) {
                 userInfo.classList.remove('hidden');
@@ -432,21 +401,17 @@
                 userInfo.classList.add('hidden');
                 if (!user) await signInAnonymously(auth);
             }
-            renderHeader();
             loadTable();
             updateAllCounts();
             loadingOverlay.style.display = 'none';
         });
 
         function updateAllCounts() {
-            ['5star', 'lowstar', 'beast'].forEach(t => {
+            ['5star', 'lowstar'].forEach(t => {
                 onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', COLLECTION_MAP[t]), (snap) => {
                     let gifts = 0; snap.forEach(d => { if (d.data().gift?.trim()) gifts++; });
                     const btn = document.getElementById(`tab-${t}`);
-                    if (btn) {
-                        const label = t === '5star' ? '5성' : t === 'lowstar' ? '4성/3성' : '지염수';
-                        btn.innerText = `${label} (${gifts}명/${snap.size}명)`;
-                    }
+                    if (btn) btn.innerText = `${t === '5star' ? '5성' : '4성/3성'} (${gifts}명/${snap.size}명)`;
                 });
             });
         }
@@ -480,8 +445,6 @@
             const isAdmin = currentUser && !currentUser.isAnonymous;
             const tr = document.createElement('tr');
             tr.setAttribute('data-id', data.id);
-            if (activeTab === 'beast') tr.classList.add('beast-row');
-            
             let currentOffset = 0;
 
             if (isAdmin) {
@@ -493,12 +456,7 @@
                 currentOffset += 44; 
             }
 
-            let fields = [];
-            if (activeTab === 'beast') {
-                fields = ['job', 'type', 'name', 'extra2', 'accessory', 'basestat', 'extra1', 'extra3'];
-            } else {
-                fields = ['job', 'type', 'name', 'status', 'light', 'support', 'reinforce', 'level', 'gift', 'skill', 'awake', 'ultimate', 'crystal', 'accessory', 'basestat', 'extra1', 'extra2', 'extra3', 'extra4'];
-            }
+            const fields = ['job', 'type', 'name', 'status', 'light', 'support', 'reinforce', 'level', 'gift', 'skill', 'awake', 'ultimate', 'crystal', 'accessory', 'basestat', 'extra1', 'extra2', 'extra3', 'extra4'];
             
             fields.forEach(field => {
                 const td = document.createElement('td');
@@ -507,7 +465,7 @@
                 if (field === 'name') { td.classList.add('sticky-col-name', 'sticky-shadow'); td.style.left = (currentOffset + 160) + 'px'; }
 
                 if (isAdmin) {
-                    if ((field === 'type' || field === 'gift') || (field === 'job' && activeTab !== 'beast')) {
+                    if (['job', 'type', 'gift'].includes(field)) {
                         const w = document.createElement('div'); w.className = "image-cell-wrapper";
                         if (data[field]) {
                             const img = document.createElement('img'); img.src = data[field]; img.className = "preview-img";
@@ -521,12 +479,12 @@
                         const ta = document.createElement('textarea'); ta.className = "cell-textarea";
                         ta.value = data[field] || '';
                         ta.onblur = () => { if (ta.value !== (data[field] || '')) updateCell(data.id, field, ta.value); };
-                        const syncHeight = () => { if (!CSS.supports('field-sizing', 'content')) { ta.style.height = activeTab === 'beast' ? 'auto' : '54px'; ta.style.height = ta.scrollHeight + 'px'; } };
+                        const syncHeight = () => { if (!CSS.supports('field-sizing', 'content')) { ta.style.height = '54px'; ta.style.height = ta.scrollHeight + 'px'; } };
                         ta.addEventListener('input', syncHeight);
                         w.appendChild(ta); td.appendChild(w);
                         setTimeout(syncHeight, 0);
                     } else if (field === 'support') {
-                        const c = document.createElement('div'); c.className = "flex gap-4 justify-center items-center h-full px-2";
+                        const c = document.createElement('div'); c.className = "flex gap-4 justify-center items-center h-[54px] px-2";
                         const cur = Array.isArray(data[field]) ? data[field] : [];
                         [1, 2].forEach(i => {
                             const rb = document.createElement('input'); rb.type = "checkbox"; rb.className = "round-radio"; rb.checked = cur.includes(i);
@@ -535,12 +493,12 @@
                         });
                         td.appendChild(c);
                     } else if (['awake', 'ultimate'].includes(field)) {
-                        const w = document.createElement('div'); w.className = "flex items-center justify-center h-full";
+                        const w = document.createElement('div'); w.className = "flex items-center justify-center h-[54px]";
                         const cb = document.createElement('input'); cb.type = "checkbox"; cb.className = "simple-checkbox"; cb.checked = !!data[field];
                         cb.onchange = () => updateCell(data.id, field, cb.checked);
                         w.appendChild(cb); td.appendChild(w);
                     } else {
-                        const w = document.createElement('div'); w.className = "flex items-center justify-center h-full";
+                        const w = document.createElement('div'); w.className = "flex items-center justify-center";
                         const inp = document.createElement('input'); inp.className = "cell-input";
                         inp.value = data[field] || '';
                         if (field === 'light' || field === 'reinforce') inp.style.color = "#99ffff";
@@ -550,32 +508,25 @@
                         w.appendChild(inp); td.appendChild(w);
                     }
                 } else {
-                    if ((field === 'type' || field === 'gift') || (field === 'job' && activeTab !== 'beast')) {
-                        td.innerHTML = data[field] ? `<div class="px-2 h-full flex items-center justify-center"><img src="${data[field]}" class="preview-img"></div>` : '-';
+                    if (['job', 'type', 'gift'].includes(field)) {
+                        td.innerHTML = data[field] ? `<div class="px-2 h-[54px] flex items-center justify-center"><img src="${data[field]}" class="preview-img"></div>` : '-';
                     } else if (field === 'support') {
                         const cur = Array.isArray(data[field]) ? data[field] : [];
-                        td.innerHTML = `<div class="flex gap-1.5 justify-center items-center h-full px-2"><span class="badge-box ${cur.includes(1) ? 'active' : ''}">배틀</span><span class="badge-box ${cur.includes(2) ? 'active' : ''}">서포트</span></div>`;
+                        td.innerHTML = `<div class="flex gap-1.5 justify-center items-center h-[54px] px-2"><span class="badge-box ${cur.includes(1) ? 'active' : ''}">배틀</span><span class="badge-box ${cur.includes(2) ? 'active' : ''}">서포트</span></div>`;
                     } else if (['awake', 'ultimate'].includes(field)) {
-                        td.innerHTML = data[field] ? '<div class="px-2 h-full flex items-center justify-center"><i class="fa-solid fa-check text-[#ff9933]"></i></div>' : '-';
+                        td.innerHTML = data[field] ? '<div class="px-2 h-[54px] flex items-center justify-center"><i class="fa-solid fa-check text-[#ff9933]"></i></div>' : '-';
                     } else {
                         const s = document.createElement('span'); 
-                        const centerFields = ['name', 'status', 'light', 'reinforce', 'level', 'skill', 'crystal', 'ultimate', 'job', 'extra2', 'accessory', 'basestat'];
-                        
-                        // 지염수 전용 정렬 및 여백 규칙 적용
-                        const isBeastCenter = activeTab === 'beast' && ['job', 'name', 'extra2', 'accessory', 'basestat'].includes(field);
-                        s.className = (centerFields.includes(field) || isBeastCenter) ? "display-center" : "display-multiline";
-                        
-                        // 지염수 탭 특정 필드 좌우여백 20px (px-5) 적용
-                        if (activeTab === 'beast' && ['job', 'name', 'extra2', 'accessory', 'basestat'].includes(field)) {
-                            s.classList.add('px-5');
-                        }
-
+                        const centerFields = ['name', 'status', 'light', 'reinforce', 'level', 'skill', 'crystal', 'ultimate'];
+                        s.className = centerFields.includes(field) ? "display-center" : "display-multiline";
                         if (field === 'light' || field === 'reinforce') s.style.color = "#99ffff";
                         if (field === 'skill') s.style.color = "#ff9933";
                         if (field === 'status') s.style.color = "#ffcc00";
                         
+                        // 악세(스탯) 열의 마이너스 수치 강조 로직
                         if (field === 'basestat' && data[field]) {
                             const val = data[field].toString();
+                            // '-' 기호와 뒤따르는 숫자를 찾아 감싸기
                             s.innerHTML = val.replace(/-\d+/g, (match) => `<span class="negative-value">${match}</span>`);
                         } else {
                             s.innerText = data[field] || '-';
@@ -619,11 +570,10 @@
             const col = collection(db, 'artifacts', appId, 'public', 'data', COLLECTION_MAP[activeTab]);
             const snap = await getDocs(col);
             let maxO = snap.docs.reduce((max, d) => Math.max(max, d.data().order ?? -1), -1);
-            let newObj = { name: '새 데이터', order: maxO + 1, job: '', type: '', accessory: '', basestat: '', extra1: '', extra2: '', extra3: '' };
-            if (activeTab !== 'beast') {
-                Object.assign(newObj, { status: activeTab === '5star' ? '5성' : '4성', light: '', reinforce: '', level: '', skill: '', crystal: '', extra4: '', support: [] });
-            }
-            await addDoc(col, newObj);
+            await addDoc(col, { 
+                name: '새 캐릭터', status: activeTab === '5star' ? '5성' : '4성', order: maxO + 1,
+                light: '', reinforce: '', level: '', skill: '', crystal: '', accessory: '', basestat: '', extra1: '', extra2: '', extra3: '', extra4: '', support: []
+            });
         };
 
         const executeLogin = async () => { try { await signInWithEmailAndPassword(auth, ADMIN_EMAIL, loginPasswordInput.value); document.getElementById('loginModal').classList.add('hidden'); } catch(e) { alert('인증 실패'); } };
