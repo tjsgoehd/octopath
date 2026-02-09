@@ -105,6 +105,12 @@
             box-shadow: inset -1px 0 0 #1c1c1a;
         }
 
+        /* 지염수 탭 전용 행 높이 상향 및 유연화 */
+        .beast-row td {
+            height: auto;
+            min-height: 80px;
+        }
+
         .sticky-col-drag { position: sticky; left: 0; z-index: 30 !important; width: 44px; box-shadow: inset -1px 0 0 #1c1c1a; }
         .sticky-col-job { position: sticky; z-index: 25; width: 80px; box-shadow: inset -1px 0 0 #1c1c1a; }
         .sticky-col-type { position: sticky; z-index: 25; width: 80px; box-shadow: inset -1px 0 0 #1c1c1a; }
@@ -120,6 +126,8 @@
         .sticky-shadow { box-shadow: inset -1px 0 0 #1c1c1a, 4px 0 8px -4px rgba(0,0,0,0.5); }
 
         .admin-textarea-wrapper { display: grid; width: 100%; min-height: 54px; align-items: center; }
+        .beast-row .admin-textarea-wrapper { min-height: 80px; }
+        
         .cell-textarea { 
             grid-area: 1 / 1 / 2 / 2; width: 100% !important; min-height: 54px !important;
             background: transparent !important; border: none !important; color: inherit; 
@@ -127,21 +135,31 @@
             margin: 0 !important; resize: none; overflow: hidden; line-height: 1.5; 
             white-space: pre-wrap; box-sizing: border-box !important; field-sizing: content; 
         }
+        .beast-row .cell-textarea { min-height: 80px !important; }
+
         .cell-input { 
             background: transparent !important; border: 0 !important; color: inherit; 
             text-align: center; outline: none !important; padding: 0 10px !important; 
             width: 100% !important; height: 54px !important; box-sizing: border-box !important;
         }
+        .beast-row .cell-input { height: 80px !important; }
 
         .drag-handle-cell { cursor: grab; background: #1a1a18; }
         .drag-handle-inner { display: flex; align-items: center; justify-content: center; opacity: 0.3; transition: 0.2s; height: 100%; min-height: 54px; }
         .drag-handle-cell:hover .drag-handle-inner { background: rgba(255,255,255,0.07); opacity: 1; }
 
         .display-multiline { display: flex; align-items: center; padding: 12px 15px !important; white-space: pre-wrap; line-height: 1.5; text-align: left; word-break: keep-all; min-height: 54px; box-sizing: border-box; }
+        .beast-row .display-multiline { min-height: 80px; }
+        
         .display-center { display: flex; align-items: center; justify-content: center; padding: 12px 15px !important; white-space: pre-wrap; line-height: 1.5; text-align: center; word-break: keep-all; min-height: 54px; box-sizing: border-box; }
+        .beast-row .display-center { min-height: 80px; }
 
         .image-cell-wrapper { display: flex; align-items: center; justify-content: center; width: 100%; min-height: 54px; cursor: pointer; padding: 0 10px; box-sizing: border-box; }
+        .beast-row .image-cell-wrapper { min-height: 80px; }
+        
         .preview-img { max-height: 40px; max-width: 100%; object-fit: contain; }
+        /* 지염수 탭 이미지 확대 */
+        .beast-row .preview-img { max-height: 70px; }
 
         .badge-box {
             display: inline-flex; align-items: center; justify-content: center;
@@ -163,6 +181,7 @@
         }
 
         .delete-btn-wrapper { display: flex; align-items: center; justify-content: center; min-height: 54px; width: 60px; }
+        .beast-row .delete-btn-wrapper { min-height: 80px; }
         .delete-btn { color: #444; transition: all 0.2s; padding: 10px; cursor: pointer; }
         .delete-btn:hover { color: #ef4444; transform: scale(1.1); }
         
@@ -351,7 +370,7 @@
             activeTab = tab;
             if (searchFieldFilter) {
                 if (tab === 'beast') {
-                    searchFieldFilter.innerHTML = '<option value="all">전체</option><option value="basestat">스킬명</option><option value="extra1">스킬내용</option>';
+                    searchFieldFilter.innerHTML = '<option value="all">전체</option><option value="basestat">스킬명</option><option value="extra1">스킬내용</option><option value="extra3">습득방법</option>';
                 } else {
                     searchFieldFilter.innerHTML = '<option value="all">전체</option><option value="basestat">악세(스탯)</option><option value="extra1">악세(효과)</option><option value="extra2">서포트</option><option value="extra3">필살기</option><option value="extra4">EX 어빌</option>';
                 }
@@ -376,10 +395,12 @@
                 hHtml += '<th id="th-job" class="sticky-col-job">직업</th>';
                 hHtml += '<th id="th-type" class="sticky-col-type">캐릭터</th>';
                 hHtml += '<th id="th-name" class="sticky-col-name">이름</th>';
-                hHtml += '<th>준비턴 / 재사용턴</th><th>스킬명</th><th>스킬내용</th>';
+                hHtml += '<th>BP소모</th>';
+                hHtml += '<th>준비턴 / 재사용턴</th><th>스킬명</th><th>스킬내용</th><th>습득방법</th>';
                 if (isAdmin) hHtml += '<th class="bg-red-900/20 text-red-500">기능</th>';
                 
-                cHtml += '<col style="width: 80px;"><col style="width: 80px;"><col style="width: 120px;"><col style="width: 170px;"><col style="width: 220px;"><col style="width: 580px;">';
+                // 지염수 탭 특정 열 자동 너비 조절
+                cHtml += '<col style="width: auto; min-width: 100px;"><col style="width: 80px;"><col style="width: auto; min-width: 120px;"><col style="width: auto; min-width: 100px;"><col style="width: auto; min-width: 180px;"><col style="width: auto; min-width: 220px;"><col style="width: 580px;"><col style="width: 250px;">';
                 if (isAdmin) cHtml += '<col style="width: 60px;">';
             } else {
                 if (isAdmin) {
@@ -459,6 +480,8 @@
             const isAdmin = currentUser && !currentUser.isAnonymous;
             const tr = document.createElement('tr');
             tr.setAttribute('data-id', data.id);
+            if (activeTab === 'beast') tr.classList.add('beast-row');
+            
             let currentOffset = 0;
 
             if (isAdmin) {
@@ -472,7 +495,7 @@
 
             let fields = [];
             if (activeTab === 'beast') {
-                fields = ['job', 'type', 'name', 'accessory', 'basestat', 'extra1'];
+                fields = ['job', 'type', 'name', 'extra2', 'accessory', 'basestat', 'extra1', 'extra3'];
             } else {
                 fields = ['job', 'type', 'name', 'status', 'light', 'support', 'reinforce', 'level', 'gift', 'skill', 'awake', 'ultimate', 'crystal', 'accessory', 'basestat', 'extra1', 'extra2', 'extra3', 'extra4'];
             }
@@ -484,7 +507,6 @@
                 if (field === 'name') { td.classList.add('sticky-col-name', 'sticky-shadow'); td.style.left = (currentOffset + 160) + 'px'; }
 
                 if (isAdmin) {
-                    // [직업] 열이 지염수 탭일 때는 텍스트 필드로 변경됨
                     if ((field === 'type' || field === 'gift') || (field === 'job' && activeTab !== 'beast')) {
                         const w = document.createElement('div'); w.className = "image-cell-wrapper";
                         if (data[field]) {
@@ -499,12 +521,12 @@
                         const ta = document.createElement('textarea'); ta.className = "cell-textarea";
                         ta.value = data[field] || '';
                         ta.onblur = () => { if (ta.value !== (data[field] || '')) updateCell(data.id, field, ta.value); };
-                        const syncHeight = () => { if (!CSS.supports('field-sizing', 'content')) { ta.style.height = '54px'; ta.style.height = ta.scrollHeight + 'px'; } };
+                        const syncHeight = () => { if (!CSS.supports('field-sizing', 'content')) { ta.style.height = activeTab === 'beast' ? 'auto' : '54px'; ta.style.height = ta.scrollHeight + 'px'; } };
                         ta.addEventListener('input', syncHeight);
                         w.appendChild(ta); td.appendChild(w);
                         setTimeout(syncHeight, 0);
                     } else if (field === 'support') {
-                        const c = document.createElement('div'); c.className = "flex gap-4 justify-center items-center h-[54px] px-2";
+                        const c = document.createElement('div'); c.className = "flex gap-4 justify-center items-center h-full px-2";
                         const cur = Array.isArray(data[field]) ? data[field] : [];
                         [1, 2].forEach(i => {
                             const rb = document.createElement('input'); rb.type = "checkbox"; rb.className = "round-radio"; rb.checked = cur.includes(i);
@@ -513,13 +535,12 @@
                         });
                         td.appendChild(c);
                     } else if (['awake', 'ultimate'].includes(field)) {
-                        const w = document.createElement('div'); w.className = "flex items-center justify-center h-[54px]";
+                        const w = document.createElement('div'); w.className = "flex items-center justify-center h-full";
                         const cb = document.createElement('input'); cb.type = "checkbox"; cb.className = "simple-checkbox"; cb.checked = !!data[field];
                         cb.onchange = () => updateCell(data.id, field, cb.checked);
                         w.appendChild(cb); td.appendChild(w);
                     } else {
-                        // 지염수 탭의 [직업]도 이쪽(텍스트 필드)을 타게 됨
-                        const w = document.createElement('div'); w.className = "flex items-center justify-center";
+                        const w = document.createElement('div'); w.className = "flex items-center justify-center h-full";
                         const inp = document.createElement('input'); inp.className = "cell-input";
                         inp.value = data[field] || '';
                         if (field === 'light' || field === 'reinforce') inp.style.color = "#99ffff";
@@ -530,16 +551,25 @@
                     }
                 } else {
                     if ((field === 'type' || field === 'gift') || (field === 'job' && activeTab !== 'beast')) {
-                        td.innerHTML = data[field] ? `<div class="px-2 h-[54px] flex items-center justify-center"><img src="${data[field]}" class="preview-img"></div>` : '-';
+                        td.innerHTML = data[field] ? `<div class="px-2 h-full flex items-center justify-center"><img src="${data[field]}" class="preview-img"></div>` : '-';
                     } else if (field === 'support') {
                         const cur = Array.isArray(data[field]) ? data[field] : [];
-                        td.innerHTML = `<div class="flex gap-1.5 justify-center items-center h-[54px] px-2"><span class="badge-box ${cur.includes(1) ? 'active' : ''}">배틀</span><span class="badge-box ${cur.includes(2) ? 'active' : ''}">서포트</span></div>`;
+                        td.innerHTML = `<div class="flex gap-1.5 justify-center items-center h-full px-2"><span class="badge-box ${cur.includes(1) ? 'active' : ''}">배틀</span><span class="badge-box ${cur.includes(2) ? 'active' : ''}">서포트</span></div>`;
                     } else if (['awake', 'ultimate'].includes(field)) {
-                        td.innerHTML = data[field] ? '<div class="px-2 h-[54px] flex items-center justify-center"><i class="fa-solid fa-check text-[#ff9933]"></i></div>' : '-';
+                        td.innerHTML = data[field] ? '<div class="px-2 h-full flex items-center justify-center"><i class="fa-solid fa-check text-[#ff9933]"></i></div>' : '-';
                     } else {
                         const s = document.createElement('span'); 
-                        const centerFields = ['name', 'status', 'light', 'reinforce', 'level', 'skill', 'crystal', 'ultimate', 'job'];
-                        s.className = (centerFields.includes(field)) ? "display-center" : "display-multiline";
+                        const centerFields = ['name', 'status', 'light', 'reinforce', 'level', 'skill', 'crystal', 'ultimate', 'job', 'extra2', 'accessory', 'basestat'];
+                        
+                        // 지염수 전용 정렬 및 여백 규칙 적용
+                        const isBeastCenter = activeTab === 'beast' && ['job', 'name', 'extra2', 'accessory', 'basestat'].includes(field);
+                        s.className = (centerFields.includes(field) || isBeastCenter) ? "display-center" : "display-multiline";
+                        
+                        // 지염수 탭 특정 필드 좌우여백 20px (px-5) 적용
+                        if (activeTab === 'beast' && ['job', 'name', 'extra2', 'accessory', 'basestat'].includes(field)) {
+                            s.classList.add('px-5');
+                        }
+
                         if (field === 'light' || field === 'reinforce') s.style.color = "#99ffff";
                         if (field === 'skill') s.style.color = "#ff9933";
                         if (field === 'status') s.style.color = "#ffcc00";
@@ -589,9 +619,9 @@
             const col = collection(db, 'artifacts', appId, 'public', 'data', COLLECTION_MAP[activeTab]);
             const snap = await getDocs(col);
             let maxO = snap.docs.reduce((max, d) => Math.max(max, d.data().order ?? -1), -1);
-            let newObj = { name: '새 데이터', order: maxO + 1, job: '', type: '', accessory: '', basestat: '', extra1: '' };
+            let newObj = { name: '새 데이터', order: maxO + 1, job: '', type: '', accessory: '', basestat: '', extra1: '', extra2: '', extra3: '' };
             if (activeTab !== 'beast') {
-                Object.assign(newObj, { status: activeTab === '5star' ? '5성' : '4성', light: '', reinforce: '', level: '', skill: '', crystal: '', extra2: '', extra3: '', extra4: '', support: [] });
+                Object.assign(newObj, { status: activeTab === '5star' ? '5성' : '4성', light: '', reinforce: '', level: '', skill: '', crystal: '', extra4: '', support: [] });
             }
             await addDoc(col, newObj);
         };
