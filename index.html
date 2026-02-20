@@ -11,36 +11,37 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Noto+Sans+KR:wght@300;400;700;900&display=swap');
         
         :root { 
-            --bg-dark: #0d0d0c; 
-            --card-bg: #1a1a18; 
-            --accent: #d97706; 
-            --status-color: #ffcc00; 
-            --highlight: #99ffff;
-            --check-accent: #99ffff; 
-            --box-accent: #FF9933;
-            --border-line: rgba(255,255,255,0.05);
-            --header-bg: #141412;
-            --th-bg: #2d2d26;
-            --text-main: #e2e2d5;
-            --tab-active-bg: rgba(255, 204, 0, 0.05);
-            --tab-text: #666;
-            --logo-color: #fef3c7;
-            --light-col-color: #99FFFF;
+            /* 이미지 참고 기반 프리미엄 다크 테마 (블루 포인트) */
+            --bg-dark: #1a1c1e; 
+            --card-bg: #212427; 
+            --header-bg: #1a1c1e;
+            --th-bg: #282c31;
+            --border-line: rgba(255, 255, 255, 0.05);
+            --text-main: #e0e0e0;
+            --text-muted: #9ba1a6;
+            --accent: #00d4ff; /* 밝은 블루 포인트 */
+            --status-color: #70e0ff; 
+            --highlight: #00d4ff;
+            --tab-active-bg: rgba(0, 212, 255, 0.1);
+            --tab-text: #80868b;
+            --logo-color: #ffffff;
+            --light-col-color: #00d4ff;
         }
 
         body.light-mode {
-            --bg-dark: #f8fafc;
+            --bg-dark: #f0f2f5;
             --card-bg: #ffffff;
             --header-bg: #ffffff;
-            --th-bg: #f8fafc;
-            --border-line: #edf2f7;
-            --text-main: #334155;
-            --accent: #3b82f6;
-            --status-color: #2563eb;
-            --tab-active-bg: #eff6ff;
-            --tab-text: #64748b;
-            --logo-color: #1e3a8a;
-            --light-col-color: #2563eb;
+            --th-bg: #f8f9fa;
+            --border-line: #e9ecef;
+            --text-main: #212529;
+            --text-muted: #6c757d;
+            --accent: #007bff;
+            --status-color: #0056b3;
+            --tab-active-bg: #eef2ff;
+            --tab-text: #adb5bd;
+            --logo-color: #0f172a;
+            --light-col-color: #0284c7;
         }
         
         body { 
@@ -52,8 +53,7 @@
             height: 100vh;    
             display: flex;
             flex-direction: column;
-            transition: background-color 0.2s ease;
-            -webkit-text-size-adjust: none;
+            transition: background-color 0.3s ease;
         }
         
         header { 
@@ -67,188 +67,176 @@
 
         .table-container { 
             height: 100%; width: 100%; overflow: auto; background: var(--bg-dark);
-            -webkit-overflow-scrolling: touch;
         }
 
-        /* 스크롤바 최적화 */
         .table-container::-webkit-scrollbar { height: 6px; width: 4px; }
-        .table-container::-webkit-scrollbar-thumb { background: rgba(128,128,128,0.2); border-radius: 10px; }
+        .table-container::-webkit-scrollbar-thumb { background: rgba(0, 212, 255, 0.1); border-radius: 10px; }
 
         table { width: max-content; border-spacing: 0; border-collapse: separate; table-layout: fixed; }
 
         th { 
             background: var(--th-bg) !important; 
-            color: var(--tab-text) !important; 
-            font-size: 11px; font-weight: 800;
-            padding: 10px 12px; 
-            border-right: 1px solid var(--border-line);
+            color: var(--text-muted) !important; 
+            font-size: 11px; font-weight: 700;
+            padding: 12px 14px; 
             border-bottom: 1px solid var(--border-line);
             position: sticky; top: 0; z-index: 40; 
             white-space: nowrap; text-align: center;
         }
 
         td { 
-            font-size: 12px; padding: 0 !important; height: 50px; text-align: center; vertical-align: middle;
-            background: var(--card-bg); border-bottom: 1px solid var(--border-line); border-right: 1px solid var(--border-line);
+            font-size: 12px; padding: 0 !important; height: 56px; text-align: center; vertical-align: middle;
+            background: var(--card-bg); border-bottom: 1px solid var(--border-line);
             color: var(--text-main);
         }
 
-        /* 모달 디자인 최적화 */
-        .modal-content {
-            width: 90%; max-width: 400px; padding: 2rem; border-radius: 1.5rem;
-        }
+        /* 롤오버 하이라이트 효과 제거됨 (tr:hover 관련 스타일 삭제) */
 
-        /* 고정 컬럼 기본 너비 (모바일에서 재조정됨) */
-        .sticky-col-drag { position: sticky; left: 0; z-index: 30 !important; width: 40px; background: var(--card-bg) !important; }
-        .sticky-col-job { position: sticky; z-index: 25; width: 50px; background: var(--card-bg) !important; }
-        .sticky-col-type { position: sticky; z-index: 25; width: 60px; background: var(--card-bg) !important; }
-        .sticky-col-name { position: sticky; z-index: 25; width: 80px; background: var(--card-bg) !important; border-right: 2px solid var(--border-line); }
+        /* 고정 열 스타일 */
+        .sticky-col-drag, .sticky-col-job, .sticky-col-type, .sticky-col-name {
+            position: sticky;
+            z-index: 20;
+            border-right: 1px solid var(--border-line) !important;
+        }
         
-        thead th.sticky-col-drag, thead th.sticky-col-job, thead th.sticky-col-type, thead th.sticky-col-name { 
-            z-index: 50 !important; background: var(--th-bg) !important; 
+        th.sticky-col-drag, th.sticky-col-job, th.sticky-col-type, th.sticky-col-name {
+            background: var(--th-bg) !important;
+            z-index: 45; 
         }
 
-        /* 탭 버튼 모바일 최적화 */
+        td.sticky-col-drag, td.sticky-col-job, td.sticky-col-type, td.sticky-col-name {
+            background: var(--card-bg) !important;
+        }
+
+        /* 탭 버튼 디자인 */
         .tab-btn {
-            padding: 10px 15px; font-size: 11px; font-weight: 900; color: var(--tab-text);
-            border-bottom: 2px solid transparent; transition: all 0.2s ease; cursor: pointer;
-            white-space: nowrap; flex: 1; text-align: center;
+            padding: 16px 20px; font-size: 12px; font-weight: 700; color: var(--tab-text);
+            transition: all 0.2s ease; cursor: pointer;
+            border-bottom: 2px solid transparent;
         }
-        .tab-btn.active { color: var(--status-color); border-bottom-color: var(--status-color); background: var(--tab-active-bg); }
+        .tab-btn.active { 
+            color: var(--accent); 
+            border-bottom-color: var(--accent);
+            background: var(--tab-active-bg);
+        }
 
-        /* 텍스트 입력 영역 */
+        /* 입력 및 디스플레이 영역 */
         .cell-textarea { 
-            width: 100% !important; min-height: 50px !important; background: transparent !important; border: none !important; color: inherit; 
-            text-align: left; outline: none !important; padding: 8px 10px !important; resize: none; overflow: hidden; line-height: 1.4; 
-            white-space: pre-wrap; box-sizing: border-box !important; field-sizing: content; font-size: 11px;
+            width: 100%; min-height: 56px; background: transparent; border: none; color: inherit; 
+            padding: 10px; resize: none; overflow: hidden; font-size: 11px; line-height: 1.5;
         }
 
         .cell-input { 
-            background: transparent !important; border: 0 !important; color: inherit; text-align: center; outline: none !important; padding: 0 !important; 
-            width: 100% !important; height: 100% !important; box-sizing: border-box !important; font-size: 11px;
+            background: transparent; border: 0; color: inherit; text-align: center; 
+            width: 100%; height: 100%; font-size: 11px; font-weight: 600;
         }
 
-        .display-multiline, .display-center, .display-left { 
-            display: flex; align-items: center; padding: 8px 10px !important; white-space: pre-wrap; line-height: 1.4; word-break: keep-all; min-height: 50px; box-sizing: border-box; font-size: 11px;
+        .display-left, .display-center { 
+            display: flex; align-items: center; padding: 10px; font-size: 11px; min-height: 56px; text-align:left;
         }
-        .display-center { justify-content: center; text-align: center; }
-        .display-left { justify-content: flex-start; text-align: left; }
+        .display-center { justify-content: center; }
 
-        .preview-img { max-height: 35px; max-width: 100%; object-fit: contain; }
+        .preview-img { max-height: 40px; border-radius: 4px; }
 
         .badge-box {
-            display: inline-flex; align-items: center; justify-content: center;
-            padding: 2px 5px; border-radius: 3px; font-size: 9px; font-weight: 900;
-            background: rgba(128,128,128,0.1); color: #94a3b8;     
+            padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 800;
+            background: rgba(255, 255, 255, 0.05); color: var(--text-muted);
         }
-        .badge-box.active { background: #dcfce7 !important; color: #166534 !important; }
-        body:not(.light-mode) .badge-box.active { background: var(--highlight) !important; color: #000 !important; }
+        .badge-box.active { background: var(--accent) !important; color: #212427 !important; }
 
         .check-circle-icon {
-            width: 16px; height: 16px; background-color: #22c55e; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center; color: white; font-size: 8px;
+            width: 18px; height: 18px; background-color: var(--accent); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; color: #000; font-size: 9px;
         }
 
-        /* 필터 및 검색 모바일 최적화 */
         .filter-select {
-            background: var(--card-bg); border: 1px solid var(--border-line); border-radius: 6px; color: var(--tab-text); 
-            font-size: 10px; font-weight: 700; padding: 4px 8px; outline: none;
+            background: var(--th-bg); border: 1px solid var(--border-line); border-radius: 8px; color: var(--text-main); 
+            font-size: 11px; padding: 6px 12px;
         }
 
         .search-input {
-            background: rgba(128,128,128,0.05); border: 1px solid var(--border-line); border-radius: 15px; 
-            padding: 4px 12px; font-size: 10px; color: var(--text-main); outline: none; width: 100%;
+            background: var(--th-bg); border: 1px solid var(--border-line); border-radius: 20px; 
+            padding: 8px 16px; font-size: 12px; color: var(--text-main); width: 100%;
         }
 
-        /* 테마 스위치 크기 축소 */
-        .theme-switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+        /* 테마 스위치 스타일 */
+        .theme-switch { position: relative; display: inline-block; width: 52px; height: 28px; }
         .slider {
             position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #e2e8f0; transition: .3s; border-radius: 24px;
-            display: flex; align-items: center; justify-content: space-between; padding: 0 6px;
+            background-color: #282c31; transition: .3s; border-radius: 34px;
+            display: flex; align-items: center; justify-content: space-between; padding: 0 8px;
+            border: 1px solid var(--border-line);
         }
         .slider:before {
-            position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px;
+            position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 3px;
             background-color: white; transition: .3s; border-radius: 50%; z-index: 2;
         }
-        input:checked + .slider:before { transform: translateX(20px); }
-        .slider i { font-size: 10px; color: #94a3b8; }
+        input:checked + .slider:before { transform: translateX(24px); }
+        .slider i { font-size: 12px; color: var(--accent); }
 
-        /* 모바일 대응 미디어 쿼리 (768px 이하) */
+        .negative-value { color: #ff5252; font-weight: 800; }
+
         @media (max-width: 768px) {
-            header .px-6 { padding-left: 1rem; padding-right: 1rem; padding-top: 0.75rem; padding-bottom: 0.75rem; }
-            header h1 { font-size: 1rem; }
-            header p { font-size: 7px; }
-            
-            .tab-btn { padding: 8px 5px; font-size: 10px; }
-            
-            /* 고정 컬럼 너비 강제 조정 */
-            .sticky-col-job { width: 40px; }
-            .sticky-col-type { width: 50px; }
-            .sticky-col-name { width: 70px; }
-            
-            .search-input { width: 120px; }
-            #userInfo { display: none; }
-            #adminBtn, #logoutBtn, #addCharBtn { padding: 6px 10px; font-size: 10px; }
+            .sticky-col-job { width: 45px; }
+            .sticky-col-type { width: 55px; }
+            .sticky-col-name { width: 75px; }
         }
-
-        .negative-value { color: #ef4444; font-weight: 700; }
     </style>
 </head>
 <body class="light-mode">
 
-    <div id="loading" class="loading-overlay fixed inset-0 z-[9999] bg-black flex items-center justify-center">
+    <div id="loading" class="fixed inset-0 z-[9999] bg-[#1a1c1e] flex items-center justify-center">
         <div class="flex flex-col items-center gap-4">
-            <div class="w-10 h-10 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin"></div>
-            <p class="text-[10px] font-black text-blue-500 uppercase tracking-widest">Loading...</p>
+            <div class="w-12 h-12 border-4 border-cyan-500/20 border-t-cyan-500 rounded-full animate-spin"></div>
+            <p class="text-[10px] font-black text-cyan-500 uppercase tracking-widest">Initialising Archive...</p>
         </div>
     </div>
 
     <header>
-        <!-- 상단: 로고 및 테마/로그인 -->
-        <div class="px-4 py-3 flex justify-between items-center">
-            <div class="flex items-center gap-2">
-                <div class="p-1.5 bg-blue-500/10 rounded-lg"><i class="fa-solid fa-feather-pointed text-blue-600 text-base"></i></div>
+        <div class="px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="p-2.5 bg-cyan-500/10 rounded-2xl border border-cyan-500/20">
+                    <i class="fa-solid fa-feather-pointed text-cyan-500 text-xl"></i>
+                </div>
                 <div>
-                    <h1 class="text-base font-black tracking-tight italic uppercase" style="color: var(--logo-color)">은빛독수리 아카이브</h1>
-                    <p class="text-[7px] font-bold uppercase tracking-[0.2em] opacity-60">SILVER EAGLE ARCHIVE</p>
+                    <h1 class="text-lg font-black tracking-tight italic uppercase" style="color: var(--logo-color)">은빛독수리 아카이브</h1>
+                    <p class="text-[8px] font-bold uppercase tracking-[0.3em] text-cyan-500/60">PREMIUM DASHBOARD v2.5</p>
                 </div>
             </div>
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-4">
                 <div class="theme-switch-wrapper">
                     <label class="theme-switch">
-                        <input type="checkbox" id="themeCheckbox">
+                        <input type="checkbox" id="themeCheckbox" style="display:none;">
                         <span class="slider">
                             <i class="fa-solid fa-sun"></i>
                             <i class="fa-solid fa-moon"></i>
                         </span>
                     </label>
                 </div>
-                <button id="addCharBtn" class="hidden px-3 py-1.5 bg-blue-600 text-white rounded-lg text-[10px] font-black hover:bg-blue-700 transition-all">
-                    <i class="fa-solid fa-plus"></i> 추가
+                <button id="addCharBtn" class="hidden px-4 py-2 bg-cyan-600 text-white rounded-xl text-xs font-black hover:bg-cyan-700 transition-all shadow-lg shadow-cyan-500/20">
+                    <i class="fa-solid fa-plus mr-1"></i> ADD
                 </button>
-                <button id="adminBtn" class="px-3 py-1.5 rounded-lg text-[10px] font-bold border border-slate-200 text-slate-500">ADMIN</button>
-                <button id="logoutBtn" class="hidden px-3 py-1.5 rounded-lg text-[10px] font-bold border border-red-200 text-red-500">OUT</button>
+                <button id="adminBtn" class="px-4 py-2 rounded-xl text-xs font-bold border border-white/10 text-slate-400 hover:bg-white/5 transition-all">ADMIN LOGIN</button>
+                <button id="logoutBtn" class="hidden px-4 py-2 rounded-xl text-xs font-bold border border-red-500/30 text-red-400 hover:bg-red-500/10">LOGOUT</button>
             </div>
         </div>
         
-        <!-- 하단: 탭 및 검색 -->
-        <div class="flex flex-col border-t border-slate-100">
-            <div class="flex w-full overflow-x-auto no-scrollbar">
+        <div class="flex flex-col bg-black/5">
+            <div class="flex w-full overflow-x-auto no-scrollbar border-t border-white/5">
                 <button id="tab-5star" class="tab-btn active" onclick="window.switchTab('5star')">5성 (...)</button>
                 <button id="tab-lowstar" class="tab-btn" onclick="window.switchTab('lowstar')">4성/3성 (...)</button>
                 <button id="tab-beast" class="tab-btn" onclick="window.switchTab('beast')">지염수 (...)</button>
             </div>
-            <div class="flex items-center gap-2 px-3 py-2 bg-slate-50/50">
-                <select id="searchFieldFilter" class="filter-select shrink-0">
-                    <option value="all">전체</option>
+            <div class="flex items-center gap-3 px-6 py-3 border-t border-white/5">
+                <select id="searchFieldFilter" class="filter-select">
+                    <option value="all">전체 필터</option>
                     <option value="basestat">악세(스탯)</option>
                     <option value="extra1">악세(효과)</option>
                     <option value="extra2">서포트</option>
                 </select>
                 <div class="relative flex-1">
-                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[9px]"></i>
-                    <input type="text" id="charSearch" placeholder="검색..." class="search-input pl-8">
+                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+                    <input type="text" id="charSearch" placeholder="검색어를 입력해 주세요..." class="search-input pl-11">
                 </div>
             </div>
         </div>
@@ -265,22 +253,28 @@
     </main>
 
     <!-- 모달: 관리자 로그인 -->
-    <div id="loginModal" class="fixed inset-0 z-[110] hidden flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
-        <div class="bg-white p-6 rounded-2xl w-full max-w-xs text-center shadow-2xl">
-            <h2 class="text-sm font-black text-slate-800 mb-4 uppercase">Admin Verify</h2>
-            <input type="password" id="loginPassword" placeholder="Password" class="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 text-center outline-none mb-4 text-sm">
-            <button id="doLogin" class="w-full py-3 bg-blue-600 text-white font-black rounded-xl text-sm">인증</button>
-            <button onclick="document.getElementById('loginModal').classList.add('hidden')" class="mt-4 text-[10px] text-slate-400 font-bold uppercase underline">취소</button>
+    <div id="loginModal" class="fixed inset-0 z-[110] hidden flex items-center justify-center bg-black/90 backdrop-blur-sm p-4">
+        <div class="bg-[#212427] p-10 rounded-[2rem] w-full max-w-sm text-center border border-white/10 shadow-2xl">
+            <div class="w-16 h-16 bg-cyan-500/10 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                <i class="fa-solid fa-key text-cyan-500 text-xl"></i>
+            </div>
+            <h2 class="text-lg font-black text-white mb-2 uppercase tracking-widest">Admin Access</h2>
+            <p class="text-xs text-slate-500 mb-8">보안 키를 입력하여 관리 모드를 활성화하세요.</p>
+            <input type="password" id="loginPassword" placeholder="PASSWORD" class="w-full bg-black/20 border border-white/5 rounded-2xl py-4 text-center outline-none mb-6 text-white focus:border-cyan-500 transition-all">
+            <button id="doLogin" class="w-full py-4 bg-cyan-600 text-white font-black rounded-2xl text-sm shadow-xl shadow-cyan-500/20">VERIFY IDENTITY</button>
+            <button onclick="document.getElementById('loginModal').classList.add('hidden')" class="mt-6 text-xs text-slate-500 font-bold hover:text-white">CLOSE</button>
         </div>
     </div>
 
     <!-- 모달: 삭제 확인 -->
-    <div id="deleteConfirmModal" class="fixed inset-0 z-[200] hidden flex items-center justify-center bg-slate-900/80 backdrop-blur-sm p-4">
-        <div class="bg-white p-6 rounded-2xl w-full max-w-xs text-center">
-            <h2 class="text-sm font-black text-slate-800 mb-2">삭제하시겠습니까?</h2>
-            <div class="flex gap-2 mt-6">
-                <button id="cancelDeleteBtn" class="flex-1 py-3 bg-slate-100 text-slate-500 font-bold rounded-xl text-xs">취소</button>
-                <button id="confirmDeleteBtn" class="flex-1 py-3 bg-red-600 text-white font-black rounded-xl text-xs">삭제</button>
+    <div id="deleteConfirmModal" class="fixed inset-0 z-[200] hidden flex items-center justify-center bg-black/90 p-4">
+        <div class="bg-[#212427] p-10 rounded-[2rem] w-full max-w-sm text-center border border-red-500/20 shadow-2xl">
+            <i class="fa-solid fa-circle-exclamation text-red-500 text-3xl mb-4"></i>
+            <h2 class="text-lg font-black text-white mb-2">데이터 삭제</h2>
+            <p class="text-xs text-slate-500 mb-8">해당 캐릭터 정보를 아카이브에서 영구적으로 삭제할까요?</p>
+            <div class="flex gap-3">
+                <button id="cancelDeleteBtn" class="flex-1 py-4 bg-white/5 text-slate-400 font-bold rounded-2xl text-xs">CANCEL</button>
+                <button id="confirmDeleteBtn" class="flex-1 py-4 bg-red-600 text-white font-black rounded-2xl text-xs">DELETE</button>
             </div>
         </div>
     </div>
@@ -329,7 +323,6 @@
 
         const COLLECTION_MAP = { '5star': 'travelers', 'lowstar': 'travelers_lowstar', 'beast': 'travelers_beast' };
 
-        // 테마 및 토글 로직
         themeCheckbox.onchange = () => {
             const isDark = themeCheckbox.checked;
             document.body.classList.toggle('light-mode', !isDark);
@@ -338,7 +331,7 @@
             renderTable();
         };
 
-        const savedTheme = localStorage.getItem('theme') || 'light';
+        const savedTheme = localStorage.getItem('theme') || 'dark';
         if (savedTheme === 'light') {
             document.body.classList.add('light-mode');
             themeCheckbox.checked = false;
@@ -358,8 +351,8 @@
             const isMobile = window.innerWidth <= 768;
             let currentLeft = 0;
             if (isAdmin && dragH) { dragH.style.left = currentLeft + 'px'; currentLeft += (isMobile ? 40 : 44); }
-            jobH.style.left = currentLeft + 'px'; currentLeft += (isMobile ? 40 : 50);
-            typeH.style.left = currentLeft + 'px'; currentLeft += (isMobile ? 50 : 60);
+            jobH.style.left = currentLeft + 'px'; currentLeft += (isMobile ? 45 : 50);
+            typeH.style.left = currentLeft + 'px'; currentLeft += (isMobile ? 55 : 60);
             nameH.style.left = currentLeft + 'px';
         }
 
@@ -394,9 +387,9 @@
                       <th id="th-type" class="sticky-col-type">캐릭터</th>
                       <th id="th-name" class="sticky-col-name">이름</th>`;
             
-            cHtml += `<col style="width: ${isMobile ? 40 : 50}px;">
-                      <col style="width: ${isMobile ? 50 : 60}px;">
-                      <col style="width: ${isMobile ? 70 : 80}px;">`;
+            cHtml += `<col style="width: ${isMobile ? 45 : 50}px;">
+                      <col style="width: ${isMobile ? 55 : 60}px;">
+                      <col style="width: ${isMobile ? 75 : 80}px;">`;
             
             if (activeTab === 'beast') {
                 hHtml += '<th>BP소모</th><th>준비/재사용</th><th>스킬명</th><th>스킬내용</th><th>습득방법</th>';
@@ -406,7 +399,7 @@
                 cHtml += '<col style="width: 70px;"><col style="width: 50px;"><col style="width: 90px;"><col style="width: 70px;"><col style="width: 50px;"><col style="width: 50px;"><col style="width: 60px;"><col style="width: 45px;"><col style="width: 45px;"><col style="width: 60px;"><col style="width: 140px;"><col style="width: 180px;"><col style="width: 380px;"><col style="width: 450px;"><col style="width: 380px;"><col style="width: 380px;">';
             }
             
-            if (isAdmin) { hHtml += '<th class="bg-red-50 text-red-500">삭제</th>'; cHtml += '<col style="width: 50px;">'; }
+            if (isAdmin) { hHtml += '<th class="bg-red-900/10 text-red-500">삭제</th>'; cHtml += '<col style="width: 50px;">'; }
             headerRow.innerHTML = hHtml;
             tableColGroup.innerHTML = cHtml;
         }
@@ -468,7 +461,7 @@
             if (isAdmin) {
                 const dTd = document.createElement('td');
                 dTd.className = "drag-handle-cell sticky-col-drag"; dTd.style.left = '0px';
-                dTd.innerHTML = '<div class="drag-handle-inner"><i class="fa-solid fa-grip-vertical"></i></div>';
+                dTd.innerHTML = '<div class="drag-handle-inner text-slate-600"><i class="fa-solid fa-grip-vertical"></i></div>';
                 tr.appendChild(dTd); currentOffset += (isMobile ? 40 : 44); 
             }
 
@@ -478,8 +471,8 @@
             fields.forEach(field => {
                 const td = document.createElement('td');
                 if (field === 'job') { td.classList.add('sticky-col-job'); td.style.left = currentOffset + 'px'; }
-                if (field === 'type') { td.classList.add('sticky-col-type'); td.style.left = (currentOffset + (isMobile ? 40 : 50)) + 'px'; }
-                if (field === 'name') { td.classList.add('sticky-col-name'); td.style.left = (currentOffset + (isMobile ? 90 : 110)) + 'px'; }
+                if (field === 'type') { td.classList.add('sticky-col-type'); td.style.left = (currentOffset + (isMobile ? 45 : 50)) + 'px'; }
+                if (field === 'name') { td.classList.add('sticky-col-name'); td.style.left = (currentOffset + (isMobile ? 100 : 110)) + 'px'; }
 
                 if (isAdmin) {
                     if ((field === 'type' || field === 'gift') || (field === 'job' && activeTab !== 'beast')) {
@@ -512,6 +505,9 @@
                         const inp = document.createElement('input'); inp.className = "cell-input"; inp.value = data[field] || '';
                         if (field === 'status') { inp.style.color = "var(--status-color)"; inp.style.fontWeight = "900"; }
                         if (field === 'light') { inp.style.color = "var(--light-col-color)"; inp.style.fontWeight = "700"; }
+                        if (['extra1', 'extra2', 'extra3', 'extra4'].includes(field)) inp.style.textAlign = 'left';
+                        if (['accessory', 'basestat'].includes(field)) inp.style.textAlign = 'center';
+                        
                         inp.onblur = () => { if (inp.value !== (data[field] || '')) updateCell(data.id, field, inp.value); };
                         td.appendChild(inp);
                     }
@@ -525,8 +521,9 @@
                         td.innerHTML = data[field] ? '<div class="px-1 h-full flex items-center justify-center"><div class="check-circle-icon"><i class="fa-solid fa-check"></i></div></div>' : '<span class="opacity-30 text-[10px]">-</span>';
                     } else {
                         const s = document.createElement('span'); 
-                        const isLeft = ['accessory', 'basestat', 'extra1', 'extra2', 'extra3', 'extra4'].includes(field);
+                        const isLeft = ['extra1', 'extra2', 'extra3', 'extra4'].includes(field);
                         s.className = isLeft ? "display-left" : "display-center";
+                        
                         if (field === 'status') s.style.color = "var(--status-color)";
                         if (field === 'light') s.style.color = "var(--light-col-color)";
                         if (field === 'basestat' && data[field]) {
@@ -540,7 +537,7 @@
 
             if (isAdmin) {
                 const delTd = document.createElement('td');
-                delTd.innerHTML = `<div class="text-slate-300 hover:text-red-500 cursor-pointer" onclick="window.deleteRow('${data.id}')"><i class="fa-solid fa-trash-can"></i></div>`;
+                delTd.innerHTML = `<div class="text-slate-700 hover:text-red-500 cursor-pointer transition-colors" onclick="window.deleteRow('${data.id}')"><i class="fa-solid fa-trash-can"></i></div>`;
                 tr.appendChild(delTd);
             }
             travelerTableBody.appendChild(tr);
