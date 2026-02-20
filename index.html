@@ -11,7 +11,6 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Noto+Sans+KR:wght@300;400;700;900&display=swap');
         
         :root { 
-            /* 이미지 참고 기반 프리미엄 다크 테마 (블루 포인트) */
             --bg-dark: #1a1c1e; 
             --card-bg: #212427; 
             --header-bg: #1a1c1e;
@@ -19,7 +18,7 @@
             --border-line: rgba(255, 255, 255, 0.05);
             --text-main: #e0e0e0;
             --text-muted: #9ba1a6;
-            --accent: #00d4ff; /* 밝은 블루 포인트 */
+            --accent: #00d4ff; 
             --status-color: #70e0ff; 
             --highlight: #00d4ff;
             --tab-active-bg: rgba(0, 212, 255, 0.1);
@@ -90,9 +89,6 @@
             color: var(--text-main);
         }
 
-        /* 롤오버 하이라이트 효과 제거됨 (tr:hover 관련 스타일 삭제) */
-
-        /* 고정 열 스타일 */
         .sticky-col-drag, .sticky-col-job, .sticky-col-type, .sticky-col-name {
             position: sticky;
             z-index: 20;
@@ -108,7 +104,6 @@
             background: var(--card-bg) !important;
         }
 
-        /* 탭 버튼 디자인 */
         .tab-btn {
             padding: 16px 20px; font-size: 12px; font-weight: 700; color: var(--tab-text);
             transition: all 0.2s ease; cursor: pointer;
@@ -120,23 +115,27 @@
             background: var(--tab-active-bg);
         }
 
-        /* 입력 및 디스플레이 영역 */
         .cell-textarea { 
-            width: 100%; min-height: 56px; background: transparent; border: none; color: inherit; 
-            padding: 10px; resize: none; overflow: hidden; font-size: 11px; line-height: 1.5;
+            width: 100%; min-height: 56px; height: 56px; background: transparent; border: none; color: inherit; 
+            padding: 18px 20px; resize: none; overflow: hidden; font-size: 11px; line-height: 1.2;
+            white-space: nowrap; text-align: inherit;
         }
 
         .cell-input { 
             background: transparent; border: 0; color: inherit; text-align: center; 
-            width: 100%; height: 100%; font-size: 11px; font-weight: 600;
+            width: 100%; height: 56px; font-size: 11px; font-weight: 600;
+            padding: 0 10px; display: block;
         }
 
         .display-left, .display-center { 
-            display: flex; align-items: center; padding: 10px; font-size: 11px; min-height: 56px; text-align:left;
+            display: flex; align-items: center; padding: 10px 20px; font-size: 11px; min-height: 56px;
+            white-space: nowrap;
         }
-        .display-center { justify-content: center; }
+        .display-left { text-align: left; justify-content: flex-start; }
+        .display-center { justify-content: center; text-align: center; width: 100%; }
 
-        .preview-img { max-height: 40px; border-radius: 4px; }
+        .preview-img { max-height: 40px; border-radius: 4px; object-fit: contain; }
+        .preview-img-large { max-height: 50px !important; width: auto; border-radius: 4px; object-fit: contain; display: block; }
 
         .badge-box {
             padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 800;
@@ -159,7 +158,6 @@
             padding: 8px 16px; font-size: 12px; color: var(--text-main); width: 100%;
         }
 
-        /* 테마 스위치 스타일 */
         .theme-switch { position: relative; display: inline-block; width: 52px; height: 28px; }
         .slider {
             position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
@@ -176,10 +174,11 @@
 
         .negative-value { color: #ff5252; font-weight: 800; }
 
+        .image-cell-wrapper { width: 100%; height: 56px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+
         @media (max-width: 768px) {
-            .sticky-col-job { width: 45px; }
-            .sticky-col-type { width: 55px; }
-            .sticky-col-name { width: 75px; }
+            .sticky-col-job { width: auto; min-width: 60px; }
+            .sticky-col-name { width: auto; min-width: 90px; }
         }
     </style>
 </head>
@@ -252,7 +251,6 @@
         </div>
     </main>
 
-    <!-- 모달: 관리자 로그인 -->
     <div id="loginModal" class="fixed inset-0 z-[110] hidden flex items-center justify-center bg-black/90 backdrop-blur-sm p-4">
         <div class="bg-[#212427] p-10 rounded-[2rem] w-full max-w-sm text-center border border-white/10 shadow-2xl">
             <div class="w-16 h-16 bg-cyan-500/10 rounded-3xl flex items-center justify-center mx-auto mb-6">
@@ -266,7 +264,6 @@
         </div>
     </div>
 
-    <!-- 모달: 삭제 확인 -->
     <div id="deleteConfirmModal" class="fixed inset-0 z-[200] hidden flex items-center justify-center bg-black/90 p-4">
         <div class="bg-[#212427] p-10 rounded-[2rem] w-full max-w-sm text-center border border-red-500/20 shadow-2xl">
             <i class="fa-solid fa-circle-exclamation text-red-500 text-3xl mb-4"></i>
@@ -327,7 +324,7 @@
             const isDark = themeCheckbox.checked;
             document.body.classList.toggle('light-mode', !isDark);
             localStorage.setItem('theme', isDark ? 'dark' : 'light');
-            updateStickyPositions();
+            setTimeout(updateStickyPositions, 50);
             renderTable();
         };
 
@@ -348,12 +345,22 @@
             const nameH = document.getElementById('th-name');
             if (!jobH || !typeH || !nameH) return;
             
-            const isMobile = window.innerWidth <= 768;
             let currentLeft = 0;
-            if (isAdmin && dragH) { dragH.style.left = currentLeft + 'px'; currentLeft += (isMobile ? 40 : 44); }
-            jobH.style.left = currentLeft + 'px'; currentLeft += (isMobile ? 45 : 50);
-            typeH.style.left = currentLeft + 'px'; currentLeft += (isMobile ? 55 : 60);
+            if (isAdmin && dragH) { 
+                dragH.style.left = currentLeft + 'px'; 
+                currentLeft += dragH.offsetWidth; 
+            }
+            
+            jobH.style.left = currentLeft + 'px';
+            document.querySelectorAll('.sticky-col-job').forEach(td => td.style.left = currentLeft + 'px');
+            currentLeft += jobH.offsetWidth;
+            
+            typeH.style.left = currentLeft + 'px';
+            document.querySelectorAll('.sticky-col-type').forEach(td => td.style.left = currentLeft + 'px');
+            currentLeft += typeH.offsetWidth;
+            
             nameH.style.left = currentLeft + 'px';
+            document.querySelectorAll('.sticky-col-name').forEach(td => td.style.left = currentLeft + 'px');
         }
 
         window.deleteRow = (id) => { deleteIdPending = id; deleteConfirmModal.classList.remove('hidden'); };
@@ -375,31 +382,34 @@
 
         function renderHeader() {
             const isAdmin = currentUser && !currentUser.isAnonymous;
-            const isMobile = window.innerWidth <= 768;
             let hHtml = ''; let cHtml = '';
             
             if (isAdmin) { 
-                hHtml += `<th id="dragHeader" class="sticky-col-drag">↕</th>`; 
-                cHtml += `<col style="width: ${isMobile ? 40 : 44}px;">`; 
+                hHtml += `<th id="dragHeader" class="sticky-col-drag" style="width: 44px;">↕</th>`; 
+                cHtml += `<col style="width: 44px;">`; 
             }
             
-            hHtml += `<th id="th-job" class="sticky-col-job">직업</th>
-                      <th id="th-type" class="sticky-col-type">캐릭터</th>
-                      <th id="th-name" class="sticky-col-name">이름</th>`;
+            const widthClass = activeTab === 'beast' ? 'width: auto; min-width: 80px;' : 'width: 50px;';
+            const typeWidthClass = activeTab === 'beast' ? 'width: 80px;' : 'width: 60px;';
+            const nameWidthClass = activeTab === 'beast' ? 'width: auto; min-width: 120px;' : 'width: 80px;';
+
+            hHtml += `<th id="th-job" class="sticky-col-job" style="${widthClass}">직업</th>
+                      <th id="th-type" class="sticky-col-type" style="${typeWidthClass}">캐릭터</th>
+                      <th id="th-name" class="sticky-col-name" style="${nameWidthClass}">이름</th>`;
             
-            cHtml += `<col style="width: ${isMobile ? 45 : 50}px;">
-                      <col style="width: ${isMobile ? 55 : 60}px;">
-                      <col style="width: ${isMobile ? 75 : 80}px;">`;
+            cHtml += `<col style="${widthClass}">
+                      <col style="${typeWidthClass}">
+                      <col style="${nameWidthClass}">`;
             
             if (activeTab === 'beast') {
                 hHtml += '<th>BP소모</th><th>준비/재사용</th><th>스킬명</th><th>스킬내용</th><th>습득방법</th>';
-                cHtml += '<col style="width: 70px;"><col style="width: 120px;"><col style="width: 150px;"><col style="width: 350px;"><col style="width: 250px;">';
+                cHtml += '<col style="width: auto; min-width: 80px;"><col style="width: auto; min-width: 120px;"><col style="width: auto; min-width: 150px;"><col style="width: auto; min-width: 350px;"><col style="width: auto; min-width: 250px;">';
             } else {
                 hHtml += '<th>성장</th><th>등화</th><th>등화(배/서)</th><th>등화(스탯)</th><th>LV</th><th>천부</th><th>필살기</th><th>각성</th><th>오의</th><th>등불</th><th>악세명</th><th>악세(스탯)</th><th>악세(효과)</th><th>서포트</th><th>필살기 정보</th><th>EX 어빌</th>';
                 cHtml += '<col style="width: 70px;"><col style="width: 50px;"><col style="width: 90px;"><col style="width: 70px;"><col style="width: 50px;"><col style="width: 50px;"><col style="width: 60px;"><col style="width: 45px;"><col style="width: 45px;"><col style="width: 60px;"><col style="width: 140px;"><col style="width: 180px;"><col style="width: 380px;"><col style="width: 450px;"><col style="width: 380px;"><col style="width: 380px;">';
             }
             
-            if (isAdmin) { hHtml += '<th class="bg-red-900/10 text-red-500">삭제</th>'; cHtml += '<col style="width: 50px;">'; }
+            if (isAdmin) { hHtml += '<th class="bg-red-900/10 text-red-500" style="width: 50px;">삭제</th>'; cHtml += '<col style="width: 50px;">'; }
             headerRow.innerHTML = hHtml;
             tableColGroup.innerHTML = cHtml;
         }
@@ -423,7 +433,7 @@
                     let gifts = 0; snap.forEach(d => { if (d.data().gift?.trim()) gifts++; });
                     const btn = document.getElementById(`tab-${t}`);
                     if (btn) btn.innerText = `${t === '5star' ? '5성' : (t === 'lowstar' ? '4성/3성' : '지염수')} (${gifts}/${snap.size})`;
-                });
+                }, (err) => console.error(err));
             });
         }
 
@@ -433,8 +443,7 @@
                 rawData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
                 rawData.sort((a, b) => (a.order ?? 9999) - (b.order ?? 9999));
                 renderTable();
-                setTimeout(updateStickyPositions, 100);
-            });
+            }, (err) => console.error(err));
         }
 
         function renderTable() {
@@ -446,6 +455,7 @@
                 if (filterField === 'all') return Object.values(i).join(' ').toLowerCase().includes(searchTerm);
                 return (i[filterField] || '').toString().toLowerCase().includes(searchTerm);
             }).forEach(i => renderRow(i));
+            setTimeout(updateStickyPositions, 50);
         }
 
         charSearch.oninput = renderTable;
@@ -453,43 +463,53 @@
 
         function renderRow(data) {
             const isAdmin = currentUser && !currentUser.isAnonymous;
-            const isMobile = window.innerWidth <= 768;
             const tr = document.createElement('tr');
             tr.setAttribute('data-id', data.id);
             
-            let currentOffset = 0;
             if (isAdmin) {
                 const dTd = document.createElement('td');
-                dTd.className = "drag-handle-cell sticky-col-drag"; dTd.style.left = '0px';
+                dTd.className = "drag-handle-cell sticky-col-drag";
                 dTd.innerHTML = '<div class="drag-handle-inner text-slate-600"><i class="fa-solid fa-grip-vertical"></i></div>';
-                tr.appendChild(dTd); currentOffset += (isMobile ? 40 : 44); 
+                tr.appendChild(dTd);
             }
 
-            let fields = (activeTab === 'beast') ? ['job', 'type', 'name', 'extra2', 'accessory', 'basestat', 'extra1', 'extra3'] 
+            let fields = (activeTab === 'beast') ? ['job', 'type', 'name', 'extra2', 'accessory', 'basestat', 'extra3', 'extra4'] 
                         : ['job', 'type', 'name', 'status', 'light', 'support', 'reinforce', 'level', 'gift', 'skill', 'awake', 'ultimate', 'crystal', 'accessory', 'basestat', 'extra1', 'extra2', 'extra3', 'extra4'];
             
             fields.forEach(field => {
                 const td = document.createElement('td');
-                if (field === 'job') { td.classList.add('sticky-col-job'); td.style.left = currentOffset + 'px'; }
-                if (field === 'type') { td.classList.add('sticky-col-type'); td.style.left = (currentOffset + (isMobile ? 45 : 50)) + 'px'; }
-                if (field === 'name') { td.classList.add('sticky-col-name'); td.style.left = (currentOffset + (isMobile ? 100 : 110)) + 'px'; }
+                if (field === 'job') td.classList.add('sticky-col-job');
+                if (field === 'type') td.classList.add('sticky-col-type');
+                if (field === 'name') td.classList.add('sticky-col-name');
 
                 if (isAdmin) {
                     if ((field === 'type' || field === 'gift') || (field === 'job' && activeTab !== 'beast')) {
-                        const w = document.createElement('div'); w.className = "image-cell-wrapper p-1 flex justify-center";
+                        const w = document.createElement('div'); w.className = "image-cell-wrapper";
                         if (data[field]) {
-                            const img = document.createElement('img'); img.src = data[field]; img.className = "preview-img";
+                            const isType = field === 'type';
+                            const imgClass = isType ? "preview-img-large" : "preview-img";
+                            const img = document.createElement('img'); img.src = data[field]; img.className = imgClass;
                             img.onclick = () => updateCell(data.id, field, '');
                             w.appendChild(img);
                         } else { w.innerHTML = '<i class="fa-solid fa-image opacity-10 text-[10px]"></i>'; }
                         w.onpaste = (e) => handlePaste(e, (res) => updateCell(data.id, field, res));
                         td.appendChild(w);
-                    } else if (['extra1', 'extra2', 'extra3', 'extra4'].includes(field)) {
+                    } else if (['extra1', 'extra2', 'extra3', 'extra4', 'accessory', 'basestat'].includes(field)) {
                         const ta = document.createElement('textarea'); ta.className = "cell-textarea"; ta.value = data[field] || '';
+                        
+                        // 지염수 탭 정렬 조건 처리 (isAdmin 모드 - textarea)
+                        if (activeTab === 'beast') {
+                            if (['extra3', 'extra4'].includes(field)) {
+                                ta.style.textAlign = 'left'; // 스킬내용, 습득방법은 항상 왼쪽 정렬
+                            } else if (['extra2', 'accessory', 'basestat'].includes(field)) {
+                                ta.style.textAlign = 'center'; // 나머지 필드는 중앙 정렬
+                            }
+                        }
+                        
                         ta.onblur = () => { if (ta.value !== (data[field] || '')) updateCell(data.id, field, ta.value); };
                         td.appendChild(ta);
                     } else if (field === 'support') {
-                        const c = document.createElement('div'); c.className = "flex gap-2 justify-center items-center h-full px-1";
+                        const c = document.createElement('div'); c.className = "flex gap-2 justify-center items-center h-full px-5";
                         const cur = Array.isArray(data[field]) ? data[field] : [];
                         [1, 2].forEach(i => {
                             const rb = document.createElement('input'); rb.type = "checkbox"; rb.className = "round-radio w-4 h-4"; rb.checked = cur.includes(i);
@@ -505,25 +525,30 @@
                         const inp = document.createElement('input'); inp.className = "cell-input"; inp.value = data[field] || '';
                         if (field === 'status') { inp.style.color = "var(--status-color)"; inp.style.fontWeight = "900"; }
                         if (field === 'light') { inp.style.color = "var(--light-col-color)"; inp.style.fontWeight = "700"; }
-                        if (['extra1', 'extra2', 'extra3', 'extra4'].includes(field)) inp.style.textAlign = 'left';
-                        if (['accessory', 'basestat'].includes(field)) inp.style.textAlign = 'center';
-                        
                         inp.onblur = () => { if (inp.value !== (data[field] || '')) updateCell(data.id, field, inp.value); };
                         td.appendChild(inp);
                     }
                 } else {
                     if ((field === 'type' || field === 'gift') || (field === 'job' && activeTab !== 'beast')) {
-                        td.innerHTML = data[field] ? `<div class="px-1 h-full flex items-center justify-center"><img src="${data[field]}" class="preview-img"></div>` : '-';
+                        const isType = field === 'type';
+                        const imgClass = isType ? "preview-img-large" : "preview-img";
+                        td.innerHTML = data[field] ? `<div class="image-cell-wrapper"><img src="${data[field]}" class="${imgClass}"></div>` : '-';
                     } else if (field === 'support') {
                         const cur = Array.isArray(data[field]) ? data[field] : [];
-                        td.innerHTML = `<div class="flex gap-1 justify-center items-center h-full px-1"><span class="badge-box ${cur.includes(1) ? 'active' : ''}">배</span><span class="badge-box ${cur.includes(2) ? 'active' : ''}">서</span></div>`;
+                        td.innerHTML = `<div class="flex gap-1 justify-center items-center h-full px-5"><span class="badge-box ${cur.includes(1) ? 'active' : ''}">배</span><span class="badge-box ${cur.includes(2) ? 'active' : ''}">서</span></div>`;
                     } else if (['awake', 'ultimate'].includes(field)) {
-                        td.innerHTML = data[field] ? '<div class="px-1 h-full flex items-center justify-center"><div class="check-circle-icon"><i class="fa-solid fa-check"></i></div></div>' : '<span class="opacity-30 text-[10px]">-</span>';
+                        td.innerHTML = data[field] ? '<div class="px-5 h-full flex items-center justify-center"><div class="check-circle-icon"><i class="fa-solid fa-check"></i></div></div>' : '<span class="opacity-30 text-[10px] px-5">-</span>';
                     } else {
                         const s = document.createElement('span'); 
-                        const isLeft = ['extra1', 'extra2', 'extra3', 'extra4'].includes(field);
-                        s.className = isLeft ? "display-left" : "display-center";
                         
+                        // 지염수 탭 정렬 조건 처리 (비로그인/로그아웃 모드 - span)
+                        const isBeastLeftField = activeTab === 'beast' && ['extra3', 'extra4'].includes(field);
+                        const isBeastCenterField = activeTab === 'beast' && ['extra2', 'accessory', 'basestat'].includes(field);
+                        
+                        // 기본적으로 긴 텍스트 필드는 왼쪽 정렬, 지염수 전용 필드 예외처리
+                        const isLeft = (['extra1', 'extra2', 'extra3', 'extra4', 'accessory', 'basestat'].includes(field) && !isBeastCenterField) || isBeastLeftField;
+                        
+                        s.className = isLeft ? "display-left" : "display-center";
                         if (field === 'status') s.style.color = "var(--status-color)";
                         if (field === 'light') s.style.color = "var(--light-col-color)";
                         if (field === 'basestat' && data[field]) {
@@ -537,7 +562,7 @@
 
             if (isAdmin) {
                 const delTd = document.createElement('td');
-                delTd.innerHTML = `<div class="text-slate-700 hover:text-red-500 cursor-pointer transition-colors" onclick="window.deleteRow('${data.id}')"><i class="fa-solid fa-trash-can"></i></div>`;
+                delTd.innerHTML = `<div class="text-slate-700 hover:text-red-500 cursor-pointer transition-colors px-5 h-full flex items-center justify-center" onclick="window.deleteRow('${data.id}')"><i class="fa-solid fa-trash-can"></i></div>`;
                 tr.appendChild(delTd);
             }
             travelerTableBody.appendChild(tr);
