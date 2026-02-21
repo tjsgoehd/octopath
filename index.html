@@ -83,10 +83,12 @@
             white-space: nowrap; text-align: center;
         }
 
+        /* td의 핵심 수정: flex를 활용하여 내부 요소를 수직/수평 중앙 정렬 */
         td { 
-            font-size: 12px; padding: 0 !important; height: 56px; text-align: center; vertical-align: middle;
+            font-size: 12px; padding: 0 !important; height: 56px;
             background: var(--card-bg); border-bottom: 1px solid var(--border-line);
             color: var(--text-main);
+            vertical-align: middle;
         }
 
         .sticky-col-drag, .sticky-col-job, .sticky-col-type, .sticky-col-name {
@@ -115,49 +117,58 @@
             background: var(--tab-active-bg);
         }
 
-        /* * [수정 핵심]: display: block; 을 제거하고 inline-block과 vertical-align: middle 적용 
-         * 블록 요소는 부모의 셀 중앙 정렬을 무시하기 때문에 위로 치우쳤던 현상을 원천 차단함.
-         */
+        /* 입력 및 표시 요소 공통 스타일: 부모의 높이를 100% 채우고 flex 중앙 정렬 */
+        .cell-content-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 56px;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+        }
+
         .cell-textarea { 
             width: 100%; 
             background: transparent; 
             border: none; 
             color: inherit; 
-            padding: 12px 14px; 
+            padding: 10px 14px; 
             resize: none; 
             overflow: hidden; 
             font-size: 11px; 
-            line-height: 1.5;
+            line-height: 1.4;
             white-space: pre-wrap; 
             word-break: break-all;
-            display: inline-block; 
-            vertical-align: middle;
+            display: block; 
             box-sizing: border-box;
+            text-align: center;
+            margin: auto 0; /* 수직 중앙 정렬 보조 */
         }
 
         .cell-input { 
             background: transparent; border: 0; color: inherit; text-align: center; 
             width: 100%; height: 56px; font-size: 11px; font-weight: 600;
             padding: 0 10px; 
-            display: inline-block;
-            vertical-align: middle;
+            display: block;
             box-sizing: border-box;
         }
 
-        /* 보기 모드에서도 텍스트 박스 자체가 수직 중앙에 오도록 inline-block 적용 */
+        /* 보기 모드 텍스트 정렬 */
         .display-left, .display-center { 
-            display: inline-block; 
-            vertical-align: middle;
-            padding: 12px 14px; 
+            display: flex;
+            align-items: center;
+            padding: 10px 14px; 
             font-size: 11px; 
             width: 100%;
+            min-height: 56px;
             white-space: pre-wrap; 
             word-break: break-all;
             box-sizing: border-box;
-            line-height: 1.5;
+            line-height: 1.4;
         }
-        .display-left { text-align: left; }
-        .display-center { text-align: center; }
+        .display-left { justify-content: flex-start; text-align: left; }
+        .display-center { justify-content: center; text-align: center; }
 
         .preview-img { max-height: 40px; border-radius: 4px; object-fit: contain; }
         .preview-img-large { max-height: 50px !important; width: auto; border-radius: 4px; object-fit: contain; display: block; }
@@ -199,8 +210,7 @@
 
         .negative-value { color: #ff5252; font-weight: 800; }
 
-        /* 이미지 셀 wrapper도 행이 커질 때를 대비해 inline-flex로 변경 */
-        .image-cell-wrapper { width: 100%; height: 56px; display: inline-flex; vertical-align: middle; align-items: center; justify-content: center; overflow: hidden; }
+        .image-cell-wrapper { width: 100%; height: 56px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
 
         @media (max-width: 768px) {
             .sticky-col-job { width: auto; min-width: 60px; }
@@ -277,6 +287,7 @@
         </div>
     </main>
 
+    <!-- 모달 등 기타 요소 생략 (기존과 동일) -->
     <div id="loginModal" class="fixed inset-0 z-[110] hidden flex items-center justify-center bg-black/90 backdrop-blur-sm p-4">
         <div class="bg-[#212427] p-10 rounded-[2rem] w-full max-w-sm text-center border border-white/10 shadow-2xl">
             <div class="w-16 h-16 bg-cyan-500/10 rounded-3xl flex items-center justify-center mx-auto mb-6">
@@ -495,7 +506,7 @@
             if (isAdmin) {
                 const dTd = document.createElement('td');
                 dTd.className = "drag-handle-cell sticky-col-drag";
-                dTd.innerHTML = '<div class="drag-handle-inner text-slate-600"><i class="fa-solid fa-grip-vertical"></i></div>';
+                dTd.innerHTML = '<div class="cell-content-wrapper text-slate-600"><i class="fa-solid fa-grip-vertical"></i></div>';
                 tr.appendChild(dTd);
             }
 
@@ -508,6 +519,9 @@
                 if (field === 'type') td.classList.add('sticky-col-type');
                 if (field === 'name') td.classList.add('sticky-col-name');
 
+                const wrapper = document.createElement('div');
+                wrapper.className = "cell-content-wrapper";
+
                 if (isAdmin) {
                     if ((field === 'type' || field === 'gift') || (field === 'job' && activeTab !== 'beast')) {
                         const w = document.createElement('div'); w.className = "image-cell-wrapper";
@@ -519,8 +533,8 @@
                             w.appendChild(img);
                         } else { w.innerHTML = '<i class="fa-solid fa-image opacity-10 text-[10px]"></i>'; }
                         w.onpaste = (e) => handlePaste(e, (res) => updateCell(data.id, field, res));
-                        td.appendChild(w);
-                    } else if (['extra1', 'extra2', 'extra3', 'extra4', 'accessory', 'basestat'].includes(field)) {
+                        wrapper.appendChild(w);
+                    } else if (['extra1', 'extra2', 'extra3', 'extra4', 'accessory', 'basestat', 'skill', 'crystal', 'reinforce'].includes(field)) {
                         const ta = document.createElement('textarea'); 
                         ta.className = "cell-textarea"; 
                         ta.value = data[field] || '';
@@ -535,17 +549,14 @@
                             ta.style.height = ta.scrollHeight + 'px';
                         }, 0);
 
-                        // 정렬 설정
                         if (['extra1', 'extra2', 'extra3', 'extra4'].includes(field)) {
                             ta.style.textAlign = 'left';
-                            ta.style.justifyContent = 'start';
                         } else {
                             ta.style.textAlign = 'center';
-                            ta.style.justifyContent = 'center';
                         }
                         
                         ta.onblur = () => { if (ta.value !== (data[field] || '')) updateCell(data.id, field, ta.value); };
-                        td.appendChild(ta);
+                        wrapper.appendChild(ta);
                     } else if (field === 'support') {
                         const c = document.createElement('div'); c.className = "flex gap-2 justify-center items-center h-full px-5";
                         const cur = Array.isArray(data[field]) ? data[field] : [];
@@ -554,30 +565,30 @@
                             rb.onchange = () => updateCell(data.id, field, rb.checked ? [...cur, i] : cur.filter(v => v !== i));
                             c.appendChild(rb);
                         });
-                        td.appendChild(c);
+                        wrapper.appendChild(c);
                     } else if (['awake', 'ultimate'].includes(field)) {
-                        const c = document.createElement('div'); c.className = "flex justify-center items-center h-full min-h-[56px]";
+                        const c = document.createElement('div'); c.className = "flex justify-center items-center h-full";
                         const cb = document.createElement('input'); cb.type = "checkbox"; cb.className = "simple-checkbox w-4 h-4"; cb.checked = !!data[field];
                         cb.onchange = () => updateCell(data.id, field, cb.checked);
                         c.appendChild(cb);
-                        td.appendChild(c);
+                        wrapper.appendChild(c);
                     } else {
                         const inp = document.createElement('input'); inp.className = "cell-input"; inp.value = data[field] || '';
                         if (field === 'status') { inp.style.color = "var(--status-color)"; inp.style.fontWeight = "900"; }
                         if (field === 'light') { inp.style.color = "var(--light-col-color)"; inp.style.fontWeight = "700"; }
                         inp.onblur = () => { if (inp.value !== (data[field] || '')) updateCell(data.id, field, inp.value); };
-                        td.appendChild(inp);
+                        wrapper.appendChild(inp);
                     }
                 } else {
                     if ((field === 'type' || field === 'gift') || (field === 'job' && activeTab !== 'beast')) {
                         const isType = field === 'type';
                         const imgClass = isType ? "preview-img-large" : "preview-img";
-                        td.innerHTML = data[field] ? `<div class="image-cell-wrapper"><img src="${data[field]}" class="${imgClass}"></div>` : '-';
+                        wrapper.innerHTML = data[field] ? `<div class="image-cell-wrapper"><img src="${data[field]}" class="${imgClass}"></div>` : '-';
                     } else if (field === 'support') {
                         const cur = Array.isArray(data[field]) ? data[field] : [];
-                        td.innerHTML = `<div class="flex gap-1 justify-center items-center h-full px-5 min-h-[56px]"><span class="badge-box ${cur.includes(1) ? 'active' : ''}">배</span><span class="badge-box ${cur.includes(2) ? 'active' : ''}">서</span></div>`;
+                        wrapper.innerHTML = `<div class="flex gap-1 justify-center items-center"><span class="badge-box ${cur.includes(1) ? 'active' : ''}">배</span><span class="badge-box ${cur.includes(2) ? 'active' : ''}">서</span></div>`;
                     } else if (['awake', 'ultimate'].includes(field)) {
-                        td.innerHTML = data[field] ? '<div class="px-5 h-full min-h-[56px] flex items-center justify-center"><div class="check-circle-icon"><i class="fa-solid fa-check"></i></div></div>' : '<div class="px-5 h-full min-h-[56px] flex items-center justify-center"><span class="opacity-30 text-[10px]">-</span></div>';
+                        wrapper.innerHTML = data[field] ? '<div class="check-circle-icon"><i class="fa-solid fa-check"></i></div>' : '<span class="opacity-30 text-[10px]">-</span>';
                     } else {
                         const s = document.createElement('span'); 
                         const isLeft = ['extra1', 'extra2', 'extra3', 'extra4'].includes(field);
@@ -587,15 +598,16 @@
                         if (field === 'basestat' && data[field]) {
                             s.innerHTML = data[field].toString().replace(/-\d+/g, (m) => `<span class="negative-value">${m}</span>`);
                         } else { s.innerText = data[field] || '-'; }
-                        td.appendChild(s);
+                        wrapper.appendChild(s);
                     }
                 }
+                td.appendChild(wrapper);
                 tr.appendChild(td);
             });
 
             if (isAdmin) {
                 const delTd = document.createElement('td');
-                delTd.innerHTML = `<div class="text-slate-700 hover:text-red-500 cursor-pointer transition-colors px-5 h-full flex items-center justify-center min-h-[56px]" onclick="window.deleteRow('${data.id}')"><i class="fa-solid fa-trash-can"></i></div>`;
+                delTd.innerHTML = `<div class="cell-content-wrapper text-slate-700 hover:text-red-500 cursor-pointer transition-colors" onclick="window.deleteRow('${data.id}')"><i class="fa-solid fa-trash-can"></i></div>`;
                 tr.appendChild(delTd);
             }
             travelerTableBody.appendChild(tr);
