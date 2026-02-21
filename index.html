@@ -71,7 +71,8 @@
         .table-container::-webkit-scrollbar { height: 6px; width: 4px; }
         .table-container::-webkit-scrollbar-thumb { background: rgba(0, 212, 255, 0.1); border-radius: 10px; }
 
-        table { width: max-content; border-spacing: 0; border-collapse: separate; table-layout: fixed; }
+        /* 가로 너비 유연성 확보를 위해 table-layout: auto 사용 */
+        table { width: max-content; border-spacing: 0; border-collapse: separate; table-layout: auto; }
 
         th { 
             background: var(--th-bg) !important; 
@@ -84,7 +85,7 @@
         }
 
         td { 
-            font-size: 12px; padding: 0 !important; height: 56px; text-align: center; vertical-align: middle;
+            font-size: 12px; padding: 0 !important; min-height: 56px; text-align: center; vertical-align: middle;
             background: var(--card-bg); border-bottom: 1px solid var(--border-line);
             color: var(--text-main);
         }
@@ -115,10 +116,11 @@
             background: var(--tab-active-bg);
         }
 
+        /* 5성, 4성 탭용 유연한 텍스트 영역 */
         .cell-textarea { 
-            width: 100%; min-height: 56px; height: 56px; background: transparent; border: none; color: inherit; 
-            padding: 18px 20px; resize: none; overflow: hidden; font-size: 11px; line-height: 1.2;
-            white-space: nowrap; text-align: inherit;
+            width: 100%; min-height: 56px; background: transparent; border: none; color: inherit; 
+            padding: 12px 14px; resize: none; overflow: hidden; font-size: 11px; line-height: 1.5;
+            white-space: pre-wrap; word-break: break-all;
         }
 
         .cell-input { 
@@ -127,9 +129,10 @@
             padding: 0 10px; display: block;
         }
 
+        /* 보기 모드에서의 유연한 높이 설정 */
         .display-left, .display-center { 
-            display: flex; align-items: center; padding: 10px 20px; font-size: 11px; min-height: 56px;
-            white-space: nowrap;
+            display: flex; align-items: center; padding: 12px 14px; font-size: 11px; min-height: 56px;
+            white-space: pre-wrap; word-break: break-all; height: auto;
         }
         .display-left { text-align: left; justify-content: flex-start; }
         .display-center { justify-content: center; text-align: center; width: 100%; }
@@ -406,7 +409,7 @@
                 cHtml += '<col style="width: auto; min-width: 80px;"><col style="width: auto; min-width: 120px;"><col style="width: auto; min-width: 150px;"><col style="width: auto; min-width: 350px;"><col style="width: auto; min-width: 250px;">';
             } else {
                 hHtml += '<th>성장</th><th>등화</th><th>등화(배/서)</th><th>등화(스탯)</th><th>LV</th><th>천부</th><th>필살기</th><th>각성</th><th>오의</th><th>등불</th><th>악세명</th><th>악세(스탯)</th><th>악세(효과)</th><th>서포트</th><th>필살기 정보</th><th>EX 어빌</th>';
-                cHtml += '<col style="width: 70px;"><col style="width: 50px;"><col style="width: 90px;"><col style="width: 70px;"><col style="width: 50px;"><col style="width: 50px;"><col style="width: 60px;"><col style="width: 45px;"><col style="width: 45px;"><col style="width: 60px;"><col style="width: 140px;"><col style="width: 180px;"><col style="width: 380px;"><col style="width: 450px;"><col style="width: 380px;"><col style="width: 380px;">';
+                cHtml += '<col style="width: 70px;"><col style="width: 50px;"><col style="width: 90px;"><col style="width: 70px;"><col style="width: 50px;"><col style="width: 50px;"><col style="width: 60px;"><col style="width: 45px;"><col style="width: 45px;"><col style="width: 60px;"><col style="width: 140px;"><col style="width: 180px;"><col style="width: auto; min-width: 380px;"><col style="width: auto; min-width: 450px;"><col style="width: auto; min-width: 380px;"><col style="width: auto; min-width: 380px;">';
             }
             
             if (isAdmin) { hHtml += '<th class="bg-red-900/10 text-red-500" style="width: 50px;">삭제</th>'; cHtml += '<col style="width: 50px;">'; }
@@ -497,16 +500,25 @@
                     } else if (['extra1', 'extra2', 'extra3', 'extra4', 'accessory', 'basestat'].includes(field)) {
                         const ta = document.createElement('textarea'); ta.className = "cell-textarea"; ta.value = data[field] || '';
                         
-                        // 5성, 4성 탭 정렬 조건 (관리자 모드)
+                        // 내용에 맞춰 높이 자동 조절
+                        ta.addEventListener('input', () => {
+                            ta.style.height = 'auto';
+                            ta.style.height = ta.scrollHeight + 'px';
+                        });
+                        
+                        // 초기 로드 시 높이 조절
+                        setTimeout(() => {
+                            ta.style.height = 'auto';
+                            ta.style.height = ta.scrollHeight + 'px';
+                        }, 0);
+
                         if (activeTab === '5star' || activeTab === 'lowstar') {
-                            // 악세(효과) extra1, 서포트 extra2, 필살기 정보 extra3, EX 어빌 extra4
                             if (['extra1', 'extra2', 'extra3', 'extra4'].includes(field)) {
                                 ta.style.textAlign = 'left';
                             } else {
                                 ta.style.textAlign = 'center';
                             }
                         } else if (activeTab === 'beast') {
-                            // 지염수 탭 정렬 유지
                             if (['extra3', 'extra4'].includes(field)) {
                                 ta.style.textAlign = 'left';
                             } else {
@@ -549,12 +561,10 @@
                     } else {
                         const s = document.createElement('span'); 
                         
-                        // 비로그인/로그아웃 보기 모드 정렬
                         let isLeft = false;
                         if (activeTab === 'beast') {
                             isLeft = ['extra3', 'extra4'].includes(field);
                         } else {
-                            // 5성, 4성 탭 보기 모드 (이미 CSS와 로직에서 긴 텍스트 필드는 왼쪽 정렬 처리됨)
                             isLeft = ['extra1', 'extra2', 'extra3', 'extra4', 'accessory', 'basestat'].includes(field);
                         }
                         
