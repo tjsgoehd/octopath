@@ -497,12 +497,20 @@
                     } else if (['extra1', 'extra2', 'extra3', 'extra4', 'accessory', 'basestat'].includes(field)) {
                         const ta = document.createElement('textarea'); ta.className = "cell-textarea"; ta.value = data[field] || '';
                         
-                        // 지염수 탭 정렬 조건 처리 (isAdmin 모드 - textarea)
-                        if (activeTab === 'beast') {
+                        // 5성, 4성 탭 정렬 조건 (관리자 모드)
+                        if (activeTab === '5star' || activeTab === 'lowstar') {
+                            // 악세(효과) extra1, 서포트 extra2, 필살기 정보 extra3, EX 어빌 extra4
+                            if (['extra1', 'extra2', 'extra3', 'extra4'].includes(field)) {
+                                ta.style.textAlign = 'left';
+                            } else {
+                                ta.style.textAlign = 'center';
+                            }
+                        } else if (activeTab === 'beast') {
+                            // 지염수 탭 정렬 유지
                             if (['extra3', 'extra4'].includes(field)) {
-                                ta.style.textAlign = 'left'; // 스킬내용, 습득방법은 항상 왼쪽 정렬
-                            } else if (['extra2', 'accessory', 'basestat'].includes(field)) {
-                                ta.style.textAlign = 'center'; // 나머지 필드는 중앙 정렬
+                                ta.style.textAlign = 'left';
+                            } else {
+                                ta.style.textAlign = 'center';
                             }
                         }
                         
@@ -541,12 +549,14 @@
                     } else {
                         const s = document.createElement('span'); 
                         
-                        // 지염수 탭 정렬 조건 처리 (비로그인/로그아웃 모드 - span)
-                        const isBeastLeftField = activeTab === 'beast' && ['extra3', 'extra4'].includes(field);
-                        const isBeastCenterField = activeTab === 'beast' && ['extra2', 'accessory', 'basestat'].includes(field);
-                        
-                        // 기본적으로 긴 텍스트 필드는 왼쪽 정렬, 지염수 전용 필드 예외처리
-                        const isLeft = (['extra1', 'extra2', 'extra3', 'extra4', 'accessory', 'basestat'].includes(field) && !isBeastCenterField) || isBeastLeftField;
+                        // 비로그인/로그아웃 보기 모드 정렬
+                        let isLeft = false;
+                        if (activeTab === 'beast') {
+                            isLeft = ['extra3', 'extra4'].includes(field);
+                        } else {
+                            // 5성, 4성 탭 보기 모드 (이미 CSS와 로직에서 긴 텍스트 필드는 왼쪽 정렬 처리됨)
+                            isLeft = ['extra1', 'extra2', 'extra3', 'extra4', 'accessory', 'basestat'].includes(field);
+                        }
                         
                         s.className = isLeft ? "display-left" : "display-center";
                         if (field === 'status') s.style.color = "var(--status-color)";
