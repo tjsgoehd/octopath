@@ -71,7 +71,6 @@
         .table-container::-webkit-scrollbar { height: 6px; width: 4px; }
         .table-container::-webkit-scrollbar-thumb { background: rgba(0, 212, 255, 0.1); border-radius: 10px; }
 
-        /* 가로 너비 유연성 확보를 위해 table-layout: auto 사용 */
         table { width: max-content; border-spacing: 0; border-collapse: separate; table-layout: auto; }
 
         th { 
@@ -116,11 +115,12 @@
             background: var(--tab-active-bg);
         }
 
-        /* 5성, 4성 탭용 유연한 텍스트 영역 */
+        /* 텍스트 영역: 중앙 정렬 속성 강화 */
         .cell-textarea { 
             width: 100%; min-height: 56px; background: transparent; border: none; color: inherit; 
             padding: 12px 14px; resize: none; overflow: hidden; font-size: 11px; line-height: 1.5;
             white-space: pre-wrap; word-break: break-all;
+            display: flex; align-items: center; /* 세로 중앙 정렬 */
         }
 
         .cell-input { 
@@ -129,7 +129,7 @@
             padding: 0 10px; display: block;
         }
 
-        /* 보기 모드에서의 유연한 높이 설정 */
+        /* 보기 모드 및 공통 정렬 스타일 */
         .display-left, .display-center { 
             display: flex; align-items: center; padding: 12px 14px; font-size: 11px; min-height: 56px;
             white-space: pre-wrap; word-break: break-all; height: auto;
@@ -500,13 +500,11 @@
                     } else if (['extra1', 'extra2', 'extra3', 'extra4', 'accessory', 'basestat'].includes(field)) {
                         const ta = document.createElement('textarea'); ta.className = "cell-textarea"; ta.value = data[field] || '';
                         
-                        // 내용에 맞춰 높이 자동 조절
                         ta.addEventListener('input', () => {
                             ta.style.height = 'auto';
                             ta.style.height = ta.scrollHeight + 'px';
                         });
                         
-                        // 초기 로드 시 높이 조절
                         setTimeout(() => {
                             ta.style.height = 'auto';
                             ta.style.height = ta.scrollHeight + 'px';
@@ -515,14 +513,18 @@
                         if (activeTab === '5star' || activeTab === 'lowstar') {
                             if (['extra1', 'extra2', 'extra3', 'extra4'].includes(field)) {
                                 ta.style.textAlign = 'left';
+                                ta.style.justifyContent = 'flex-start';
                             } else {
                                 ta.style.textAlign = 'center';
+                                ta.style.justifyContent = 'center';
                             }
                         } else if (activeTab === 'beast') {
                             if (['extra3', 'extra4'].includes(field)) {
                                 ta.style.textAlign = 'left';
+                                ta.style.justifyContent = 'flex-start';
                             } else {
                                 ta.style.textAlign = 'center';
+                                ta.style.justifyContent = 'center';
                             }
                         }
                         
@@ -538,9 +540,11 @@
                         });
                         td.appendChild(c);
                     } else if (['awake', 'ultimate'].includes(field)) {
+                        const c = document.createElement('div'); c.className = "flex justify-center items-center h-full min-h-[56px]";
                         const cb = document.createElement('input'); cb.type = "checkbox"; cb.className = "simple-checkbox w-4 h-4"; cb.checked = !!data[field];
                         cb.onchange = () => updateCell(data.id, field, cb.checked);
-                        td.appendChild(cb);
+                        c.appendChild(cb);
+                        td.appendChild(c);
                     } else {
                         const inp = document.createElement('input'); inp.className = "cell-input"; inp.value = data[field] || '';
                         if (field === 'status') { inp.style.color = "var(--status-color)"; inp.style.fontWeight = "900"; }
@@ -555,9 +559,9 @@
                         td.innerHTML = data[field] ? `<div class="image-cell-wrapper"><img src="${data[field]}" class="${imgClass}"></div>` : '-';
                     } else if (field === 'support') {
                         const cur = Array.isArray(data[field]) ? data[field] : [];
-                        td.innerHTML = `<div class="flex gap-1 justify-center items-center h-full px-5"><span class="badge-box ${cur.includes(1) ? 'active' : ''}">배</span><span class="badge-box ${cur.includes(2) ? 'active' : ''}">서</span></div>`;
+                        td.innerHTML = `<div class="flex gap-1 justify-center items-center h-full px-5 min-h-[56px]"><span class="badge-box ${cur.includes(1) ? 'active' : ''}">배</span><span class="badge-box ${cur.includes(2) ? 'active' : ''}">서</span></div>`;
                     } else if (['awake', 'ultimate'].includes(field)) {
-                        td.innerHTML = data[field] ? '<div class="px-5 h-full flex items-center justify-center"><div class="check-circle-icon"><i class="fa-solid fa-check"></i></div></div>' : '<span class="opacity-30 text-[10px] px-5">-</span>';
+                        td.innerHTML = data[field] ? '<div class="px-5 h-full min-h-[56px] flex items-center justify-center"><div class="check-circle-icon"><i class="fa-solid fa-check"></i></div></div>' : '<div class="px-5 h-full min-h-[56px] flex items-center justify-center"><span class="opacity-30 text-[10px]">-</span></div>';
                     } else {
                         const s = document.createElement('span'); 
                         
@@ -582,7 +586,7 @@
 
             if (isAdmin) {
                 const delTd = document.createElement('td');
-                delTd.innerHTML = `<div class="text-slate-700 hover:text-red-500 cursor-pointer transition-colors px-5 h-full flex items-center justify-center" onclick="window.deleteRow('${data.id}')"><i class="fa-solid fa-trash-can"></i></div>`;
+                delTd.innerHTML = `<div class="text-slate-700 hover:text-red-500 cursor-pointer transition-colors px-5 h-full flex items-center justify-center min-h-[56px]" onclick="window.deleteRow('${data.id}')"><i class="fa-solid fa-trash-can"></i></div>`;
                 tr.appendChild(delTd);
             }
             travelerTableBody.appendChild(tr);
