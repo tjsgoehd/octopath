@@ -126,22 +126,23 @@
             box-sizing: border-box;
         }
 
+        /* 관리자 모드 입력창이 조회 모드의 텍스트 박스와 동일한 여백을 갖도록 수정 */
         .cell-textarea { 
             width: 100%; 
             background: transparent; 
             border: none; 
             color: inherit; 
-            padding: 12px 14px; 
+            padding: 10px 14px; /* 조회 모드의 padding과 일치시킴 */
             resize: none; 
             overflow: hidden; 
             font-size: 11px; 
-            line-height: 1.5;
+            line-height: 1.4; /* 조회 모드의 line-height와 일치 */
             white-space: pre-wrap; 
             word-break: break-all;
             display: block; 
             box-sizing: border-box;
-            text-align: center;
             outline: none;
+            font-family: inherit;
         }
 
         .cell-input { 
@@ -151,6 +152,7 @@
             display: block;
             box-sizing: border-box;
             outline: none;
+            font-family: inherit;
         }
 
         .display-left, .display-center { 
@@ -211,7 +213,7 @@
         .image-cell-wrapper { width: 100%; height: 56px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
 
         @media (max-width: 768px) {
-            .sticky-col-job { width: auto; min-width: 70px; }
+            .sticky-col-job { width: auto; min-width: 60px; }
             .sticky-col-name { width: auto; min-width: 90px; }
         }
     </style>
@@ -424,7 +426,7 @@
             }
             
             const widthClass = activeTab === 'beast' ? 'width: auto; min-width: 80px;' : 'width: 50px;';
-            const typeWidthClass = activeTab === 'beast' ? 'width: 80px;' : 'width: 70px;';
+            const typeWidthClass = activeTab === 'beast' ? 'width: 80px;' : 'width: 60px;';
             const nameWidthClass = activeTab === 'beast' ? 'width: auto; min-width: 120px;' : 'width: 80px;';
 
             hHtml += `<th id="th-job" class="sticky-col-job" style="${widthClass}">직업</th>
@@ -440,7 +442,7 @@
                 cHtml += '<col style="width: auto; min-width: 80px;"><col style="width: auto; min-width: 120px;"><col style="width: auto; min-width: 150px;"><col style="width: auto; min-width: 350px;"><col style="width: auto; min-width: 250px;">';
             } else {
                 hHtml += '<th>성장</th><th>등화</th><th>등화(배/서)</th><th>등화(스탯)</th><th>LV</th><th>천부</th><th>필살기</th><th>각성</th><th>오의</th><th>등불</th><th>악세명</th><th>악세(스탯)</th><th>악세(효과)</th><th>서포트</th><th>필살기 정보</th><th>EX 어빌</th>';
-                cHtml += '<col style="width: 120px;"><col style="width: 50px;"><col style="width: 90px;"><col style="width: 130px;"><col style="width: 50px;"><col style="width: 50px;"><col style="width: 70px;"><col style="width: 45px;"><col style="width: 45px;"><col style="width: 70px;"><col style="width: 140px;"><col style="width: 180px;"><col style="width: auto; min-width: 470px;"><col style="width: auto; min-width: 600px;"><col style="width: auto; min-width: 470px;"><col style="width: auto; min-width: 570px;">';
+                cHtml += '<col style="width: 120px;"><col style="width: 50px;"><col style="width: 90px;"><col style="width: 130px;"><col style="width: 50px;"><col style="width: 50px;"><col style="width: 60px;"><col style="width: 45px;"><col style="width: 45px;"><col style="width: 60px;"><col style="width: 140px;"><col style="width: 180px;"><col style="width: auto; min-width: 470px;"><col style="width: auto; min-width: 600px;"><col style="width: auto; min-width: 470px;"><col style="width: auto; min-width: 570px;">';
             }
             
             if (isAdmin) { hHtml += '<th class="bg-red-900/10 text-red-500" style="width: 50px;">삭제</th>'; cHtml += '<col style="width: 50px;">'; }
@@ -496,10 +498,8 @@
         searchFieldFilter.onchange = renderTable;
 
         function adjustHeight(ta) {
-            const currentHeight = ta.style.height;
             ta.style.height = 'auto';
             const newHeight = ta.scrollHeight;
-            ta.style.height = currentHeight;
             const finalHeight = Math.max(newHeight, 56);
             ta.style.height = finalHeight + 'px';
         }
@@ -544,12 +544,14 @@
                         const ta = document.createElement('textarea'); 
                         ta.className = "cell-textarea"; 
                         ta.value = data[field] || '';
-                        // 마우스 드래그 기능을 위해 preventDefault 제거하고 focus만 호출
                         ta.onmousedown = (e) => { ta.focus({ preventScroll: true }); };
                         ta.addEventListener('input', () => adjustHeight(ta));
+                        
+                        // 정렬 설정: 조회 모드와 동일하게
+                        const isLeft = ['extra1', 'extra2', 'extra3', 'extra4'].includes(field);
+                        ta.style.textAlign = isLeft ? 'left' : 'center';
+
                         requestAnimationFrame(() => adjustHeight(ta));
-                        if (['extra1', 'extra2', 'extra3', 'extra4'].includes(field)) ta.style.textAlign = 'left';
-                        else ta.style.textAlign = 'center';
                         ta.onblur = () => { if (ta.value !== (data[field] || '')) updateCell(data.id, field, ta.value); };
                         wrapper.appendChild(ta);
                     } else if (field === 'support') {
@@ -557,7 +559,6 @@
                         const cur = Array.isArray(data[field]) ? data[field] : [];
                         [1, 2].forEach(i => {
                             const rb = document.createElement('input'); rb.type = "checkbox"; rb.className = "round-radio w-4 h-4"; rb.checked = cur.includes(i);
-                            // 체크박스 클릭 시 먹통 현상 및 스크롤 튐 방지
                             rb.onclick = (e) => { 
                                 e.stopPropagation(); 
                                 const nextVal = rb.checked ? [...cur, i] : cur.filter(v => v !== i);
@@ -570,7 +571,6 @@
                     } else if (['awake', 'ultimate'].includes(field)) {
                         const c = document.createElement('div'); c.className = "flex justify-center items-center h-full";
                         const cb = document.createElement('input'); cb.type = "checkbox"; cb.className = "simple-checkbox w-4 h-4"; cb.checked = !!data[field];
-                        // 체크박스 클릭 시 먹통 현상 및 스크롤 튐 방지
                         cb.onclick = (e) => { 
                                 e.stopPropagation(); 
                                 updateCell(data.id, field, cb.checked);
@@ -582,7 +582,6 @@
                         const inp = document.createElement('input'); inp.className = "cell-input"; inp.value = data[field] || '';
                         if (field === 'status') { inp.style.color = "var(--status-color)"; inp.style.fontWeight = "900"; }
                         if (field === 'light') { inp.style.color = "var(--light-col-color)"; inp.style.fontWeight = "700"; }
-                        // 마우스 드래그 기능을 위해 preventDefault 제거하고 focus만 호출
                         inp.onmousedown = (e) => { inp.focus({ preventScroll: true }); };
                         inp.onblur = () => { if (inp.value !== (data[field] || '')) updateCell(data.id, field, inp.value); };
                         wrapper.appendChild(inp);
