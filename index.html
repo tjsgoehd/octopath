@@ -84,7 +84,7 @@
         }
 
         td { 
-            font-size: 12px; padding: 0 !important; height: 56px;
+            font-size: 12px; padding: 0 !important; min-height: 56px;
             background: var(--card-bg); border-bottom: 1px solid var(--border-line);
             color: var(--text-main);
             vertical-align: middle;
@@ -131,19 +131,17 @@
             background: transparent; 
             border: none; 
             color: inherit; 
-            padding: 10px 14px; 
+            padding: 12px 14px; 
             resize: none; 
             overflow: hidden; 
             font-size: 11px; 
-            line-height: 1.4;
+            line-height: 1.5;
             white-space: pre-wrap; 
             word-break: break-all;
             display: block; 
             box-sizing: border-box;
             text-align: center;
-            margin: auto 0;
-            /* 높이 변화시 부드럽게 보이기 위해 트랜지션 추가 (선택사항) */
-            transition: height 0.05s ease;
+            outline: none;
         }
 
         .cell-input { 
@@ -152,6 +150,7 @@
             padding: 0 10px; 
             display: block;
             box-sizing: border-box;
+            outline: none;
         }
 
         .display-left, .display-center { 
@@ -496,14 +495,18 @@
         charSearch.oninput = renderTable;
         searchFieldFilter.onchange = renderTable;
 
-        // textarea 높이 조절 함수 (깜빡임 최소화 로직)
+        // 화면 튐(Scroll Jump) 방지용 높이 조절 함수
         function adjustHeight(ta) {
-            // style.height를 초기화하기 전에 현재 스크롤 위치를 기록하지 않아도 되도록
-            // 현재 높이를 유지한 상태에서 scrollHeight를 계산
-            const offset = ta.offsetHeight - ta.clientHeight;
-            ta.style.height = 'auto'; // 순간적으로 auto로 설정
-            const newHeight = ta.scrollHeight + offset;
-            ta.style.height = newHeight + 'px';
+            // style.height를 초기화(auto)할 때 높이가 0이 되어 스크롤이 튀는 것을 막기 위해
+            // 현재 높이를 유지한 상태에서 필요한 scrollHeight를 계산합니다.
+            const currentHeight = ta.style.height;
+            ta.style.height = 'auto';
+            const newHeight = ta.scrollHeight;
+            ta.style.height = currentHeight; // 즉시 복구하여 레이아웃 흔들림 방지
+            
+            // 실제 높이 적용 (최소 높이 56px 보장)
+            const finalHeight = Math.max(newHeight, 56);
+            ta.style.height = finalHeight + 'px';
         }
 
         function renderRow(data) {
@@ -547,17 +550,16 @@
                         ta.className = "cell-textarea"; 
                         ta.value = data[field] || '';
                         
-                        // 입력 중 높이 조절
+                        // 브라우저의 포커스 시 스크롤 이동 자동 방지 (preventScroll)
+                        ta.onmousedown = (e) => {
+                            e.preventDefault(); 
+                            ta.focus({ preventScroll: true });
+                        };
+                        
                         ta.addEventListener('input', () => adjustHeight(ta));
                         
-                        // 클릭(포커스) 시 화면 튀는 현상 방지를 위해 auto 초기화 생략 또는 지연 실행
-                        ta.addEventListener('focus', () => {
-                            // focus 시점에 scrollHeight가 제대로 안 잡힐 수 있으므로 지연 호출
-                            setTimeout(() => adjustHeight(ta), 0);
-                        });
-
-                        // 렌더링 직후 높이 설정
-                        setTimeout(() => adjustHeight(ta), 0);
+                        // 렌더링 직후 높이 설정 (스크롤 위치 변화 없이)
+                        requestAnimationFrame(() => adjustHeight(ta));
 
                         if (['extra1', 'extra2', 'extra3', 'extra4'].includes(field)) {
                             ta.style.textAlign = 'left';
@@ -586,6 +588,13 @@
                         const inp = document.createElement('input'); inp.className = "cell-input"; inp.value = data[field] || '';
                         if (field === 'status') { inp.style.color = "var(--status-color)"; inp.style.fontWeight = "900"; }
                         if (field === 'light') { inp.style.color = "var(--light-col-color)"; inp.style.fontWeight = "700"; }
+                        
+                        // input 클릭 시에도 스크롤 튐 방지
+                        inp.onmousedown = (e) => {
+                            e.preventDefault();
+                            inp.focus({ preventScroll: true });
+                        };
+
                         inp.onblur = () => { if (inp.value !== (data[field] || '')) updateCell(data.id, field, inp.value); };
                         wrapper.appendChild(inp);
                     }
