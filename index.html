@@ -120,23 +120,23 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-direction: column; /* 세로 중앙 정렬 유지를 위해 추가 */
             min-height: 56px;
             width: 100%;
             height: 100%;
             box-sizing: border-box;
         }
 
-        /* 관리자 모드 입력창이 조회 모드의 텍스트 박스와 동일한 여백을 갖도록 수정 */
         .cell-textarea { 
             width: 100%; 
             background: transparent; 
             border: none; 
             color: inherit; 
-            padding: 10px 14px; /* 조회 모드의 padding과 일치시킴 */
+            padding: 10px 14px;
             resize: none; 
             overflow: hidden; 
             font-size: 11px; 
-            line-height: 1.4; /* 조회 모드의 line-height와 일치 */
+            line-height: 1.4;
             white-space: pre-wrap; 
             word-break: break-all;
             display: block; 
@@ -442,7 +442,7 @@
                 cHtml += '<col style="width: auto; min-width: 80px;"><col style="width: auto; min-width: 120px;"><col style="width: auto; min-width: 150px;"><col style="width: auto; min-width: 350px;"><col style="width: auto; min-width: 250px;">';
             } else {
                 hHtml += '<th>성장</th><th>등화</th><th>등화(배/서)</th><th>등화(스탯)</th><th>LV</th><th>천부</th><th>필살기</th><th>각성</th><th>오의</th><th>등불</th><th>악세명</th><th>악세(스탯)</th><th>악세(효과)</th><th>서포트</th><th>필살기 정보</th><th>EX 어빌</th>';
-                cHtml += '<col style="width: 120px;"><col style="width: 50px;"><col style="width: 90px;"><col style="width: 130px;"><col style="width: 50px;"><col style="width: 50px;"><col style="width: 60px;"><col style="width: 45px;"><col style="width: 45px;"><col style="width: 60px;"><col style="width: 140px;"><col style="width: 180px;"><col style="width: auto; min-width: 470px;"><col style="width: auto; min-width: 600px;"><col style="width: auto; min-width: 470px;"><col style="width: auto; min-width: 570px;">';
+                cHtml += '<col style="width: 120px;"><col style="width: 50px;"><col style="width: 90px;"><col style="width: 130px;"><col style="width: 50px;"><col style="width: 50px;"><col style="width: 75px;"><col style="width: 45px;"><col style="width: 45px;"><col style="width: 60px;"><col style="width: 140px;"><col style="width: 180px;"><col style="width: auto; min-width: 470px;"><col style="width: auto; min-width: 600px;"><col style="width: auto; min-width: 470px;"><col style="width: auto; min-width: 570px;">';
             }
             
             if (isAdmin) { hHtml += '<th class="bg-red-900/10 text-red-500" style="width: 50px;">삭제</th>'; cHtml += '<col style="width: 50px;">'; }
@@ -547,7 +547,6 @@
                         ta.onmousedown = (e) => { ta.focus({ preventScroll: true }); };
                         ta.addEventListener('input', () => adjustHeight(ta));
                         
-                        // 정렬 설정: 조회 모드와 동일하게
                         const isLeft = ['extra1', 'extra2', 'extra3', 'extra4'].includes(field);
                         ta.style.textAlign = isLeft ? 'left' : 'center';
 
