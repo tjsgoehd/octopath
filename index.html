@@ -83,7 +83,6 @@
             white-space: nowrap; text-align: center;
         }
 
-        /* td의 핵심 수정: flex를 활용하여 내부 요소를 수직/수평 중앙 정렬 */
         td { 
             font-size: 12px; padding: 0 !important; height: 56px;
             background: var(--card-bg); border-bottom: 1px solid var(--border-line);
@@ -117,7 +116,6 @@
             background: var(--tab-active-bg);
         }
 
-        /* 입력 및 표시 요소 공통 스타일: 부모의 높이를 100% 채우고 flex 중앙 정렬 */
         .cell-content-wrapper {
             display: flex;
             align-items: center;
@@ -143,7 +141,9 @@
             display: block; 
             box-sizing: border-box;
             text-align: center;
-            margin: auto 0; /* 수직 중앙 정렬 보조 */
+            margin: auto 0;
+            /* 높이 변화시 부드럽게 보이기 위해 트랜지션 추가 (선택사항) */
+            transition: height 0.05s ease;
         }
 
         .cell-input { 
@@ -154,7 +154,6 @@
             box-sizing: border-box;
         }
 
-        /* 보기 모드 텍스트 정렬 */
         .display-left, .display-center { 
             display: flex;
             align-items: center;
@@ -287,7 +286,6 @@
         </div>
     </main>
 
-    <!-- 모달 등 기타 요소 생략 (기존과 동일) -->
     <div id="loginModal" class="fixed inset-0 z-[110] hidden flex items-center justify-center bg-black/90 backdrop-blur-sm p-4">
         <div class="bg-[#212427] p-10 rounded-[2rem] w-full max-w-sm text-center border border-white/10 shadow-2xl">
             <div class="w-16 h-16 bg-cyan-500/10 rounded-3xl flex items-center justify-center mx-auto mb-6">
@@ -498,6 +496,16 @@
         charSearch.oninput = renderTable;
         searchFieldFilter.onchange = renderTable;
 
+        // textarea 높이 조절 함수 (깜빡임 최소화 로직)
+        function adjustHeight(ta) {
+            // style.height를 초기화하기 전에 현재 스크롤 위치를 기록하지 않아도 되도록
+            // 현재 높이를 유지한 상태에서 scrollHeight를 계산
+            const offset = ta.offsetHeight - ta.clientHeight;
+            ta.style.height = 'auto'; // 순간적으로 auto로 설정
+            const newHeight = ta.scrollHeight + offset;
+            ta.style.height = newHeight + 'px';
+        }
+
         function renderRow(data) {
             const isAdmin = currentUser && !currentUser.isAnonymous;
             const tr = document.createElement('tr');
@@ -539,15 +547,17 @@
                         ta.className = "cell-textarea"; 
                         ta.value = data[field] || '';
                         
-                        ta.addEventListener('input', () => {
-                            ta.style.height = 'auto';
-                            ta.style.height = ta.scrollHeight + 'px';
-                        });
+                        // 입력 중 높이 조절
+                        ta.addEventListener('input', () => adjustHeight(ta));
                         
-                        setTimeout(() => {
-                            ta.style.height = 'auto';
-                            ta.style.height = ta.scrollHeight + 'px';
-                        }, 0);
+                        // 클릭(포커스) 시 화면 튀는 현상 방지를 위해 auto 초기화 생략 또는 지연 실행
+                        ta.addEventListener('focus', () => {
+                            // focus 시점에 scrollHeight가 제대로 안 잡힐 수 있으므로 지연 호출
+                            setTimeout(() => adjustHeight(ta), 0);
+                        });
+
+                        // 렌더링 직후 높이 설정
+                        setTimeout(() => adjustHeight(ta), 0);
 
                         if (['extra1', 'extra2', 'extra3', 'extra4'].includes(field)) {
                             ta.style.textAlign = 'left';
@@ -661,6 +671,3 @@
     </script>
 </body>
 </html>
-
-
-
