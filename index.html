@@ -544,7 +544,8 @@
                         const ta = document.createElement('textarea'); 
                         ta.className = "cell-textarea"; 
                         ta.value = data[field] || '';
-                        ta.onmousedown = (e) => { e.preventDefault(); ta.focus({ preventScroll: true }); };
+                        // 마우스 드래그 기능을 위해 preventDefault 제거하고 focus만 호출
+                        ta.onmousedown = (e) => { ta.focus({ preventScroll: true }); };
                         ta.addEventListener('input', () => adjustHeight(ta));
                         requestAnimationFrame(() => adjustHeight(ta));
                         if (['extra1', 'extra2', 'extra3', 'extra4'].includes(field)) ta.style.textAlign = 'left';
@@ -556,25 +557,33 @@
                         const cur = Array.isArray(data[field]) ? data[field] : [];
                         [1, 2].forEach(i => {
                             const rb = document.createElement('input'); rb.type = "checkbox"; rb.className = "round-radio w-4 h-4"; rb.checked = cur.includes(i);
-                            // 체크박스 클릭 시 스크롤 이동 방지 로직 추가
-                            rb.onmousedown = (e) => { e.preventDefault(); rb.click(); rb.focus({ preventScroll: true }); };
-                            rb.onchange = (e) => { e.stopPropagation(); updateCell(data.id, field, rb.checked ? [...cur, i] : cur.filter(v => v !== i)); };
+                            // 체크박스 클릭 시 먹통 현상 및 스크롤 튐 방지
+                            rb.onclick = (e) => { 
+                                e.stopPropagation(); 
+                                const nextVal = rb.checked ? [...cur, i] : cur.filter(v => v !== i);
+                                updateCell(data.id, field, nextVal);
+                                rb.focus({ preventScroll: true });
+                            };
                             c.appendChild(rb);
                         });
                         wrapper.appendChild(c);
                     } else if (['awake', 'ultimate'].includes(field)) {
                         const c = document.createElement('div'); c.className = "flex justify-center items-center h-full";
                         const cb = document.createElement('input'); cb.type = "checkbox"; cb.className = "simple-checkbox w-4 h-4"; cb.checked = !!data[field];
-                        // 체크박스 클릭 시 스크롤 이동 방지 로직 추가
-                        cb.onmousedown = (e) => { e.preventDefault(); cb.click(); cb.focus({ preventScroll: true }); };
-                        cb.onchange = (e) => { e.stopPropagation(); updateCell(data.id, field, cb.checked); };
+                        // 체크박스 클릭 시 먹통 현상 및 스크롤 튐 방지
+                        cb.onclick = (e) => { 
+                                e.stopPropagation(); 
+                                updateCell(data.id, field, cb.checked);
+                                cb.focus({ preventScroll: true });
+                        };
                         c.appendChild(cb);
                         wrapper.appendChild(c);
                     } else {
                         const inp = document.createElement('input'); inp.className = "cell-input"; inp.value = data[field] || '';
                         if (field === 'status') { inp.style.color = "var(--status-color)"; inp.style.fontWeight = "900"; }
                         if (field === 'light') { inp.style.color = "var(--light-col-color)"; inp.style.fontWeight = "700"; }
-                        inp.onmousedown = (e) => { e.preventDefault(); inp.focus({ preventScroll: true }); };
+                        // 마우스 드래그 기능을 위해 preventDefault 제거하고 focus만 호출
+                        inp.onmousedown = (e) => { inp.focus({ preventScroll: true }); };
                         inp.onblur = () => { if (inp.value !== (data[field] || '')) updateCell(data.id, field, inp.value); };
                         wrapper.appendChild(inp);
                     }
