@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>리세계 뉴비 가이드 - 옥토패스 트래블러</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
+        
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f1f5f9;
+            color: #1e293b;
+        }
+        .section-card {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            border: 1px solid #e2e8f0;
+        }
+        .priority-1 {
+            border-left: 6px solid #ef4444;
+        }
+        .priority-2 {
+            border-left: 6px solid #f59e0b;
+        }
+        .jp-highlight {
+            background: linear-gradient(135deg, #fef3c7 0%, #fffbeb 100%);
+            border: 1px solid #fcd34d;
+        }
+        .checkbox-item:checked + label {
+            text-decoration: line-through;
+            color: #94a3b8;
+        }
+    </style>
+</head>
+<body class="pb-10">
+
+    <!-- Hero Header -->
+    <header class="bg-gradient-to-r from-slate-900 to-slate-800 text-white py-14 px-6 mb-8 shadow-xl relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')]"></div>
+        <div class="max-w-4xl mx-auto text-center relative z-10">
+            <h1 class="text-3xl md:text-5xl font-extrabold mb-4 tracking-tight text-amber-400">리세계 시작시 뉴비 가이드</h1>
+            <p class="text-slate-300 text-lg">- 은빛독수리 -</p>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4">
+        
+        <!-- 1. 퀘스트 진행 순서 -->
+        <section id="progress">
+            <div class="flex items-center mb-6">
+                <span class="bg-indigo-600 text-white px-4 py-1 rounded-full text-sm font-bold mr-3">STEP 01</span>
+                <h2 class="text-2xl font-bold">퀘스트 진행 순서</h2>
+            </div>
+            
+            <div class="section-card">
+                <div class="mb-6">
+                    <h3 class="flex items-center text-lg font-bold text-slate-900 mb-2">
+                        <span class="w-2 h-2 bg-indigo-500 rounded-full mr-2"></span>
+                        메인 스토리 진행
+                    </h3>
+                    <p class="text-slate-600 ml-4">모든 콘텐츠의 기본입니다. 막히기 전까지 꾸준히 진행하세요.</p>
+                </div>
+
+                <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center">
+                    <span class="w-2 h-2 bg-amber-500 rounded-full mr-2"></span>
+                    사이드 퀘스트 우선순위 리스트
+                </h3>
+
+                <div class="grid gap-4 ml-4">
+                    <!-- 무명마을 (강조) -->
+                    <div class="p-4 rounded-lg bg-red-50 border border-red-100 priority-1">
+                        <div class="flex justify-between items-start mb-2">
+                            <strong class="text-red-700 text-lg">🏡 이름없는 마을</strong>
+                            <span class="bg-red-200 text-red-800 text-xs px-2 py-0.5 rounded font-bold">1순위 필수</span>
+                        </div>
+                        <p class="text-sm text-red-600 font-medium">추억의 조각과 재료가 다량 소모되므로 가장 먼저 시작하고 꾸준히 관리해야 합니다.</p>
+                    </div>
+
+                    <!-- 향로 -->
+                    <div class="p-4 rounded-lg bg-amber-50 border border-amber-100 priority-2">
+                        <strong class="text-amber-800">🕯 향로 (성스러운 불꽃의 인도)</strong>
+                        <ul class="text-sm text-amber-700 mt-2 list-disc ml-4 space-y-1">
+                            <li>최초 1회 클리어 후 마을 지도에서 <strong>27시간 간격</strong> 보상 수령</li>
+                            <li>3성 난나(검사)의 스킬보드 해방에 필수적인 서브퀘스트</li>
+                        </ul>
+                    </div>
+
+                    <!-- 지염수 -->
+                    <div class="p-4 rounded-lg bg-blue-50 border border-blue-100 border-l-6 border-l-blue-400">
+                        <strong class="text-blue-800">🐾 지염수/신수</strong>
+                        <p class="text-sm text-blue-700 mt-1">지염수 능력치가 착용자에게 적용되며, <strong>과염조각</strong>으로 강화 가능합니다.</p>
+                    </div>
+
+                    <!-- 상급토벌 -->
+                    <div class="p-4 rounded-lg bg-purple-50 border border-purple-100 border-l-6 border-l-purple-400">
+                        <strong class="text-purple-800">⚔ 상급토벌 퀘스트</strong>
+                        <p class="text-sm text-purple-700 mt-1">일반 토벌을 넘어 상급 토벌을 열기 위해 반드시 선행되어야 하는 필수 퀘스트입니다.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. 필수 사항 -->
+        <section id="essentials">
+            <div class="flex items-center mb-6">
+                <span class="bg-red-600 text-white px-4 py-1 rounded-full text-sm font-bold mr-3">STEP 02</span>
+                <h2 class="text-2xl font-bold">일일 및 성장 필수사항</h2>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6 mb-8">
+                <!-- 일일 공적 -->
+                <div class="section-card !mb-0">
+                    <h3 class="font-bold text-slate-900 mb-4 flex items-center">
+                        📅 일일 공적 완료
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center p-2 hover:bg-slate-50 rounded transition">
+                            <input type="checkbox" id="check1" class="checkbox-item w-5 h-5 rounded border-slate-300 text-indigo-600">
+                            <label for="check1" class="ml-3 text-sm text-slate-700">필드 전투 4~5회 진행</label>
+                        </div>
+                        <div class="flex items-center p-2 hover:bg-slate-50 rounded transition">
+                            <input type="checkbox" id="check2" class="checkbox-item w-5 h-5 rounded border-slate-300 text-indigo-600">
+                            <label for="check2" class="ml-3 text-sm text-slate-700">무기점에 재료 팔기</label>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-2 bg-slate-100 p-2 rounded">※ 루비, 금도석, 추억의 조각 수급의 핵심입니다.</p>
+                    </div>
+                </div>
+
+                <!-- 광고 시청 -->
+                <div class="section-card !mb-0">
+                    <h3 class="font-bold text-slate-900 mb-4 flex items-center">
+                        📺 광고 시청 보상
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center border-b pb-2">
+                            <span class="text-sm font-medium">캣링 트레저</span>
+                            <span class="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded font-bold">매일 10회</span>
+                        </div>
+                        <p class="text-xs text-slate-500 -mt-2">오후 5시 / 새벽 5시 초기화</p>
+                        
+                        <div class="flex justify-between items-center border-b pb-2">
+                            <span class="text-sm font-medium">캣링 광고 (출현)</span>
+                            <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded font-bold">매일 3회</span>
+                        </div>
+                        <p class="text-xs text-slate-500 -mt-2">초반 빠른 레벨업의 지름길</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- JP 습득 (새로운 강조 사항) -->
+            <div class="section-card jp-highlight">
+                <h3 class="font-bold text-amber-900 mb-3 flex items-center">
+                    ✨ 렙업 후 JP 사용 가이드
+                </h3>
+                <p class="text-sm text-amber-800 leading-relaxed">
+                    스킬 습득에서 얻은 JP는 아끼지 말고 사용하세요. 특히 스킬 트리에서 다음 두 가지 노드를 <strong class="underline decoration-2 underline-offset-4">최우선</strong>으로 활성화해야 합니다.
+                </p>
+                <div class="flex gap-4 mt-4">
+                    <div class="flex-1 bg-white p-3 rounded shadow-sm text-center border border-amber-200">
+                        <span class="block text-xl mb-1">👑</span>
+                        <span class="text-sm font-bold text-amber-900">영향력</span>
+                    </div>
+                    <div class="flex-1 bg-white p-3 rounded shadow-sm text-center border border-amber-200">
+                        <span class="block text-xl mb-1">⚡</span>
+                        <span class="text-sm font-bold text-amber-900">BP (기초)</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. 무기/방어구 -->
+        <section id="equipment">
+            <div class="flex items-center mb-6">
+                <span class="bg-slate-700 text-white px-4 py-1 rounded-full text-sm font-bold mr-3">STEP 03</span>
+                <h2 class="text-2xl font-bold">무기 및 방어구</h2>
+            </div>
+            
+            <div class="section-card">
+                <p class="text-slate-700 mb-4 leading-relaxed">
+                    스토리 진행 중 던전에서 얻은 재료로 마을 무기점에서 레벨에 맞는 장비를 제작하세요. 초반 장비에 과하게 집착할 필요는 없습니다.
+                </p>
+                <div class="flex flex-col md:flex-row items-center justify-between bg-slate-50 p-4 rounded-lg gap-4">
+                    <div class="text-center md:text-left">
+                        <p class="text-xs text-slate-400 uppercase tracking-widest font-bold">Current Target</p>
+                        <p class="text-sm font-bold text-slate-700">스토리에 막힘이 없을 정도</p>
+                    </div>
+                    <div class="text-2xl text-slate-300 hidden md:block">→</div>
+                    <div class="text-center">
+                        <p class="text-xs text-slate-400 uppercase tracking-widest font-bold">End Game Roadmap</p>
+                        <div class="flex gap-1 mt-1 justify-center">
+                            <span class="bg-indigo-600 text-white text-[10px] px-1.5 py-0.5 rounded">포춘</span>
+                            <span class="bg-indigo-600 text-white text-[10px] px-1.5 py-0.5 rounded">에리얼</span>
+                            <span class="bg-indigo-600 text-white text-[10px] px-1.5 py-0.5 rounded">변옥</span>
+                            <span class="bg-indigo-600 text-white text-[10px] px-1.5 py-0.5 rounded">신역</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. 주요 퀘스트 (상급토벌) -->
+        <section id="quests">
+            <div class="flex items-center mb-6">
+                <span class="bg-amber-500 text-white px-4 py-1 rounded-full text-sm font-bold mr-3">STEP 04</span>
+                <h2 class="text-2xl font-bold">주요 퀘스트 (상급토벌 연계)</h2>
+            </div>
+
+            <div class="section-card overflow-hidden !p-0">
+                <div class="p-6 bg-slate-900 text-white">
+                    <p class="text-sm text-slate-400 mb-4">토벌 해금을 위한 순서도</p>
+                    <div class="space-y-6 relative border-l-2 border-slate-700 ml-2 pl-6">
+                        <div class="relative">
+                            <span class="absolute -left-[31px] top-0 w-4 h-4 rounded-full bg-slate-700 border-2 border-slate-900"></span>
+                            <p class="text-sm font-bold">일반 토벌 NEW 지역 한번씩 클리어</p>
+                        </div>
+                        <div class="relative">
+                            <span class="absolute -left-[31px] top-0 w-4 h-4 rounded-full bg-slate-700 border-2 border-slate-900"></span>
+                            <p class="text-sm font-bold">상급 토벌 퀘스트 완료</p>
+                        </div>
+                        <div class="relative">
+                            <span class="absolute -left-[31px] top-0 w-4 h-4 rounded-full bg-slate-700 border-2 border-slate-900"></span>
+                            <p class="text-sm font-bold">상급 토벌 NEW 지역 한번씩 클리어</p>
+                        </div>
+                        <div class="relative">
+                            <span class="absolute -left-[31px] top-0 w-4 h-4 rounded-full bg-amber-500 border-2 border-slate-900"></span>
+                            <p class="text-sm font-bold text-amber-400 font-bold">숨겨진 역전 용사 4명 처치</p>
+                            <div class="flex flex-wrap gap-2 mt-2">
+                                <span class="text-[10px] bg-slate-800 text-slate-300 border border-slate-700 px-2 py-0.5 rounded">선셰이드</span>
+                                <span class="text-[10px] bg-slate-800 text-slate-300 border border-slate-700 px-2 py-0.5 rounded">클리어브룩</span>
+                                <span class="text-[10px] bg-slate-800 text-slate-300 border border-slate-700 px-2 py-0.5 rounded">크래그스피어</span>
+                                <span class="text-[10px] bg-slate-800 text-slate-300 border border-slate-700 px-2 py-0.5 rounded">셰퍼드록</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-6 bg-red-600 text-white">
+                    <div class="flex items-center mb-2">
+                        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                        <h4 class="font-bold">반드시 주의하세요!</h4>
+                    </div>
+                    <p class="text-sm leading-relaxed opacity-90">
+                        토벌 퀘스트 진행 시, <strong>간이 토벌</strong>이 아닌 지도의 <span class="underline font-bold text-white uppercase">NEW</span> 표시가 있는 토벌을 <strong>최초 1회 직접 플레이</strong>하여 완료해야 다음 단계로 넘어갈 수 있습니다.
+                    </p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="text-center text-slate-400 text-xs py-10 border-t border-slate-200 mt-10">
+        <p>© 옥토패스 트래블러: 대륙의 패자 뉴비 가이드</p>
+        <p class="mt-1">수시로 업데이트되는 정보를 확인해 주세요.</p>
+    </footer>
+
+    <script>
+        // Smooth scrolling for links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
