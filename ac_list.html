@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>옥토패스 트래블러 계정 매물 리스트</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;800&display=swap');
+        
+        body {
+            font-family: 'Pretendard', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        /* 기본 하이라이트 스타일 */
+        .highlight-partitio {
+            background-color: #fef08a; /* Yellow-200 */
+            color: #854d0e; /* Yellow-900 */
+            font-weight: bold;
+            padding: 2px 4px;
+            border-radius: 4px;
+            border: 1px solid #fde047;
+            transition: all 0.2s;
+        }
+
+        .highlight-moru {
+            background-color: #dcfce7; /* Green-100 */
+            color: #166534; /* Green-900 */
+            font-weight: bold;
+            padding: 2px 4px;
+            border-radius: 4px;
+            border: 1px solid #bbf7d0;
+            transition: all 0.2s;
+        }
+
+        .highlight-priestess {
+            background-color: #f3e8ff; /* Purple-100 */
+            color: #581c87; /* Purple-900 */
+            font-weight: bold;
+            padding: 2px 4px;
+            border-radius: 4px;
+            border: 1px solid #e9d5ff;
+            transition: all 0.2s;
+        }
+
+        /* 토글 오프 상태일 때 하이라이트 제거 */
+        body.hide-partitio .highlight-partitio,
+        body.hide-moru .highlight-moru,
+        body.hide-priestess .highlight-priestess {
+            background-color: transparent;
+            color: inherit;
+            font-weight: inherit;
+            border-color: transparent;
+            padding: 0;
+        }
+
+        .account-card:hover {
+            transform: translateY(-2px);
+            transition: all 0.2s ease;
+        }
+
+        .char-tag {
+            display: inline-block;
+            margin: 2px;
+        }
+
+        /* 버튼 활성/비활성 스타일 */
+        .btn-toggle {
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+        .btn-toggle.inactive {
+            background-color: #e2e8f0 !important;
+            color: #64748b !important;
+            border-color: #cbd5e1 !important;
+            text-decoration: line-through;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-6xl mx-auto">
+        <!-- Header -->
+        <header class="mb-8 text-center">
+            <h1 class="text-3xl font-extrabold text-slate-800 mb-2">옥토패스 트래블러 계정 리스트</h1>
+            <p class="text-slate-500">주요 캐릭터 하이라이트 및 검색 시스템</p>
+        </header>
+
+        <!-- Search Bar -->
+        <div class="mb-4 sticky top-4 z-20">
+            <input type="text" id="searchInput" placeholder="번호, 보석수, 또는 캐릭터 이름으로 검색..." 
+                   class="w-full p-4 rounded-xl border-none shadow-xl focus:ring-2 focus:ring-blue-500 outline-none text-lg">
+            
+            <!-- Toggle Buttons -->
+            <div class="flex gap-2 mt-4 overflow-x-auto pb-2 no-scrollbar">
+                <button onclick="toggleHighlight('moru', this)" 
+                        class="btn-toggle flex-shrink-0 px-4 py-2 rounded-full bg-green-500 text-white font-bold shadow-md hover:bg-green-600">
+                    모루룻소EX On
+                </button>
+                <button onclick="toggleHighlight('partitio', this)" 
+                        class="btn-toggle flex-shrink-0 px-4 py-2 rounded-full bg-yellow-500 text-white font-bold shadow-md hover:bg-yellow-600">
+                    파르티티오EX On
+                </button>
+                <button onclick="toggleHighlight('priestess', this)" 
+                        class="btn-toggle flex-shrink-0 px-4 py-2 rounded-full bg-purple-500 text-white font-bold shadow-md hover:bg-purple-600">
+                    흑무녀 On
+                </button>
+                <span class="text-xs text-slate-400 flex items-center ml-2">* 버튼을 눌러 강조를 켜고 끕니다.</span>
+            </div>
+        </div>
+
+        <div id="listContainer">
+            <!-- 5만 섹션 -->
+            <section class="mb-10 price-section" data-price="50000">
+                <div class="flex items-center mb-4 border-b-2 border-blue-500 pb-2">
+                    <h2 class="text-2xl font-bold text-blue-700">#### 5만 ####</h2>
+                </div>
+                <div class="grid gap-3" id="section-5"></div>
+            </section>
+
+            <!-- 8만 섹션 -->
+            <section class="mb-10 price-section" data-price="80000">
+                <div class="flex items-center mb-4 border-b-2 border-emerald-500 pb-2">
+                    <h2 class="text-2xl font-bold text-emerald-700">#### 8만 ####</h2>
+                </div>
+                <div class="grid gap-3" id="section-8"></div>
+            </section>
+
+            <!-- 11만 섹션 -->
+            <section class="mb-10 price-section" data-price="110000">
+                <div class="flex items-center mb-4 border-b-2 border-purple-500 pb-2">
+                    <h2 class="text-2xl font-bold text-purple-700">#### 11만 ####</h2>
+                </div>
+                <div class="grid gap-3" id="section-11"></div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        const rawData = {
+            "5": [
+                "2-162/보석11000/샤나/미디야/파디스/카이네/니어/티치/시그나/프림EX/니콜라1/사이러스1/리크/한이트EX1/세실리/네하2/비올라EX/흑무녀/시그나EX",
+                "3-535/보석11000/모루룻소EX/샤나/미디야/파디스/카이네1/니어1/티치/프림EX/시그나/한이트EX1/니콜라/사이러스/엘트릭스/흑무녀/테레즈EX",
+                "6-998/보석13000/샤나/미디야/파디스/카이네/니어/티치/카나리/프림EX/니콜라/사이러스1/린유/소니아/비올라EX/흑기사/시그나EX",
+                "6-210/보석14000/샤나/미디야/파디스/카이네1/니어1/티치/프림EX/에밀/니콜라/사이러스/테리온/세실리/네하/사이러스EX/흑기사/파르티티오EX/시그나EX",
+                "1-047/보석9000/모루룻소EX/샤나2/미디야/파디스/카이네/니어/티치/에밀/시그나/프림EX1/니콜라2/사이러스1/리크/비올라EX/흑무녀/시그나EX",
+                "1-983/보석12000/샤나/미디야/파디스/카이네/니어1/티치/시그나/프림EX/니콜라1/사이러스1/올리/아일라/테리온/사이러스EX/흑기사/시그나EX/파르티티오EX",
+                "4-721/보석13000/샤나/미디야/파디스/카이네/니어/티치1/시그나/프림EX/바르젤로/린유EX/니콜라/사이러스1/솔론/사이러스EX/흑무녀/시그나EX",
+                "6-126/보석15000/샤나1/미디야1/파디스/카이네/니어/티치/프림EX/니콜라1/사이러스/에밀1/한이트EX/비올라EX/흑무녀/테레즈EX",
+                "1-283/보석14000/샤나/미디야/파디스/카이네1/니어/티치/카나리/시그나1/프림EX/니콜라1/사이러스3/아일리/크릭/오슈트/사이러스EX/흑기사/파르티티오EX",
+                "3-753/보석14000/샤나1/미디야1/파디스/카이네/니어/티치/카나리/론도/프림EX1/바르젤로/소니아/아일라/니콜라/사이러스2/테리온/세실리/비올라EX/흑기사/테레즈EX",
+                "4-561/보석12000/샤나/미디야/파디스/카이네1/니어/티치/카나리/프림EX/에밀/한이트EX1/니콜라/사이러스/제인/테리온/사이러스EX/흑기사/파르티티오EX",
+                "5-641/보석12000/샤나/미디야/파디스2/카이네2/니어/티치/프림EX/소니아/니콜라1/사이러스3/린유/한이트EX/리크/세실리/리샤르/사이러스EX/흑기사/시그나EX/테레즈EX",
+                "6-431/보석12000/샤나/미디야/파디스/카이네/니어/티치1/시그나/리샤르/A2/한이트EX/니콜라1/사이러스1/론도/비올라EX/흑무녀/파르티티오EX",
+                "1-676/보석1000/샤나/미디야/파디스/카이네/니어/티치/프림EX1/바르젤로/솔론/한이트EX1/니콜라/아일리/사이러스EX/흑기사/시그나EX4/테레즈EX5/파르티티오EX4",
+                "6-978/보석12000/샤나/미디야/파디스1/카이네/니어1/티치/시그나1/프림EX/니콜라/사이러스1/론도/파르티티오/리샤르/비올라EX/흑무녀/파르티티오EX",
+                "5-525/보석15000/샤나/미디야1/파디스/카이네1/니어/티치/에밀5/카나리/프림EX/니콜라3/사이러스1/론도/디트레이나EX2/사이러스EX/흑무녀/시그나EX",
+                "4-769/보석13000/샤나/미디야/파디스/카이네2/니어/티치1/에밀1/시그나1/프림EX/에리카/니콜라2/사이러스1/세실리/론도/비올라EX/사이러스EX/흑무녀/테레즈EX",
+                "3-477/보석14000/샤나/미디야/파디스/카이네/니어/티치/에밀/시그나1/프림EX/니콜라2/사이러스/아일라/한이트EX/세라피나4/테리온/바르젤로/사이러스EX/흑무녀/시그나EX",
+                "1-393/보석11000/모루룻소EX/샤나/미디야/파디스/카이네/니어/티치/에밀1/시그나/프림EX/소니아/니콜라/사이러스/론도/흑기사/시그나EX",
+                "2-680/보석12000/샤나/미디야/파디스/카이네/니어/티치1/시그나/프림EX3/바르젤로/솔론/니콜라/사이러스3/에밀/한이트EX1/사잔/사이러스EX/흑기사/테레즈EX",
+                "3-048/보석10000/샤나/미디야/파디스/카이네2/니어/티치/시그나/프림EX2/아일라/솔론/니콜라1/사이러스/비올라EX/흑기사/파르티티오EX",
+                "5-406/보석10000/샤나/미디야/파디스/카이네/니어/티치/에밀/시그나/프림EX2/네프티/소니아/니콜라1/사이러스/한이트EX1/올리/비올라EX/사이러스EX/흑무녀/시그나EX1/테레즈EX",
+                "2-309/보석14000/모루룻소EX/샤나/미디야/파디스/카이네1/니어/티치/시그나/프림EX/네프티/소니아/한이트EX/니콜라/사이러스/세실리/비올라EX/흑무녀/테레즈EX",
+                "2-981/보석11000/모루룻소EX/샤나/미디야/파디스/카이네2/니어/티치/시그나/프림EX/솔론/니콜라/사이러스/세실리/흑기사/테레즈EX",
+                "6-294/보석14000/모루룻소EX/샤나/미디야/파디스1/카이네/니어1/티치/에밀3/시그나/소니아/프림EX/니콜라1/사이러스/세실리/네프티/사이러스EX/흑무녀/테레즈EX1",
+                "2-590/보석9000/모루룻소EX/샤나/미디야/파디스/카이네1/니어/티치1/시그나/프림EX/한이트EX/니콜라/사이러스1/제인/세실리/네하/론도/흑무녀/시그나EX",
+                "3-818/보석14000/모루룻소EX/샤나/미디야/파디스/카이네/니어/티치/시그나/프림EX/니콜라2/사이러스1/에밀/소니아/한이트EX/테리온/린유/흑기사/테레즈EX",
+                "5-654/보석11000/샤나/미디야/파디스/카이네/니어2/티치/시그나/사잔/에리카/프림EX/니콜라1/사이러스1/오즈발드/테리온/비올라EX/흑무녀/파르티티오EX",
+                "4-514/보석14000/모루룻소EX/샤나/미디야/파디스/카이네/니어/티치/에밀1/시그나/프림EX/바르젤로/캐스티1/니콜라/사이러스1/한이트EX/흑무녀/파르티티오EX",
+                "6-492/보석10000/샤나/미디야/파디스/카이네/니어/티치/시그나/프림EX1/니콜라/사이러스1/에밀1/킬른/히카리/오슈트/세실리/네프티/비올라EX/흑기사/테레즈EX",
+                "1-729/보석14000/샤나/미디야/파디스/카이네2/니어/티치/시그나1/니콜라1/사이러스/린유1/한이트EX/히카리/에밀3/엘트릭스/올리/비올라EX/흑기사/시그나EX",
+                "4-286/보석12000/샤나/미디야2/파디스/카이네/니어1/티치/에밀1/시그나/프림EX/바르젤로/솔론/리크/한이트EX/니콜라/사이러스2/린유/세실리/비올라EX/흑기사/테레즈EX",
+                "3-024/보석14000/모루룻소EX/샤나/미디야/파디스/카이네1/니어/티치/시그나/프림EX2/니콜라/사이러스1/아일라/린유/테리온/아라우네EX/사잔/흑무녀/시그나EX/테레즈EX",
+                "6-832/보석11000/모루룻소EX/샤나1/미디야/파디스/카이네/니어/티치/시그나/프림EX/에밀1/사이러스/한이트EX2/캐스티/엘트릭스/니콜라1/사이러스1/흑무녀/테레즈EX",
+                "3-022/보석14000/모루룻소EX/샤나/미디야/파디스/카이네1/니어/티치/시그나/프림EX/바르젤로1/에밀/킬른/아라우네EX/니콜라/사이러스2/테리온/흑무녀/시그나EX",
+                "2-956/보석7000/모루룻소EX/샤나/미디야/파디스/카이네/니어/티치/바르젤로/프림EX/리샤르/A2/니콜라/사이러스2/에밀1/킬른/네하1/흑기사/테레즈EX",
+                "3-072/보석9000/모루룻소EX/샤나/미디야/파디스/카이네/니어/티치/시그나2/프림EX/소니아/니콜라/사이러스1/에밀/한이트EX/세실리1/흑기사/시그나EX",
+                "5-739/보석13000/모루룻소EX1/샤나/미디야/파디스/카이네/니어/티치/시그나/프림EX/에리카/리샤르1/니콜라1/사이러스1/타투록/리크/흑무녀/파르티티오EX/시그나EX",
+                "3-294/보석14000/모루룻소EX1/샤나/미디야/파디스/카이네/니어/티치/시그나/프림EX1/에밀/니콜라/사이러스/테리온/흑기사/시그나EX",
+                "5-530/보석14000/모루룻소EX/샤나/미디야1/파디스/카이네/니어1/티치/시그나1/프림EX/니콜라/사이러스/테메노스/아그네아//흑기사/테레즈EX",
+                "3-678/보석14000/모루룻소EX/샤나/미디야/파디스/카이네/니어/티치/시그나/프림EX/니콜라1/사이러스/에밀/한이트EX/테리온/사이러스EX/흑기사/파르티티오EX",
+                "6-455/보석14000/모루룻소EX/샤나/미디야/파디스/카이네2/니어/티치/에밀1/시그나/린유1/소니아/니콜라1/사이러스/한이트EX/세실리/흑기사/파르티티오EX/시그나EX",
+                "1-255/보석14000/모루룻소EX/샤나/미디야1/파디스/카이네/니어/티치/시그나/프림EX/니콜라/사이러스1/솔론/흑무녀/시그나EX",
+                "5-368/보석14000/모루룻소EX/샤나/미디야/파디스/카이네1/니어/티치/시그나/프림EX/니콜라1/사이러스1/에밀/한이트EX/흑기사/시그나EX/테레즈EX",
+                "3-679/보석13000/모루룻소EX/샤나/미디야/파디스/카이네/니어/티치/시그나1/프림EX/한이트EX2/오스카/니콜라1/엘트릭스/아라우네EX/사이러스EX/흑무녀/시그나EX",
+                "2-260/보석13000/모루룻소EX/샤나/미디야/파디스/카이네1/니어/티치/카나리/프림EX/니콜라1/사이러스/아일라/오데트/오스카/캐스티/네프티/흑무녀/테레즈EX",
+                "4-112/보석14000/모루룻소EX/샤나/미디야/파디스/카이네/니어/티치/시그나/프림EX/니콜라/사이러스/사잔/에리카/에밀2/한이트EX1/세실리/흑무녀/시그나EX",
+                "1-493/보석14000/모루룻소EX1/샤나/미디야/파디스/카이네/니어/티치1/카나리1/프림EX/에리카1/리샤르/에밀5/니콜라/사이러스1/테리온/세실리/흑기사/테레즈EX",
+                "6-569/보석13000/모루룻소EX/샤나/미디야/파디스/카이네2/니어/티치/시그나/프림EX/니콜라1/사이러스/에밀/에리카EX/흑기사/테레즈EX",
+                "1-407/보석11000/모루룻소EX/샤나/미디야1/파디스/카이네/니어1/티치/시그나/프림EX/에리카/에밀/한이트EX1/니콜라/사이러스/네하/흑무녀/테레즈EX",
+                "1-220/보석13000/모루룻소EX/샤나/미디야/파디스/카이네/니어1/티치/에밀2/카나리/프림EX1/사이러스/니콜라2/네하/바르젤로/네프티/엘트릭스//파르티티오EX",
+                "2-805/보석14000/모루룻소EX/샤나/미디야/파디스/카이네1/니어/티치/에밀/카나리/시그나2/프림EX/한이트EX/소니아/니콜라2/오스카/린유/아라우네EX/흑기사/파르티티오EX"
+            ],
+            "8": [
+                "5-240/보석17000/샤나/미디야/파디스/카이네1/니어/티치/시그나/프림EX/니콜라/사이러스2/한이트EX/사이러스EX/흑무녀/시그나EX4/테레즈EX1/파르티티오EX1",
+                "1-563/보석13000/샤나/미디야/파디스/카이네/니어/티치/프림EX/소니아1/테리온/니콜라2/사이러스/킬른/네하/비올라EX/흑무녀/시그나EX4/테레즈EX/파르티티오EX",
+                "3-025/보석17000/샤나/미디야/파디스/카이네4/니어/티치/에밀2/시그나1/프림EX/니콜라1/사이러스1/린유/비올라EX/흑무녀/테레즈EX",
+                "3-071/보석12000/샤나/미디야/파디스/카이네4/니어/티치/에밀/시그나1/프림EX/니콜라/사이러스/사이러스EX/흑기사/파르티티오EX"
+            ],
+            "11": [
+                "2-254/보석15000/샤나/미디야/파디스/카이네1/니어4/티치/에밀2/시그나/프림EX/한이트EX/니콜라1/사이러스/사이러스EX/흑무녀/테레즈EX",
+                "6-405/보석9000/모루룻소EX/샤나/미디야/파디스/카이네1/니어4/티치/시그나2/프림EX/니콜라/사이러스1/린유/한이트EX/흑무녀/시그나EX/파르티티오EX/테레즈EX1"
+            ]
+        };
+
+        function formatLine(line) {
+            const parts = line.split('/');
+            const id = parts[0];
+            const gems = parts[1];
+            const characters = parts.slice(2);
+
+            let charHtml = characters.map(char => {
+                if (char.includes("파르티티오EX")) {
+                    return `<span class="highlight-partitio">${char}</span>`;
+                } else if (char.includes("모루룻소EX")) {
+                    return `<span class="highlight-moru">${char}</span>`;
+                } else if (char.includes("흑무녀")) {
+                    return `<span class="highlight-priestess">${char}</span>`;
+                }
+                return `<span class="char-tag text-slate-600">${char}</span>`;
+            }).join(' / ');
+
+            return `
+                <div class="account-card bg-white p-4 rounded-lg shadow-sm border border-slate-200 flex flex-col md:flex-row gap-4 items-start md:items-center">
+                    <div class="flex-shrink-0 bg-slate-100 px-3 py-1 rounded font-bold text-slate-700 w-24 text-center">
+                        ${id}
+                    </div>
+                    <div class="flex-shrink-0 font-extrabold text-orange-600 min-w-[100px]">
+                        ${gems}
+                    </div>
+                    <div class="flex-grow text-sm leading-relaxed">
+                        ${charHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        function toggleHighlight(type, btn) {
+            const body = document.body;
+            const className = `hide-${type}`;
+            const isHiding = body.classList.toggle(className);
+            
+            if (isHiding) {
+                btn.classList.add('inactive');
+                btn.innerText = btn.innerText.replace('On', 'Off');
+            } else {
+                btn.classList.remove('inactive');
+                btn.innerText = btn.innerText.replace('Off', 'On');
+            }
+        }
+
+        function renderAll() {
+            const sections = {
+                "5": document.getElementById('section-5'),
+                "8": document.getElementById('section-8'),
+                "11": document.getElementById('section-11')
+            };
+
+            for (const key in rawData) {
+                sections[key].innerHTML = rawData[key].map(line => formatLine(line)).join('');
+            }
+        }
+
+        // 검색 기능
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const cards = document.querySelectorAll('.account-card');
+
+            cards.forEach(card => {
+                const text = card.innerText.toLowerCase();
+                card.style.display = text.includes(term) ? 'flex' : 'none';
+            });
+
+            document.querySelectorAll('.price-section').forEach(section => {
+                const visibleCards = section.querySelectorAll('.account-card[style="display: flex;"]');
+                section.style.display = (visibleCards.length > 0 || term === "") ? 'block' : 'none';
+            });
+        });
+
+        // 초기 실행
+        renderAll();
+    </script>
+</body>
+</html>
