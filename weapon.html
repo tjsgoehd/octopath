@@ -11,7 +11,27 @@
         .soul-rainbow { background: linear-gradient(45deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%); color: #742a2a; }
         .soul-gold { background-color: #fef3c7; color: #92400e; border: 1px solid #f59e0b; }
         .step-card:hover { transform: translateY(-2px); transition: all 0.2s ease; }
+        .upload-btn { transition: all 0.2s; cursor: pointer; }
+        .upload-btn:hover { transform: scale(1.05); background-color: #1e293b; }
+        .upload-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .img-container { min-height: 20px; }
     </style>
+    <!-- 전역 에러 핸들러 -->
+    <script>
+        window.handleImageError = function(img) {
+            console.log("이미지 로드 실패:", img.src);
+            const wrapper = img.closest('.img-wrapper');
+            if (wrapper) {
+                wrapper.innerHTML = `
+                    <div class="flex flex-col items-center justify-center p-8 text-slate-400 bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl">
+                        <svg class="w-12 h-12 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                        <p class="text-sm font-medium">이미지를 불러올 수 없습니다</p>
+                        <p class="text-xs">이미지 추가 버튼을 눌러 새 이미지를 등록해주세요</p>
+                    </div>
+                `;
+            }
+        };
+    </script>
 </head>
 <body class="pb-12">
 
@@ -23,7 +43,7 @@
 
     <main class="max-w-5xl mx-auto px-4 space-y-12">
         
-        <!-- Navigation Tabs (Anchor Links) -->
+        <!-- Navigation Tabs -->
         <div class="flex justify-center gap-4 sticky top-4 z-10">
             <a href="#fortune" class="bg-amber-500 hover:bg-amber-600 text-white px-6 py-2 rounded-full font-bold shadow-md transition-colors">포춘 무기</a>
             <a href="#aerial" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-full font-bold shadow-md transition-colors">에리얼 무기</a>
@@ -39,14 +59,12 @@
             </div>
             
             <div class="p-6 space-y-8">
-                <!-- Info Alert -->
                 <div class="bg-amber-50 border-l-4 border-amber-400 p-4 rounded-r">
                     <p class="text-amber-800 text-sm">
                         <strong>필수 조건:</strong> 천운의 게임보드를 돌아 <strong>부/권력/명성 메달</strong>을 확보해야 합니다.
                     </p>
                 </div>
 
-                <!-- Steps -->
                 <div class="grid md:grid-cols-2 gap-6">
                     <div class="step-card bg-slate-50 p-5 rounded-xl border border-slate-100">
                         <h3 class="font-bold text-slate-800 mb-3 flex items-center gap-2">
@@ -69,14 +87,28 @@
                     </div>
                 </div>
 
-                <!-- Souls -->
                 <div>
-                    <h3 class="font-bold text-lg text-slate-800 mb-4 flex items-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                        소울 부여 (필수 세팅)
-                    </h3>
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-lg text-slate-800 flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                            소울 부여 (필수 세팅)
+                        </h3>
+                        <div>
+                            <button id="uploadBtnFortune" onclick="document.getElementById('fileInputFortune').click()" class="upload-btn bg-slate-800 text-white text-xs px-3 py-1.5 rounded-lg flex items-center gap-1 shadow-sm">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-width="2" stroke-linecap="round" stroke="currentColor"/></svg>
+                                이미지 추가
+                            </button>
+                            <input type="file" id="fileInputFortune" class="hidden" accept="image/*" onchange="handleImageUpload(event, 'fortune')">
+                        </div>
+                    </div>
+
+                    <div id="fortuneImageContainer" class="img-container space-y-4 mb-6">
+                        <div class="img-wrapper rounded-xl overflow-hidden border border-slate-200 shadow-sm bg-slate-50">
+                            <img src="image_e9504d.jpg" alt="소울 부여 예시 이미지" class="w-full h-auto block mx-auto" onerror="handleImageError(this)">
+                        </div>
+                    </div>
+
                     <div class="space-y-4">
-                        <!-- Slot 1 -->
                         <div class="flex flex-col md:flex-row gap-3 items-start md:items-center p-4 border rounded-lg hover:bg-slate-50">
                             <span class="soul-rainbow px-3 py-1 rounded-md text-xs font-bold whitespace-nowrap">1번칸 / 무지개</span>
                             <div class="text-sm">
@@ -84,7 +116,6 @@
                                 <strong>종류:</strong> 부(현인/속공), 권력(무인/물공)
                             </div>
                         </div>
-                        <!-- Slot 2/3 -->
                         <div class="flex flex-col md:flex-row gap-3 items-start md:items-center p-4 border rounded-lg hover:bg-slate-50">
                             <span class="soul-gold px-3 py-1 rounded-md text-xs font-bold whitespace-nowrap">2·3번칸 / 금</span>
                             <div class="text-sm">
@@ -92,7 +123,6 @@
                                 <span class="text-amber-600">※ 아이템창의 랜덤 상자를 열어 물공/속공 소울을 획득하세요.</span>
                             </div>
                         </div>
-                        <!-- Slot 4 -->
                         <div class="flex flex-col md:flex-row gap-3 items-start md:items-center p-4 border rounded-lg hover:bg-slate-50">
                             <span class="soul-rainbow px-3 py-1 rounded-md text-xs font-bold whitespace-nowrap">4번칸 / 무지개</span>
                             <div class="text-sm">
@@ -103,7 +133,6 @@
                     </div>
                 </div>
 
-                <!-- Tips -->
                 <div class="bg-slate-900 text-white p-6 rounded-xl">
                     <h4 class="font-bold mb-3 text-amber-400">💡 금소울 부여 추천 팁</h4>
                     <div class="grid md:grid-cols-2 gap-4 text-sm">
@@ -134,14 +163,12 @@
             </div>
             
             <div class="p-6 space-y-8">
-                <!-- Info Alert -->
                 <div class="bg-indigo-50 border-l-4 border-indigo-400 p-4 rounded-r">
                     <p class="text-indigo-800 text-sm">
                         <strong>필수 조건:</strong> 이계토벌(Live a Live)을 통해 <strong>명정의 조각</strong>과 재료를 수급해야 합니다.
                     </p>
                 </div>
 
-                <!-- Steps -->
                 <div class="grid md:grid-cols-2 gap-6">
                     <div class="step-card bg-slate-50 p-5 rounded-xl border border-slate-100">
                         <h3 class="font-bold text-slate-800 mb-3 flex items-center gap-2">
@@ -164,13 +191,26 @@
                     </div>
                 </div>
 
-                <!-- Souls -->
                 <div>
-                    <h3 class="font-bold text-lg text-slate-800 mb-4 flex items-center gap-2 text-indigo-600">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-7.714 2.143L11 21l-2.286-6.857L1 12l7.714-2.143L11 3z"></path></svg>
-                        소울 부여 (고정 수치/확정 옵션)
-                    </h3>
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-lg text-slate-800 mb-2 flex items-center gap-2 text-indigo-600">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-7.714 2.143L11 21l-2.286-6.857L1 12l7.714-2.143L11 3z"></path></svg>
+                            소울 부여 (고정 수치/확정 옵션)
+                        </h3>
+                        <div>
+                            <button id="uploadBtnAerial" onclick="document.getElementById('fileInputAerial').click()" class="upload-btn bg-slate-800 text-white text-xs px-3 py-1.5 rounded-lg flex items-center gap-1 shadow-sm">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-width="2" stroke-linecap="round" stroke="currentColor"/></svg>
+                                이미지 추가
+                            </button>
+                            <input type="file" id="fileInputAerial" class="hidden" accept="image/*" onchange="handleImageUpload(event, 'aerial')">
+                        </div>
+                    </div>
                     <p class="text-xs text-slate-500 mb-4">※ 모든 소울은 교환소 → 필살기 · 장비강화 → 소울조각 탭에서 구입 가능</p>
+
+                    <!-- 에리얼 이미지 표시 영역 -->
+                    <div id="aerialImageContainer" class="img-container space-y-4 mb-6">
+                        <!-- 파이어베이스 데이터 로딩 시 에리얼 전용 이미지들이 이곳에 추가됨 -->
+                    </div>
                     
                     <div class="grid md:grid-cols-2 gap-4">
                         <div class="p-4 border border-slate-200 rounded-lg hover:shadow-md transition-shadow">
@@ -208,8 +248,108 @@
 
     <footer class="mt-12 text-center text-slate-400 text-sm">
         <p>© 옥토패스 트래블러: 대륙의 패자 유저 가이드</p>
-        <p class="mt-1">뉴비분들의 즐거운 여행을 응원합니다!</p>
+        <p class="mt-1 text-slate-500 font-medium" id="connectionStatus">Firebase 연결 상태 확인 중...</p>
     </footer>
 
+    <!-- Firebase Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAjbApqAPhrZXcnR2P_xd-nvrZOvZp67CI",
+            authDomain: "octopath-85851.firebaseapp.com",
+            projectId: "octopath-85851",
+            storageBucket: "octopath-85851.firebasestorage.app",
+            messagingSenderId: "744016190979",
+            appId: "1:744016190979:web:fbc5badeda2e24f5f47836",
+            measurementId: "G-T66TC51C7W"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const customAppId = 'silver-eagle-archive';
+
+        let currentUser = null;
+
+        onAuthStateChanged(auth, async (user) => {
+            const statusEl = document.getElementById('connectionStatus');
+            if (!user) {
+                try { await signInAnonymously(auth); } catch (err) { statusEl.textContent = "Firebase 연결 실패"; }
+            } else {
+                currentUser = user;
+                statusEl.textContent = "Firebase (octopath-85851) 연동 완료";
+                setupImageListeners();
+            }
+        });
+
+        function setupImageListeners() {
+            // 포춘과 에리얼 각각의 리스너 설정
+            const imgRef = collection(db, 'artifacts', customAppId, 'public', 'data', 'images');
+            
+            onSnapshot(imgRef, (snapshot) => {
+                const fortuneContainer = document.getElementById('fortuneImageContainer');
+                const aerialContainer = document.getElementById('aerialImageContainer');
+                
+                // 기존 데이터 이미지들만 정리
+                fortuneContainer.querySelectorAll('.firebase-img-wrapper').forEach(el => el.remove());
+                aerialContainer.querySelectorAll('.firebase-img-wrapper').forEach(el => el.remove());
+
+                const docs = [];
+                snapshot.forEach(doc => docs.push({ id: doc.id, ...doc.data() }));
+                docs.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+
+                docs.forEach(data => {
+                    const div = document.createElement('div');
+                    div.className = "firebase-img-wrapper rounded-xl overflow-hidden border border-slate-200 shadow-sm bg-slate-50";
+                    div.innerHTML = `<img src="${data.url}" class="w-full h-auto block mx-auto" onerror="handleImageError(this)">`;
+                    
+                    // weaponType 필드에 따라 배정 (기본값은 fortune으로 처리하여 호환성 유지)
+                    if (data.weaponType === 'aerial') {
+                        aerialContainer.appendChild(div);
+                    } else {
+                        fortuneContainer.appendChild(div);
+                    }
+                });
+            }, (error) => {
+                console.error("Firestore Listen Error:", error);
+            });
+        }
+
+        window.handleImageUpload = async (event, weaponType) => {
+            if (!currentUser) return;
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const btnId = weaponType === 'fortune' ? 'uploadBtnFortune' : 'uploadBtnAerial';
+            const uploadBtn = document.getElementById(btnId);
+            const originalText = uploadBtn.innerHTML;
+            
+            uploadBtn.disabled = true;
+            uploadBtn.textContent = "업로드 중...";
+
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                const base64Data = e.target.result;
+                try {
+                    await addDoc(collection(db, 'artifacts', customAppId, 'public', 'data', 'images'), {
+                        url: base64Data,
+                        uid: currentUser.uid,
+                        weaponType: weaponType, // 무기 종류 구분 필드 추가
+                        createdAt: serverTimestamp()
+                    });
+                } catch (error) {
+                    console.error("이미지 저장 실패:", error);
+                } finally {
+                    uploadBtn.disabled = false;
+                    uploadBtn.innerHTML = originalText;
+                    event.target.value = ''; 
+                }
+            };
+            reader.readAsDataURL(file);
+        };
+    </script>
 </body>
 </html>
