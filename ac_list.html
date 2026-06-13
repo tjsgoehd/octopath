@@ -4,72 +4,103 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>옥토패스 트래블러 계정 매물 리스트</title>
-    <!-- Tailwind CSS 로드 -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Pretendard 폰트 로드 -->
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;800&display=swap');
         
         body {
             font-family: 'Pretendard', sans-serif;
-            background-color: #f1f5f9;
+            background-color: #f8fafc;
         }
 
-        /* 하이라이트 효과 활성화 시 세련된 미세 글로우 및 외곽선 제공 */
+        /* 기본 하이라이트 스타일 */
         .highlight-partitio {
-            background-color: #fef3c7 !important; /* Yellow-100 */
-            color: #b45309 !important; /* Yellow-700 */
-            border: 1px solid #fcd34d !important;
-            font-weight: 700;
-            box-shadow: 0 0 8px rgba(251, 191, 36, 0.2);
+            background-color: #fef08a; /* Yellow-200 */
+            color: #854d0e; /* Yellow-900 */
+            font-weight: bold;
+            padding: 2px 4px;
+            border-radius: 4px;
+            border: 1px solid #fde047;
+            transition: all 0.2s;
         }
 
         .highlight-moru {
-            background-color: #dcfce7 !important; /* Green-100 */
-            color: #15803d !important; /* Green-700 */
-            border: 1px solid #86efac !important;
-            font-weight: 700;
-            box-shadow: 0 0 8px rgba(74, 222, 128, 0.2);
+            background-color: #dcfce7; /* Green-100 */
+            color: #166534; /* Green-900 */
+            font-weight: bold;
+            padding: 2px 4px;
+            border-radius: 4px;
+            border: 1px solid #bbf7d0;
+            transition: all 0.2s;
         }
 
         .highlight-priestess {
-            background-color: #f3e8ff !important; /* Purple-100 */
-            color: #7e22ce !important; /* Purple-700 */
-            border: 1px solid #d8b4fe !important;
-            font-weight: 700;
-            box-shadow: 0 0 8px rgba(192, 132, 252, 0.2);
+            background-color: #f3e8ff; /* Purple-100 */
+            color: #581c87; /* Purple-900 */
+            font-weight: bold;
+            padding: 2px 4px;
+            border-radius: 4px;
+            border: 1px solid #e9d5ff;
+            transition: all 0.2s;
         }
 
-        .highlight-avite {
-            background-color: #ffe4e6 !important; /* Rose-100 */
-            color: #be123c !important; /* Rose-700 */
-            border: 1px solid #fecdd3 !important;
-            font-weight: 700;
-            box-shadow: 0 0 8px rgba(251, 113, 133, 0.2);
+        .highlight-abite {
+            background-color: #dbeafe; /* Blue-100 */
+            color: #1e3a8a; /* Blue-900 */
+            font-weight: bold;
+            padding: 2px 4px;
+            border-radius: 4px;
+            border: 1px solid #bfdbfe;
+            transition: all 0.2s;
         }
 
-        /* 토글 해제(숨김) 시 투명 처리하여 일반 텍스트화 */
+        .highlight-shana {
+            background-color: #ffe4e6; /* Rose-100 */
+            color: #881337; /* Rose-900 */
+            font-weight: bold;
+            padding: 2px 4px;
+            border-radius: 4px;
+            border: 1px solid #fecdd3;
+            transition: all 0.2s;
+        }
+
+        /* 토글 오프 상태일 때 하이라이트 제거 */
         body.hide-partitio .highlight-partitio,
         body.hide-moru .highlight-moru,
         body.hide-priestess .highlight-priestess,
-        body.hide-avite .highlight-avite {
-            background-color: #f1f5f9 !important;
-            color: #475569 !important;
-            border-color: #e2e8f0 !important;
-            font-weight: normal;
-            box-shadow: none !important;
+        body.hide-abite .highlight-abite,
+        body.hide-shana .highlight-shana {
+            background-color: transparent;
+            color: inherit;
+            font-weight: inherit;
+            border-color: transparent;
+            padding: 0;
         }
 
-        /* 카드 호버 이펙트 */
-        .account-card {
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-        }
         .account-card:hover {
-            transform: translateY(-3px) scale(1.005);
-            box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.08), 0 0 0 1px #cbd5e1;
+            transform: translateY(-2px);
+            transition: all 0.2s ease;
         }
 
-        /* 스크롤바 커스텀 숨김 */
+        .char-tag {
+            display: inline-block;
+            margin: 2px;
+        }
+
+        /* 버튼 활성/비활성 스타일 */
+        .btn-toggle {
+            transition: all 0.2s;
+            border: 1px solid transparent;
+            white-space: nowrap; /* 텍스트 줄바꿈 방지 */
+        }
+        .btn-toggle.inactive {
+            background-color: #e2e8f0 !important;
+            color: #64748b !important;
+            border-color: #cbd5e1 !important;
+            text-decoration: line-through;
+        }
+
+        /* 스크롤바 숨기기 */
         .no-scrollbar::-webkit-scrollbar {
             display: none;
         }
@@ -77,572 +108,170 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
-
-        /* 부드러운 토스트 애니메이션 */
-        @keyframes slideInUp {
-            from {
-                transform: translate(-50%, 100%);
-                opacity: 0;
-            }
-            to {
-                transform: translate(-50%, 0);
-                opacity: 1;
-            }
-        }
-        .animate-toast {
-            animation: slideInUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
     </style>
 </head>
-<body class="p-3 sm:p-6 md:p-8 bg-slate-50 min-h-screen">
-
-    <!-- 사용자 피드백(복사 완료 알림 등)을 제공할 세련된 토스트 알림창 -->
-    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-900 text-white px-6 py-3 rounded-xl shadow-2xl flex items-center gap-2 pointer-events-none opacity-0 transition-opacity duration-300">
-        <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-        <span id="toastMessage" class="font-medium text-sm"></span>
-    </div>
+<body class="p-4 md:p-8">
 
     <div class="max-w-6xl mx-auto">
-        
-        <!-- 상단 헤더: RPG 느낌의 고급스러운 그라데이션 및 통계 요약 카드 배치 -->
-        <header class="mb-8 text-center relative py-6 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-3xl shadow-xl overflow-hidden border border-slate-800">
-            <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:16px_16px]"></div>
-            <div class="relative z-10 px-4">
-                <span class="inline-block px-3 py-1 bg-amber-500/15 border border-amber-500/30 text-amber-400 text-xs font-semibold rounded-full uppercase tracking-wider mb-2">OCTOPATH TRAVELER</span>
-                <h1 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mb-2">옥토패스 트래블러 계정 매물 리스트</h1>
-                <p class="text-slate-400 text-sm sm:text-base font-light">고급 다중 검색 필터링 및 타깃 캐릭터 실시간 하이라이트 대시보드</p>
-            </div>
+        <!-- Header -->
+        <header class="mb-8 text-center">
+            <h1 class="text-3xl font-extrabold text-slate-800 mb-2">옥토패스 트래블러 계정 리스트</h1>
+            <p class="text-slate-500">주요 캐릭터 하이라이트 및 검색 시스템</p>
         </header>
 
-        <!-- 통계 요약판 -->
-        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 mb-6">
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
-                <p class="text-xs text-slate-500 font-semibold mb-1">총 등록 매물</p>
-                <div class="flex items-baseline gap-1">
-                    <span id="stat-total" class="text-2xl font-bold text-slate-800">-</span>
-                    <span class="text-slate-400 text-xs">개</span>
-                </div>
-            </div>
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
-                <p class="text-xs text-slate-500 font-semibold mb-1">5만대 매물</p>
-                <div class="flex items-baseline gap-1">
-                    <span id="stat-5m" class="text-2xl font-bold text-blue-600">-</span>
-                    <span class="text-slate-400 text-xs">개</span>
-                </div>
-            </div>
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
-                <p class="text-xs text-slate-500 font-semibold mb-1">8만대 매물</p>
-                <div class="flex items-baseline gap-1">
-                    <span id="stat-8m" class="text-2xl font-bold text-emerald-600">-</span>
-                    <span class="text-slate-400 text-xs">개</span>
-                </div>
-            </div>
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
-                <p class="text-xs text-slate-500 font-semibold mb-1">10만대 매물</p>
-                <div class="flex items-baseline gap-1">
-                    <span id="stat-10m" class="text-2xl font-bold text-purple-600">-</span>
-                    <span class="text-slate-400 text-xs">개</span>
-                </div>
-            </div>
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 col-span-2 sm:col-span-1">
-                <p class="text-xs text-slate-500 font-semibold mb-1">최대 보유 보석 수</p>
-                <div class="flex items-baseline gap-1">
-                    <span id="stat-max-gems" class="text-2xl font-bold text-orange-500">-</span>
-                    <span class="text-slate-400 text-xs">루비</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- 컨트롤러 카드 데크 -->
-        <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-md border border-slate-200 mb-6 sticky top-4 z-30">
-            <!-- 검색 필드 -->
-            <div class="relative mb-4">
-                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <svg class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                </div>
-                <input type="text" id="searchInput" placeholder="번호(ID), 보석 수량, 혹은 원하시는 캐릭터 이름을 콤마(,)나 띄어쓰기로 여러 개 입력해보세요..." 
-                       class="w-full pl-11 pr-10 py-3.5 rounded-xl border border-slate-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none text-base transition-all placeholder:text-slate-400">
-                <button id="clearSearch" class="hidden absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600">
-                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        <!-- Search Bar -->
+        <div class="mb-4 sticky top-4 z-20">
+            <input type="text" id="searchInput" placeholder="번호, 보석수, 또는 캐릭터 이름으로 검색..." 
+                   class="w-full p-4 rounded-xl border-none shadow-xl focus:ring-2 focus:ring-blue-500 outline-none text-lg">
+            
+            <!-- Toggle Buttons (Fixed for Mobile) -->
+            <div class="flex items-center gap-2 mt-4 overflow-x-auto pb-2 no-scrollbar">
+                <button onclick="toggleHighlight('moru', this)" 
+                        class="btn-toggle flex-shrink-0 px-4 py-2 rounded-full bg-green-500 text-white text-sm md:text-base font-bold shadow-md hover:bg-green-600">
+                    모루룻소EX On
                 </button>
-            </div>
-
-            <!-- 하이라이트 토글 & 정렬 컨트롤 -->
-            <div class="flex flex-col lg:flex-row gap-4 justify-between items-start lg:items-center">
-                <!-- 핵심 유닛 강조 토글 -->
-                <div class="w-full lg:w-auto">
-                    <span class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">실시간 하이라이트 강조 필터</span>
-                    <div class="flex flex-wrap gap-2">
-                        <button onclick="toggleHighlight('avite', this)" id="btn-avite"
-                                class="flex items-center gap-1.5 px-4 py-2 rounded-full bg-rose-500 text-white text-xs sm:text-sm font-bold shadow-sm hover:bg-rose-600 transition-all border border-rose-400/30">
-                            <span class="w-2.5 h-2.5 rounded-full bg-white animate-pulse"></span>
-                            아뷔테 On
-                        </button>
-                        <button onclick="toggleHighlight('moru', this)" id="btn-moru"
-                                class="flex items-center gap-1.5 px-4 py-2 rounded-full bg-emerald-500 text-white text-xs sm:text-sm font-bold shadow-sm hover:bg-emerald-600 transition-all border border-emerald-400/30">
-                            <span class="w-2.5 h-2.5 rounded-full bg-white animate-pulse"></span>
-                            모루룻소EX On
-                        </button>
-                        <button onclick="toggleHighlight('partitio', this)" id="btn-partitio"
-                                class="flex items-center gap-1.5 px-4 py-2 rounded-full bg-amber-500 text-white text-xs sm:text-sm font-bold shadow-sm hover:bg-amber-600 transition-all border border-amber-400/30">
-                            <span class="w-2.5 h-2.5 rounded-full bg-white animate-pulse"></span>
-                            파르티티오EX On
-                        </button>
-                        <button onclick="toggleHighlight('priestess', this)" id="btn-priestess"
-                                class="flex items-center gap-1.5 px-4 py-2 rounded-full bg-purple-500 text-white text-xs sm:text-sm font-bold shadow-sm hover:bg-purple-600 transition-all border border-purple-400/30">
-                            <span class="w-2.5 h-2.5 rounded-full bg-white animate-pulse"></span>
-                            흑무녀 On
-                        </button>
-                    </div>
-                </div>
-
-                <!-- 정렬 및 추가 유닛 수집 조건 -->
-                <div class="w-full lg:w-auto flex flex-wrap sm:flex-nowrap gap-3">
-                    <div class="w-full sm:w-auto">
-                        <span class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">조건 정렬</span>
-                        <select id="sortBy" class="w-full sm:w-48 px-3 py-2 text-xs sm:text-sm bg-white border border-slate-300 rounded-xl focus:border-indigo-500 focus:ring-1 focus:ring-indigo-100 outline-none text-slate-700 font-semibold cursor-pointer">
-                            <option value="id_asc">매물번호 순 (오름차순)</option>
-                            <option value="id_desc">매물번호 역순 (내림차순)</option>
-                            <option value="gems_desc">보석량 많은 순</option>
-                            <option value="gems_asc">보석량 적은 순</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 자주 쓰이는 선호 0티어 유닛 빠른 정밀 필터링 -->
-            <div class="mt-4 pt-4 border-t border-slate-100">
-                <span class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">필수 포함 캐릭터 필터 (다중 선택 가능)</span>
-                <div class="flex flex-wrap gap-1.5" id="characterQuickFilters">
-                    <!-- JS로 채워짐 -->
-                </div>
-                <div class="flex justify-between items-center mt-2">
-                    <p class="text-[10px] text-slate-400">* 선택된 캐릭터를 모두 '동시에' 보유한 매물만 출력합니다.</p>
-                    <button id="resetCharFilters" class="hidden text-xs text-indigo-600 hover:text-indigo-800 font-bold font-semibold">필터 초기화 ↺</button>
-                </div>
+                <button onclick="toggleHighlight('partitio', this)" 
+                        class="btn-toggle flex-shrink-0 px-4 py-2 rounded-full bg-yellow-500 text-white text-sm md:text-base font-bold shadow-md hover:bg-yellow-600">
+                    파르티티오EX On
+                </button>
+                <button onclick="toggleHighlight('priestess', this)" 
+                        class="btn-toggle flex-shrink-0 px-4 py-2 rounded-full bg-purple-500 text-white text-sm md:text-base font-bold shadow-md hover:bg-purple-600">
+                    흑무녀 On
+                </button>
+                <button onclick="toggleHighlight('abite', this)" 
+                        class="btn-toggle flex-shrink-0 px-4 py-2 rounded-full bg-blue-500 text-white text-sm md:text-base font-bold shadow-md hover:bg-blue-600">
+                    아뷔테 On
+                </button>
+                <button onclick="toggleHighlight('shana', this)" 
+                        class="btn-toggle flex-shrink-0 px-4 py-2 rounded-full bg-rose-500 text-white text-sm md:text-base font-bold shadow-md hover:bg-rose-600">
+                    샤나 On
+                </button>
+                <span class="text-[10px] md:text-xs text-slate-400 flex-shrink-0 ml-2">* 터치하여 온/오프</span>
             </div>
         </div>
 
-        <!-- 결과 표시 리스트 컨테이너 -->
-        <div id="listContainer" class="space-y-6">
+        <div id="listContainer">
             <!-- 5만 섹션 -->
-            <section id="section-wrapper-5" class="price-section bg-white p-4 sm:p-6 rounded-3xl shadow-sm border border-slate-200">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 border-b border-slate-100 pb-3">
-                    <div class="flex items-center gap-2">
-                        <span class="w-3.5 h-3.5 rounded-full bg-blue-500"></span>
-                        <h2 class="text-xl sm:text-2xl font-bold text-slate-800">50,000원 대 섹션 (5만)</h2>
-                    </div>
-                    <span id="counter-5" class="px-3 py-1 bg-blue-50 text-blue-700 font-semibold text-xs rounded-full">검색결과: 0개</span>
+            <section class="mb-10 price-section" data-price="50000">
+                <div class="flex items-center mb-4 border-b-2 border-blue-500 pb-2">
+                    <h2 class="text-2xl font-bold text-blue-700">#### 5만 ####</h2>
                 </div>
                 <div class="grid gap-3" id="section-5"></div>
             </section>
 
             <!-- 8만 섹션 -->
-            <section id="section-wrapper-8" class="price-section bg-white p-4 sm:p-6 rounded-3xl shadow-sm border border-slate-200">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 border-b border-slate-100 pb-3">
-                    <div class="flex items-center gap-2">
-                        <span class="w-3.5 h-3.5 rounded-full bg-emerald-500"></span>
-                        <h2 class="text-xl sm:text-2xl font-bold text-slate-800">80,000원 대 섹션 (8만)</h2>
-                    </div>
-                    <span id="counter-8" class="px-3 py-1 bg-emerald-50 text-emerald-700 font-semibold text-xs rounded-full">검색결과: 0개</span>
+            <section class="mb-10 price-section" data-price="80000">
+                <div class="flex items-center mb-4 border-b-2 border-emerald-500 pb-2">
+                    <h2 class="text-2xl font-bold text-emerald-700">#### 8만 ####</h2>
                 </div>
                 <div class="grid gap-3" id="section-8"></div>
             </section>
-
-            <!-- 10만 섹션 (신설) -->
-            <section id="section-wrapper-10" class="price-section bg-white p-4 sm:p-6 rounded-3xl shadow-sm border border-slate-200">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 border-b border-slate-100 pb-3">
-                    <div class="flex items-center gap-2">
-                        <span class="w-3.5 h-3.5 rounded-full bg-purple-500"></span>
-                        <h2 class="text-xl sm:text-2xl font-bold text-slate-800">100,000원 대 섹션 (10만)</h2>
-                    </div>
-                    <span id="counter-10" class="px-3 py-1 bg-purple-50 text-purple-700 font-semibold text-xs rounded-full">검색결과: 0개</span>
-                </div>
-                <div class="grid gap-3" id="section-10"></div>
-            </section>
-
-            <!-- 매물이 존재하지 않을 경우의 가벼운 공백 안내창 -->
-            <div id="noResults" class="hidden bg-white p-12 rounded-3xl text-center border border-slate-200">
-                <svg class="mx-auto h-12 w-12 text-slate-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                <h3 class="text-lg font-bold text-slate-700 mb-1">검색 조건에 맞는 매물이 없습니다.</h3>
-                <p class="text-slate-500 text-sm">입력하신 검색어나 필터 선택을 다시 변경해보세요.</p>
-            </div>
         </div>
     </div>
 
     <script>
-        // 업데이트된 원본 데이터 객체 (5만 / 8만 / 10만 반영)
         const rawData = {
             "5": [
-                "1-047/보석9000/아뷔테/샤나2/미디야/파디스/카이네/니어/티치/시그나/니콜라2/흑무녀/모루룻소EX/비올라EX/시그나EX/프림EX1/리크",
-                "3-372/보석15000/아뷔테1/샤나/미디야/파디스/카이네/니어/티치/니콜라1/흑기사/사이러스EX/테레즈EX/바르젤로/네프티/한이트EX2/프림EX/",
-                "1-085/보석12000/아뷔테/샤나/미디야/파디스/카이네1/니어1/티치1/니콜라/이데아5/흑기사/사이러스EX/시그나EX/프림EX1/",
-                "4-810/보석16000/아뷔테/샤나/미디야/파디스/카이네/니어1/티치/시그나/니콜라/흑기사/시그나EX/모루룻소EX/프림EX/한이트EX/",
-                "2-881/보석12000/아뷔테/샤나/미디야/파디스1/카이네/니어/티치/시그나/니콜라1/흑기사/시그나EX/사이러스EX/프림EX/오즈발드/소니아/바르젤로/레비나EX",
-                "5-062/보석12000/아뷔테/샤나/미디야/파디스/카이네1/니어/티치1/시그나/니콜라/프림EX/에리카/에밀/한이트EX1/오즈발드/사이러스EX/흑기사/시그나EX/테레즈EX/바르젤로/",
-                "5-654/보석12000/아뷔테/샤나/미디야/파디스/카이네/니어2/티치/시그나/니콜라1/흑무녀/파르티티오EX/비올라EX/오즈발드/에리카/사잔/프림EX/ ",
-                "2-023/보석14000/아뷔테/샤나/미디야/파디스1/카이네/니어1/티치/시그나/니콜라1/프림EX/사이러스EX/흑무녀/테레즈EX/셀크1/사잔/",
-                "4-803/보석13000/아뷔테/샤나/미디야/파디스/카이네/니어/티치/시그나1/니콜라1/프림EX/한이트EX/에리카EX/사이러스EX1/흑무녀/테레즈EX/셀크1",
-                "6-832/보석11000/아뷔테/샤나1/미디야/파디스/카이네/니어/티치/시그나/니콜라1/흑무녀/테레즈EX/모루룻소EX/프림EX/한이트EX2/캐스티/디트레이나EX",
-                "5-035/보석16000/아뷔테/샤나/미디야/파디스/카이네/니어/티치/시그나1/니콜라2/흑무녀/비올라EX/시그나EX/모루룻소EX/프림EX/바르젤로/소니아/아라우네EX/한이트EX2/리크/르메르/",
-                "1-801/보석16000/아뷔테/샤나/미디야/파디스2/카이네1/니어/티치/시그나/니콜라1/흑무녀/비올라EX/파르티티오EX/프림EX1/한이트EX/오스카/리넷EX/레비나EX"
+                "4-721/보석16000/아뷔테/샤나/미디야/파디스/카이네/니어/티치1/시그나/니콜라/프림EX/바르젤로/린유EX/솔론/사이러스EX/흑무녀/시그나EX/로크",
+                "4-407/보석13000/아뷔테/샤나/미디야/파디스/카이네1/니어1/티치/시그나/니콜라/프림EX1/네프티/사이러스EX/흑기사/시그나EX/파르티티오EX/로크",
+                "2-512/보석15000/아뷔테/샤나1/미디야/파디스/카이네/니어1/티치/카나리/시그나1/니콜라/프림EX/아일라/에리카1/사이러스EX/흑기사/테레즈EX/리넷EX/티나",
+                "5-024/보석16000/아뷔테/샤나/미디야/파디스/카이네/니어/티치1/시그나/니콜라1/프림EX/소니아/크릭/비올라EX/흑무녀/시그나EX/테레즈EX/르메르/티나/에드거",
+                "6-978/보석15000/아뷔테/샤나/미디야/파디스1/카이네/니어1/티치/시그나1/니콜라/프림EX/파르티티오/리샤르/비올라EX/흑무녀/파르티티오EX/에드거",
+                "1-891/보석15000/아뷔테1/샤나/미디야/파디스/카이네1/니어/티치/카나리/니콜라/프림EX/사잔/사이러스EX/흑무녀/시그나EX1/에드거",
+                "2-309/보석15000/아뷔테/샤나/미디야/파디스/카이네1/니어/티치/시그나/니콜라/모루룻소EX/프림EX/네프티/소니아/한이트EX/비올라EX/흑무녀/테레즈EX/킬른/로크",
+                "3-885/보석16000/아뷔테/샤나/미디야/파디스/카이네2/니어1/티치/시그나/니콜라/모루룻소EX/프림EX1/한이트EX/흑무녀/시그나EX/로크",
+                "1-393/보석15000/아뷔테/샤나1/미디야/파디스/카이네/니어/티치/시그나/니콜라/모루룻소EX/프림EX/소니아/흑기사/시그나EX/로크",
+                "4-926/보석15000/아뷔테/샤나/미디야/파디스/카이네/니어1/티치1/시그나/니콜라1/모루룻소EX/프림EX1/리샤르/히카리/아일라1/한이트EX/흑기사/파르티티오EX/시그나EX/르메르/로크",
+                "2-305/보석16000/아뷔테/샤나/미디야/파디스1/카이네/니어/티치/시그나/니콜라/모루룻소EX/프림EX/사잔/린유EX/흑무녀/시그나EX/르메르/로크"
             ],
             "8": [
-                "3-555/보석13000/아뷔테/샤나/미디야/파디스/카이네4/니어/티치/시그나/카나리/니콜라1/흑기사/테레즈EX/비올라EX/솔론/프림EX/바르젤로/리넷EX/아일라/레비나EX/한이트EX",
-                "4-708/보석15000/아뷔테/샤나1/미디야/파디스/카이네/니어4/티치/니콜라1/프림EX/흑기사/사이러스EX1/비올라EX/시그나EX/한이트EX/알론드/에리카EX/리넷EX",
-                "2-378/보석15000/아뷔테/샤나/미디야/파디스/카이네/니어/티치/카나리/시그나/니콜라/흑기사/비올라EX/시그나EX4/파르티티오EX2/프림EX2/라스2/에리카/아일라/리넷EX"
-            ],
-            "10": [
-                "6-415/보석19000/아뷔테4/샤나/미디야/파디스/카이네/니어/티치/카나리/니콜라/프림EX/사이러스EX/흑무녀/시그나EX/파르티티오EX"
+                "3-470/보석11000/아뷔테/샤나/미디야/파디스/카이네1/니어/티치/시그나/니콜라1/모루룻소EX/프림EX/흑무녀/시그나EX4/테레즈EX1/파르티티오EX1/티나",
+                "3-739/보석10000/아뷔테/샤나/미디야/파디스/카이네/니어/티치/시그나1/니콜라1/모루룻소EX/프림EX1/솔론/한이트EX1/사이러스EX1/흑무녀/시그나EX4/테레즈EX5/파르티티오EX1/로크1"
             ]
         };
 
-        // 원본 데이터를 검색, 필터링이 가능하도록 완벽하게 정밀 파싱 진행
-        let parsedData = [];
-        let allUniqueCharacters = new Set();
-        let selectedCharFilters = new Set();
+        function formatLine(line) {
+            const parts = line.split('/');
+            if (parts.length < 2) return ""; 
+            const id = parts[0];
+            const gems = parts[1];
+            const characters = parts.slice(2);
 
-        function initializeData() {
-            parsedData = [];
-            for (const section in rawData) {
-                rawData[section].forEach(line => {
-                    const parts = line.split('/');
-                    if (parts.length < 2) return;
-                    
-                    const id = parts[0];
-                    const gemsRaw = parts[1];
-                    // 보석 데이터에서 숫자만 추출
-                    const gemsCount = parseInt(gemsRaw.replace(/[^0-9]/g, "")) || 0;
-                    
-                    // 빈 값 필터링한 캐릭터 리스트 추출
-                    const characters = parts.slice(2)
-                        .map(c => c.trim())
-                        .filter(c => c.length > 0);
-
-                    // 다중 선택에 활용할 유니크 캐릭터 명단 집계
-                    characters.forEach(c => {
-                        // 돌파수 숫자 제거하고 순수 캐릭터 이름만 파싱
-                        const baseName = c.replace(/[0-9]/g, "");
-                        if(baseName) allUniqueCharacters.add(baseName);
-                    });
-
-                    parsedData.push({
-                        id,
-                        section,
-                        gemsRaw,
-                        gemsCount,
-                        characters,
-                        rawString: line
-                    });
-                });
-            }
-        }
-
-        // 선호도가 높거나 자주 검색하는 추천 유닛 버튼 목록 자동 생성
-        function renderQuickFilters() {
-            const container = document.getElementById('characterQuickFilters');
-            // '아뷔테'를 최우선 순위로 추가하여 특별 관리
-            const priorityList = ['아뷔테', '린유', '사이러스', '카이네', '시그나', '바르젤로', '솔론', '한이트EX', '테리온', '프림EX'];
-            
-            let sortedList = Array.from(allUniqueCharacters).sort();
-            // 우선 배치 대상을 앞쪽으로 정렬
-            sortedList = sortedList.filter(item => !priorityList.includes(item));
-            sortedList = [...priorityList, ...sortedList];
-
-            container.innerHTML = sortedList.map(char => {
-                const isSelected = selectedCharFilters.has(char);
-                const activeClasses = isSelected 
-                    ? 'bg-slate-800 text-amber-300 border-slate-700 shadow-sm' 
-                    : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100';
-                
-                return `
-                    <button onclick="toggleCharacterFilter('${char}')" 
-                            class="px-2.5 py-1 text-xs border rounded-lg transition-all font-semibold ${activeClasses}">
-                        ${char} ${isSelected ? '✓' : '+'}
-                    </button>
-                `;
-            }).join('');
-
-            // 초기화 버튼 제어
-            const resetButton = document.getElementById('resetCharFilters');
-            if (selectedCharFilters.size > 0) {
-                resetButton.classList.remove('hidden');
-            } else {
-                resetButton.classList.add('hidden');
-            }
-        }
-
-        // 캐릭터 퀵 필터 토글 제어
-        window.toggleCharacterFilter = function(char) {
-            if (selectedCharFilters.has(char)) {
-                selectedCharFilters.delete(char);
-            } else {
-                selectedCharFilters.add(char);
-            }
-            renderQuickFilters();
-            applyFiltersAndRender();
-        }
-
-        // 캐릭터 필터 초기화
-        document.getElementById('resetCharFilters').addEventListener('click', () => {
-            selectedCharFilters.clear();
-            renderQuickFilters();
-            applyFiltersAndRender();
-        });
-
-        // iFrame 제약을 우회한 완벽한 텍스트 복사 및 알림 피드백 구현
-        window.copyToClipboard = function(text, btnElement) {
-            const tempTextArea = document.createElement("textarea");
-            tempTextArea.value = text;
-            document.body.appendChild(tempTextArea);
-            tempTextArea.select();
-            
-            try {
-                document.execCommand('copy');
-                showToast("계정 정보가 복사되었습니다! 판매자에게 전달해보세요.");
-                
-                // 해당 버튼에 임시 상태 변경 이펙트
-                const originContent = btnElement.innerHTML;
-                btnElement.innerHTML = `
-                    <svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                    <span class="text-xs text-emerald-600 font-bold">복사됨!</span>
-                `;
-                btnElement.classList.add('bg-emerald-50', 'border-emerald-200');
-                
-                setTimeout(() => {
-                    btnElement.innerHTML = originContent;
-                    btnElement.classList.remove('bg-emerald-50', 'border-emerald-200');
-                }, 2000);
-
-            } catch (err) {
-                showToast("복사에 실패했습니다. 직접 복사해주세요.");
-            } finally {
-                document.body.removeChild(tempTextArea);
-            }
-        }
-
-        // 토스트 알림창 출력 함수
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            const toastMsg = document.getElementById('toastMessage');
-            toastMsg.innerText = message;
-            
-            toast.classList.remove('opacity-0', 'pointer-events-none');
-            toast.classList.add('opacity-100', 'animate-toast');
-            
-            setTimeout(() => {
-                toast.classList.add('opacity-0', 'pointer-events-none');
-                toast.classList.remove('opacity-100', 'animate-toast');
-            }, 3000);
-        }
-
-        // 핵심 유닛 색상 하이라이트 토글 관리
-        window.toggleHighlight = function(type, btn) {
-            const body = document.body;
-            const className = `hide-${type}`;
-            const isHiding = body.classList.toggle(className);
-            
-            if (isHiding) {
-                btn.classList.add('inactive', 'bg-slate-300', 'text-slate-500', 'border-slate-300');
-                btn.classList.remove('bg-emerald-500', 'bg-amber-500', 'bg-purple-500', 'bg-rose-500', 'text-white');
-                btn.innerText = btn.innerText.replace('On', 'Off');
-                // 내부 점 라이트 끄기
-                if(btn.querySelector('span')) btn.querySelector('span').classList.add('hidden');
-            } else {
-                btn.classList.remove('inactive', 'bg-slate-300', 'text-slate-500', 'border-slate-300');
-                
-                if (type === 'moru') btn.classList.add('bg-emerald-500', 'text-white');
-                else if (type === 'partitio') btn.classList.add('bg-amber-500', 'text-white');
-                else if (type === 'priestess') btn.classList.add('bg-purple-500', 'text-white');
-                else if (type === 'avite') btn.classList.add('bg-rose-500', 'text-white');
-                
-                btn.innerText = btn.innerText.replace('Off', 'On');
-                if(btn.querySelector('span')) btn.querySelector('span').classList.remove('hidden');
-            }
-        }
-
-        // 개별 매물 카드를 구성하며 캐릭터 하이라이트 클래스를 유동적으로 적용
-        function createAccountCardHtml(item) {
-            // 개별 캐릭터 하이라이팅 검출
-            let charHtml = item.characters.map(char => {
-                let badgeClass = "text-slate-700 bg-slate-100 border-slate-200";
-                
-                if (char.includes("아뷔테")) {
-                    badgeClass = "highlight-avite";
-                } else if (char.includes("파르티티오EX")) {
-                    badgeClass = "highlight-partitio";
+            let charHtml = characters.map(char => {
+                if (char.includes("파르티티오EX")) {
+                    return `<span class="highlight-partitio">${char}</span>`;
                 } else if (char.includes("모루룻소EX")) {
-                    badgeClass = "highlight-moru";
+                    return `<span class="highlight-moru">${char}</span>`;
                 } else if (char.includes("흑무녀")) {
-                    badgeClass = "highlight-priestess";
+                    return `<span class="highlight-priestess">${char}</span>`;
+                } else if (char.includes("아뷔테")) {
+                    return `<span class="highlight-abite">${char}</span>`;
+                } else if (char.includes("샤나")) {
+                    return `<span class="highlight-shana">${char}</span>`;
                 }
-
-                return `
-                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs sm:text-sm font-medium border ${badgeClass} m-0.5 transition-all">
-                        ${char}
-                    </span>
-                `;
-            }).join('');
+                return `<span class="char-tag text-slate-600">${char}</span>`;
+            }).join(' / ');
 
             return `
-                <div class="account-card bg-slate-50/50 p-4 rounded-2xl border border-slate-200/80 flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
-                    <div class="flex items-center gap-3 w-full md:w-auto">
-                        <!-- 번호 태그 -->
-                        <div class="bg-slate-900 text-amber-400 font-bold px-3 py-1.5 rounded-xl text-sm w-20 text-center shadow-inner">
-                            # ${item.id}
-                        </div>
-                        <!-- 보석 태그 -->
-                        <div class="flex items-center gap-1 font-extrabold text-orange-600 bg-orange-50 px-3 py-1.5 rounded-xl text-sm border border-orange-100">
-                            <svg class="w-4 h-4 text-orange-500" fill="currentColor" viewBox="0 0 20 20"><path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM5.05 6.464A1 1 0 106.464 5.05l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM5 10a1 1 0 11-2 0h1a1 1 0 110 2H5zM12.93 14.343a1 1 0 10-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM10 14a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM14.343 12.93a1 1 0 101.414-1.414l-.707-.707a1 1 0 00-1.414 1.414l.707.707z"/></svg>
-                            ${item.gemsRaw}
-                        </div>
+                <div class="account-card bg-white p-4 rounded-lg shadow-sm border border-slate-200 flex flex-col md:flex-row gap-4 items-start md:items-center">
+                    <div class="flex-shrink-0 bg-slate-100 px-3 py-1 rounded font-bold text-slate-700 w-24 text-center">
+                        ${id}
                     </div>
-
-                    <!-- 캐릭터 목록 -->
-                    <div class="flex-grow min-w-0">
-                        <div class="flex flex-wrap items-center">
-                            ${charHtml}
-                        </div>
+                    <div class="flex-shrink-0 font-extrabold text-orange-600 min-w-[100px]">
+                        ${gems}
                     </div>
-
-                    <!-- 상호작용 영역 -->
-                    <div class="flex-shrink-0 w-full md:w-auto flex items-center justify-end border-t border-slate-150 pt-3 md:pt-0 md:border-none gap-2">
-                        <button onclick="copyToClipboard('${item.rawString}', this)" 
-                                class="w-full md:w-auto flex items-center justify-center gap-1.5 px-3 py-2 bg-white border border-slate-300 rounded-xl hover:bg-slate-100 active:scale-95 transition-all shadow-sm">
-                            <svg class="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
-                            <span class="text-xs text-slate-700 font-bold">복사하기</span>
-                        </button>
+                    <div class="flex-grow text-sm leading-relaxed">
+                        ${charHtml}
                     </div>
                 </div>
             `;
         }
 
-        // 검색어, 다중 필수 캐릭터 필터, 정렬 옵션을 조합하여 화면에 뿌려주는 메인 컨트롤 타워
-        function applyFiltersAndRender() {
-            const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
-            const sortBy = document.getElementById('sortBy').value;
+        function toggleHighlight(type, btn) {
+            const body = document.body;
+            const className = `hide-${type}`;
+            const isHiding = body.classList.toggle(className);
             
-            // 검색 키워드 다중 분석 (콤마 또는 띄어쓰기로 분절하여 다중 검색 허용)
-            const searchKeywords = searchTerm.split(/[\s,]+/).filter(k => k.length > 0);
-
-            // 1단계: 조건 필터링
-            let filtered = parsedData.filter(item => {
-                // 검색 키워드 필터링 (다중 키워드가 각각 하나라도 매칭되어야 함)
-                if (searchKeywords.length > 0) {
-                    const matchAllKeywords = searchKeywords.every(keyword => {
-                        // ID 매칭
-                        if (item.id.toLowerCase().includes(keyword)) return true;
-                        // 보석수 매칭
-                        if (item.gemsRaw.toLowerCase().includes(keyword)) return true;
-                        // 캐릭터 이름 매칭
-                        return item.characters.some(char => char.toLowerCase().includes(keyword));
-                    });
-                    if (!matchAllKeywords) return false;
-                }
-
-                // 필수 캐릭터 필터링 (다중 선택한 캐릭터가 모두 포함되었는지 검증)
-                if (selectedCharFilters.size > 0) {
-                    const hasAllSelected = Array.from(selectedCharFilters).every(filterChar => {
-                        return item.characters.some(char => char.replace(/[0-9]/g, "").includes(filterChar));
-                    });
-                    if (!hasAllSelected) return false;
-                }
-
-                return true;
-            });
-
-            // 2단계: 정렬 수행
-            filtered.sort((a, b) => {
-                if (sortBy === 'id_asc') {
-                    return a.id.localeCompare(b.id, undefined, { numeric: true, sensitivity: 'base' });
-                } else if (sortBy === 'id_desc') {
-                    return b.id.localeCompare(a.id, undefined, { numeric: true, sensitivity: 'base' });
-                } else if (sortBy === 'gems_desc') {
-                    return b.gemsCount - a.gemsCount;
-                } else if (sortBy === 'gems_asc') {
-                    return a.gemsCount - b.gemsCount;
-                }
-                return 0;
-            });
-
-            // 3단계: 가격대 섹션 분할 렌더링 (5만 / 8만 / 10만)
-            const section5Data = filtered.filter(item => item.section === "5");
-            const section8Data = filtered.filter(item => item.section === "8");
-            const section10Data = filtered.filter(item => item.section === "10");
-
-            const section5Container = document.getElementById('section-5');
-            const section8Container = document.getElementById('section-8');
-            const section10Container = document.getElementById('section-10');
-
-            section5Container.innerHTML = section5Data.map(item => createAccountCardHtml(item)).join('');
-            section8Container.innerHTML = section8Data.map(item => createAccountCardHtml(item)).join('');
-            section10Container.innerHTML = section10Data.map(item => createAccountCardHtml(item)).join('');
-
-            // 상단 개별 섹션 카운터 업데이트
-            document.getElementById('counter-5').innerText = `검색결과: ${section5Data.length}개`;
-            document.getElementById('counter-8').innerText = `검색결과: ${section8Data.length}개`;
-            document.getElementById('counter-10').innerText = `검색결과: ${section10Data.length}개`;
-
-            // 매물이 하나도 보이지 않는 섹션은 화면 공간 효율화를 위해 자동 숨김처리
-            const wrapper5 = document.getElementById('section-wrapper-5');
-            const wrapper8 = document.getElementById('section-wrapper-8');
-            const wrapper10 = document.getElementById('section-wrapper-10');
-            const noResults = document.getElementById('noResults');
-
-            if (section5Data.length === 0) wrapper5.classList.add('hidden');
-            else wrapper5.classList.remove('hidden');
-
-            if (section8Data.length === 0) wrapper8.classList.add('hidden');
-            else wrapper8.classList.remove('hidden');
-
-            if (section10Data.length === 0) wrapper10.classList.add('hidden');
-            else wrapper10.classList.remove('hidden');
-
-            // 전체에 해당하는 조건이 없는 경우 빈 레이아웃 안내
-            if (filtered.length === 0) {
-                noResults.classList.remove('hidden');
+            if (isHiding) {
+                btn.classList.add('inactive');
+                btn.innerText = btn.innerText.replace('On', 'Off');
             } else {
-                noResults.classList.add('hidden');
-            }
-
-            // 검색어 초기화(X) 버튼 토글
-            const clearBtn = document.getElementById('clearSearch');
-            if (searchTerm.length > 0) {
-                clearBtn.classList.remove('hidden');
-            } else {
-                clearBtn.classList.add('hidden');
+                btn.classList.remove('inactive');
+                btn.innerText = btn.innerText.replace('Off', 'On');
             }
         }
 
-        function calculateStats() {
-            document.getElementById('stat-total').innerText = parsedData.length;
-            document.getElementById('stat-5m').innerText = parsedData.filter(d => d.section === "5").length;
-            document.getElementById('stat-8m').innerText = parsedData.filter(d => d.section === "8").length;
-            document.getElementById('stat-10m').innerText = parsedData.filter(d => d.section === "10").length;
-            
-            const maxGems = Math.max(...parsedData.map(d => d.gemsCount));
-            document.getElementById('stat-max-gems').innerText = maxGems.toLocaleString();
+        function renderAll() {
+            const sections = {
+                "5": document.getElementById('section-5'),
+                "8": document.getElementById('section-8')
+            };
+
+            for (const key in rawData) {
+                if (sections[key]) {
+                    sections[key].innerHTML = rawData[key].map(line => formatLine(line)).join('');
+                }
+            }
         }
 
-        // 검색어 입력 감지
-        document.getElementById('searchInput').addEventListener('input', applyFiltersAndRender);
+        // 검색 기능
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const cards = document.querySelectorAll('.account-card');
 
-        // 검색창 지우기 버튼 액션
-        document.getElementById('clearSearch').addEventListener('click', () => {
-            document.getElementById('searchInput').value = '';
-            applyFiltersAndRender();
+            cards.forEach(card => {
+                const text = card.innerText.toLowerCase();
+                card.style.display = text.includes(term) ? 'flex' : 'none';
+            });
+
+            document.querySelectorAll('.price-section').forEach(section => {
+                const visibleCards = section.querySelectorAll('.account-card[style="display: flex;"]');
+                section.style.display = (visibleCards.length > 0 || term === "") ? 'block' : 'none';
+            });
         });
 
-        // 정렬 변경 이벤트 감지
-        document.getElementById('sortBy').addEventListener('change', applyFiltersAndRender);
-
-        // 첫 페이지 로드 시 라이프사이클 구동
-        window.onload = function() {
-            initializeData();
-            calculateStats();
-            renderQuickFilters();
-            applyFiltersAndRender();
-        }
+        // 초기 실행
+        renderAll();
     </script>
 </body>
 </html>
