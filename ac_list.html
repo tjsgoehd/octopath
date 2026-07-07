@@ -159,6 +159,14 @@
                 <div class="grid gap-3" id="section-5"></div>
             </section>
 
+            <!-- 6만 섹션 -->
+            <section class="mb-10 price-section" data-price="60000">
+                <div class="flex items-center mb-4 border-b-2 border-amber-500 pb-2">
+                    <h2 class="text-2xl font-bold text-amber-700">#### 6만 ####</h2>
+                </div>
+                <div class="grid gap-3" id="section-6"></div>
+            </section>
+
             <!-- 8만 섹션 -->
             <section class="mb-10 price-section" data-price="80000">
                 <div class="flex flex-col mb-4 border-b-2 border-emerald-500 pb-2 gap-2">
@@ -198,14 +206,17 @@
                 "5-020/보석15000/아뷔테/샤나/미디야/파디스/카이네1/니어/티치/시그나/니콜라2/흑무녀/사이러스EX/시그나EX/비올라EX1/프림EX/소니아/디트레이나EX/에드거",
                 "4-370/보석18000/아뷔테/샤나/미디야1/파디스/카이네2/니어/티치/니콜라/프림EX1/소니아1/한이트EX1/사이러스EX/흑무녀/시그나EX/파르티티오EX/르메르/에드거1",
                 "2-998/보석17000/아뷔테/샤나/미디야/파디스/카이네1/니어/티치/시그나1/니콜라1/흑무녀/파르티티오EX/비올라EX/프림EX1/바르젤로/로크",
-                "3-333/보석15000/아뷔테/샤나/미디야/파디스/카이네/니어/티치/시그나/니콜라/모루룻소EX/프림EX1/리샤르/사이러스EX/흑기사/파르티티오EX/레비나EX/한이트ex/르메르/로크3/에드거"
+                "3-072/보석9000/아뷔테/샤나/미디야/파디스/카이네/니어/티치/시그나2/니콜라/모루룻소EX/프림EX/소니아/한이트EX/세실리1/흑기사/시그나EX/에드거"
+            ],
+            "6": [
+                "4-836/보석15000/아뷔테/샤나/미디야/파디스/카이네1/니어1/티치1/시그나1/니콜라/모루룻소EX/프림EX/소니아/한이트EX/흑기사/파르티티오EX/테레즈EX/티나2/펜/로크/에드거"
             ],
             "8": [
-                "5-198/보석15000/아뷔테/샤나/미디야/파디스/카이네/니어/티치/카나리/프림EX/솔론/니콜라/리샤르/비올라EX/흑기사/티나/시그나EX4/",
+                "5-412/보석12000/아뷔테/샤나/미디야/파디스/카이네2/니어1/티치/시그나/니콜라1/프림EX1/에리카/비올라EX/흑무녀/파르티티오EX/테레즈EX3/시그나EX4/리넷EX/에드거",
                 "1-676/보석2000/아뷔테/샤나1/미디야/파디스/카이네/니어/티치/니콜라/프림EX1/바르젤로/솔론/한이트EX1/아일라/사이러스EX/흑기사/시그나EX4/테레즈EX5/파르티티오EX4/르메르/티나"
             ],
             "10": [
-                "1-311/보석17000/아뷔테/샤나1/미디야/파디스/카이네/니어/티치/카나리/시그나1/니콜라/흑기사/모루룻소EX/파르티티오EX/테메노스/히카리EX/한이트EX/프림EX/르메르/티나4/에드거/로크"
+                "1-513/보석18000/아뷔테/샤나/미디야1/파디스/카이네1/니어/티치/카나리/니콜라/모루룻소EX/프림EX/소니아/흑무녀/시그나EX/테레즈EX/티나4/로크/에드거"
             ]
         };
 
@@ -214,7 +225,6 @@
             if (parts.length < 2) return ""; 
             const id = parts[0];
             const gems = parts[1];
-            // 빈 요소(연속된 슬래시로 인한 공백 등)를 필터링합니다.
             const characters = parts.slice(2).filter(char => char.trim() !== "");
 
             let charHtml = characters.map(char => {
@@ -264,6 +274,7 @@
         function renderAll() {
             const sections = {
                 "5": document.getElementById('section-5'),
+                "6": document.getElementById('section-6'),
                 "8": document.getElementById('section-8'),
                 "10": document.getElementById('section-10')
             };
