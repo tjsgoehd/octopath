@@ -64,12 +64,23 @@
             transition: all 0.2s;
         }
 
+        .highlight-locke {
+            background-color: #ccfbf1; /* Teal-100 */
+            color: #115e59; /* Teal-800 */
+            font-weight: bold;
+            padding: 2px 4px;
+            border-radius: 4px;
+            border: 1px solid #99f6e4;
+            transition: all 0.2s;
+        }
+
         /* 토글 오프 상태일 때 하이라이트 제거 */
         body.hide-partitio .highlight-partitio,
         body.hide-moru .highlight-moru,
         body.hide-priestess .highlight-priestess,
         body.hide-abite .highlight-abite,
-        body.hide-shana .highlight-shana {
+        body.hide-shana .highlight-shana,
+        body.hide-locke .highlight-locke {
             background-color: transparent;
             color: inherit;
             font-weight: inherit;
@@ -146,6 +157,10 @@
                         class="btn-toggle flex-shrink-0 px-4 py-2 rounded-full bg-rose-500 text-white text-sm md:text-base font-bold shadow-md hover:bg-rose-600">
                     샤나 On
                 </button>
+                <button onclick="toggleHighlight('locke', this)" 
+                        class="btn-toggle flex-shrink-0 px-4 py-2 rounded-full bg-teal-500 text-white text-sm md:text-base font-bold shadow-md hover:bg-teal-600">
+                    로크 On
+                </button>
                 <span class="text-[10px] md:text-xs text-slate-400 flex-shrink-0 ml-2">* 터치하여 온/오프</span>
             </div>
         </div>
@@ -196,7 +211,6 @@
                 "1-269/보석17000/아뷔테/샤나/미디야/파디스/카이네2/니어2/티치/시그나1/니콜라/프림EX1/킬른/비올라EX/흑무녀/시그나EX/파르티티오EX/사잔/르메르/티나/에드거/릴름",
                 "4-580/보석14000/아뷔테/샤나/미디야/파디스/카이네/니어/티치/시그나/니콜라/흑기사/비올라EX/린유/한이트EX1/에리카EX/프림EX/르메르/티나/에드거/세쳐/릴름",
                 "2-956/보석11000/아뷔테/샤나/미디야/파디스/카이네/니어/티치/니콜라/모루룻소EX/바르젤로/프림EX/리샤르/킬른/흑기사/에드거/세쳐",
-                "3-527/보석15000/아뷔테1/샤나/미디야/파디스/카이네/니어/티치/니콜라2/프림EX/리샤르/히카리/바르젤로/솔론/한이트EX1/사이러스EX1/네프티/흑무녀/파르티티오EX/리넷EX2/로크/셀리스",
                 "1-530/보석15000/아뷔테1/샤나/미디야/파디스/카이네/니어/티치/시그나/니콜라1/흑기사/비올라EX1/프림EX/바르젤로/리넷EX/킬른1/리크/레비나EX/르메르/한이트EX/티나/셀리스",
                 "2-121/보석13000/아뷔테/샤나/미디야/파디스/카이네/니어/티치/카나리/시그나/니콜라1/프림EX1/비올라EX/흑기사/파르티티오EX/리샤르/리넷EX/르메르/에드거/셀리스"
             ],
@@ -213,7 +227,7 @@
                 "4-932/보석13000/아뷔테/샤나/미디야/파디스/카이네1/니어/티치/시그나/니콜라1/바르젤로/사이러스EX/비올라EX/흑기사/시그나EX4/테레즈EX3/파르티티오EX2/티나/펜/셀리스/세쳐",
                 "5-198/보석16000/아뷔테/샤나/미디야/파디스/카이네/니어/티치/카나리/프림EX/솔론/니콜라/리샤르/비올라EX/흑기사/시그나EX4/티나/릴름",
                 "1-676/보석3000/아뷔테/샤나1/미디야/파디스/카이네/니어/티치/니콜라/프림EX1/바르젤로/아일라/사이러스EX/흑기사/시그나EX4/테레즈EX5/파르티티오EX4/르메르/티나/릴름",
-                "2-369/보석9000/아뷔테/샤나/미디야1/파디스/카이네/니어/티치/시그나/니콜라/프림EX/한이트EX1/사이러스EX/비올라EX/흑기사/시그나EX4/파르티티오EX1/에드거/릴름"
+                "2-369/보석9000/아뷔테/샤나/미디야1/파디스/카이네/니어/티치/시그나/니콜라/프림EX/한이트EX1/사이러스EX/비올라EX/흑기사/시그나EX4/파르티티오EX1/ए드거/릴름"
             ]
         };
 
@@ -235,6 +249,8 @@
                     return `<span class="highlight-abite">${char}</span>`;
                 } else if (char.includes("샤나")) {
                     return `<span class="highlight-shana">${char}</span>`;
+                } else if (char.includes("로크")) {
+                    return `<span class="highlight-locke">${char}</span>`;
                 }
                 return `<span class="char-tag text-slate-600">${char}</span>`;
             }).join(' / ');
